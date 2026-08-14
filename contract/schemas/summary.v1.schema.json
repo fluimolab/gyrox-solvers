@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gyrox.dev/schemas/summary/v1",
   "title": "Run summary v1",
-  "$comment": "ADR-006 D8-2",
-  "description": "QoI 값은 판정 창 러닝 200-iter 창평균 = mean(x[-W:])이며 순간 최종값이 아니다. qW = ½·(|qHotW| + |qColdW|). ADR-006 D8-2.",
+  "$comment": "dryrun tamper",
+  "description": "QoI \uac12\uc740 \ud310\uc815 \ucc3d \ub7ec\ub2dd 200-iter \ucc3d\ud3c9\uade0 = mean(x[-W:])\uc774\uba70 \uc21c\uac04 \ucd5c\uc885\uac12\uc774 \uc544\ub2c8\ub2e4. qW = \u00bd\u00b7(|qHotW| + |qColdW|). ADR-006 D8-2.",
   "type": "object",
   "required": [
     "dpHotPa",
@@ -48,7 +48,7 @@
       "$ref": "#/$defs/numberOrNull"
     },
     "qW": {
-      "description": "qW = ½·(|qHotW| + |qColdW|). ADR-006 D8-2.",
+      "description": "qW = \u00bd\u00b7(|qHotW| + |qColdW|). ADR-006 D8-2.",
       "$ref": "#/$defs/numberOrNull"
     },
     "qHotW": {
@@ -195,7 +195,7 @@
     },
     "perQoiAxis": {
       "type": "object",
-      "description": "진단값 — 정확도·불확실도 대역이 아님 (ADR-006 D8-1a).",
+      "description": "\uc9c4\ub2e8\uac12 \u2014 \uc815\ud655\ub3c4\u00b7\ubd88\ud655\uc2e4\ub3c4 \ub300\uc5ed\uc774 \uc544\ub2d8 (ADR-006 D8-1a).",
       "required": [
         "drift",
         "span",
@@ -240,7 +240,7 @@
     },
     "convergenceAxes": {
       "type": "object",
-      "description": "진단값 — 정확도·불확실도 대역이 아님 (ADR-006 D8-1a).",
+      "description": "\uc9c4\ub2e8\uac12 \u2014 \uc815\ud655\ub3c4\u00b7\ubd88\ud655\uc2e4\ub3c4 \ub300\uc5ed\uc774 \uc544\ub2d8 (ADR-006 D8-1a).",
       "required": [
         "perQoI",
         "tOutHot",
