@@ -1,1 +1,9 @@
-# S4 activates make test; S7 later makes the image suite fully standalone.
+# S4 발효 전 자리 워크플로 — 자동 트리거 없음(S0). S4에서 make test(S7 자립) 실배선.
+name: make-test
+on:
+  workflow_dispatch: {}
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "S4 발효 전 자리 — DETAIL §1.4 make test는 S4에서 배선된다"

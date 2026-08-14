@@ -1,1 +1,9 @@
-# S4/G2 activates the digest-pinned base/case image build and artifact upload.
+# S4(G2) 발효 전 자리 워크플로 — 자동 트리거 없음(S0). base/case 레이어 분리·digest 기록은 S4에서 배선.
+name: image-build
+on:
+  workflow_dispatch: {}
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "S4(G2) 발효 전 자리 — 이미지 빌드 파이프라인은 S4에서 배선된다"
