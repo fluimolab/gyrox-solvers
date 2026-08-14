@@ -19,6 +19,9 @@ QOI_TOKENS = [
     r"qWall", r"q_wall", r"heatOutput", r"heat_output", r"heatTransfer", r"heat_transfer",
     r"epsilonNTU", r"effectiveness", r"\bNTU\b",
     r"dpCold", r"dp_cold", r"deltaPCold", r"dpHot", r"dp_hot", r"deltaPHot",
+    r"\bdpHotPa\b", r"\bdpColdPa\b", r"\bqW\b", r"\bqHotW\b", r"\bqColdW\b",
+    r"\bntu\b", r"\buaWK\b", r"\bjFactor\b", r"\bfFactor\b", r"\btOutHotK\b",
+    r"\btOutColdK\b", r"\benergyBalancePct\b", r"\bmdotHotKgS\b", r"\bmdotColdKgS\b",
 ]
 # 등록 고지 마커 — 하나 이상 존재해야 함 (D8-2 정본 문구 식별자 / API 필드 규약 / 규격 참조)
 NOTICE_MARKERS = [
