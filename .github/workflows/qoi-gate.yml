@@ -1,0 +1,48 @@
+name: qoi-gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  qoi-gate:
+    name: qoi-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify vendored copy against pin
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          copy_hash = hashlib.sha256(Path("ci/qoi_merge_gate.py").read_bytes()).hexdigest()
+          pin = json.loads(Path("ci/qoi-gate.pin").read_text(encoding="utf-8"))
+          if copy_hash != pin.get("fileSha256"):
+              raise SystemExit(f"vendored copy={copy_hash} pin={pin.get('fileSha256')}")
+          print(f"vendored copy matches pin: {copy_hash}")
+          PY
+      - name: Run vendored gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_OID: ${{ github.event.pull_request.base.sha }}
+          HEAD_OID: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            mapfile -d '' files < <(git diff --name-only --diff-filter=ACMRT -z "$BASE_OID" "$HEAD_OID")
+            if ((${#files[@]} == 0)); then
+              echo "No files changed."
+              exit 0
+            fi
+            python3 ci/qoi_merge_gate.py --files "${files[@]}"
+          else
+            python3 ci/qoi_merge_gate.py --scope .
+          fi

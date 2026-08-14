@@ -1,0 +1,30 @@
+name: pin-freshness
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pin-freshness:
+    name: pin-freshness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Reject copy and pin drift
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          copy_hash = hashlib.sha256(Path("ci/qoi_merge_gate.py").read_bytes()).hexdigest()
+          pin = json.loads(Path("ci/qoi-gate.pin").read_text(encoding="utf-8"))
+          pin_hash = pin.get("fileSha256")
+          if copy_hash != pin_hash:
+              raise SystemExit(f"vendored copy={copy_hash} pin={pin_hash}")
+          print(f"pin-freshness pass: {copy_hash}")
+          PY

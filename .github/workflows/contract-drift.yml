@@ -1,0 +1,18 @@
+name: contract-drift
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-drift:
+    name: contract-drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate manifest, file set, hashes, and pin pair
+        run: python3 ci/contract_drift.py --self-test
