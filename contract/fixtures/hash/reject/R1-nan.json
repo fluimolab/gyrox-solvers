@@ -1,0 +1,9 @@
+{
+  "fixtureId": "R1",
+  "decision": "reject",
+  "description": "NaN is not an I-JSON number",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "setToken": { "/payload/bc/0/tK": "NaN" },
+  "expected": { "errorCode": "CANONICAL_SCHEMA_INVALID" }
+}

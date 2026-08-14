@@ -1,0 +1,40 @@
+{
+  "fixtureId": "CT-VER-runner-base",
+  "noticeMarker": "D8-2",
+  "value": {
+    "dpHotPa": null,
+    "dpColdPa": null,
+    "mdotHotKgS": null,
+    "mdotColdKgS": null,
+    "fFactor": null,
+    "qW": null,
+    "qHotW": null,
+    "qColdW": null,
+    "effectiveness": null,
+    "ntu": null,
+    "uaWK": null,
+    "jFactor": null,
+    "tOutHotK": null,
+    "tOutColdK": null,
+    "energyBalancePct": null,
+    "converged": null,
+    "convergenceAxes": null,
+    "convergenceNotice": null,
+    "iterations": null,
+    "wallClockS": null,
+    "cells": null,
+    "windowMeanConverged": null,
+    "dpHotWindowMeanConverged": null,
+    "verification": {
+      "dpHot": { "status": "regression_only" },
+      "dpCold": { "status": "judgment_not_established", "ref": "D-M06-1" },
+      "thermal": {
+        "status": "unverified_underprediction",
+        "noticeId": "D8-2",
+        "dm051": true
+      },
+      "holds": null
+    }
+  },
+  "expected": { "schemaValid": true, "runnerPolicyValid": true }
+}

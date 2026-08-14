@@ -1,0 +1,9 @@
+{
+  "fixtureId": "R5",
+  "decision": "reject",
+  "description": "only the frozen OpenFOAM CHT backend is accepted",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "set": { "/payload/backend": "another-backend" },
+  "expected": { "errorCode": "INPUT_SCHEMA_INVALID" }
+}

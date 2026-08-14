@@ -1,0 +1,20 @@
+{
+  "fixtureId": "A8",
+  "decision": "accept",
+  "description": "array order remains significant",
+  "sourceFixture": "A1",
+  "target": "geometry",
+  "variants": [
+    {
+      "name": "xyz",
+      "set": { "/payload/envelope/sizeM": [0.03, 0.04, 0.05] },
+      "expectedHash": "a981fc1bc50841e2052eac0ca56baf47cfeca8612fd1586b1a3e5899342d8272"
+    },
+    {
+      "name": "zyx",
+      "set": { "/payload/envelope/sizeM": [0.05, 0.04, 0.03] },
+      "expectedHash": "fe6dee431761093ca3b430b660f41ea4940b9e3c9de1bfd56e55a0be41f22eac"
+    }
+  ],
+  "expected": { "relation": "different" }
+}

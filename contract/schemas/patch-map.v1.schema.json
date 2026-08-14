@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/patch-map/v1",
+  "title": "M1 fixed-topology patch-map v1",
+  "type": "array",
+  "minItems": 11,
+  "maxItems": 11,
+  "items": {
+    "oneOf": [
+      {
+        "$ref": "#/$defs/hotInterface"
+      },
+      {
+        "$ref": "#/$defs/hotInlet"
+      },
+      {
+        "$ref": "#/$defs/hotOutlet"
+      },
+      {
+        "$ref": "#/$defs/hotWall"
+      },
+      {
+        "$ref": "#/$defs/coldInterface"
+      },
+      {
+        "$ref": "#/$defs/coldInlet"
+      },
+      {
+        "$ref": "#/$defs/coldOutlet"
+      },
+      {
+        "$ref": "#/$defs/coldWall"
+      },
+      {
+        "$ref": "#/$defs/solidHotInterface"
+      },
+      {
+        "$ref": "#/$defs/solidColdInterface"
+      },
+      {
+        "$ref": "#/$defs/solidExternalWall"
+      }
+    ]
+  },
+  "allOf": [
+    {
+      "contains": {
+        "$ref": "#/$defs/hotInterface"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/hotInlet"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/hotOutlet"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/hotWall"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/coldInterface"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/coldInlet"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/coldOutlet"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/coldWall"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/solidHotInterface"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/solidColdInterface"
+      }
+    },
+    {
+      "contains": {
+        "$ref": "#/$defs/solidExternalWall"
+      }
+    }
+  ],
+  "$defs": {
+    "hotInterface": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "interface.hot_solid"
+        },
+        "patchName": {
+          "const": "hot_to_solid"
+        },
+        "patchType": {
+          "const": "interface"
+        },
+        "region": {
+          "const": "hot"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hotInlet": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "port.hot.inlet"
+        },
+        "patchName": {
+          "const": "hot_inlet"
+        },
+        "patchType": {
+          "const": "inlet"
+        },
+        "region": {
+          "const": "hot"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hotOutlet": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "port.hot.outlet"
+        },
+        "patchName": {
+          "const": "hot_outlet"
+        },
+        "patchType": {
+          "const": "outlet"
+        },
+        "region": {
+          "const": "hot"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hotWall": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "wall.hot"
+        },
+        "patchName": {
+          "const": "hot_wall"
+        },
+        "patchType": {
+          "const": "wall"
+        },
+        "region": {
+          "const": "hot"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "coldInterface": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "interface.cold_solid"
+        },
+        "patchName": {
+          "const": "cold_to_solid"
+        },
+        "patchType": {
+          "const": "interface"
+        },
+        "region": {
+          "const": "cold"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "coldInlet": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "port.cold.inlet"
+        },
+        "patchName": {
+          "const": "cold_inlet"
+        },
+        "patchType": {
+          "const": "inlet"
+        },
+        "region": {
+          "const": "cold"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "coldOutlet": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "port.cold.outlet"
+        },
+        "patchName": {
+          "const": "cold_outlet"
+        },
+        "patchType": {
+          "const": "outlet"
+        },
+        "region": {
+          "const": "cold"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "coldWall": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "wall.cold"
+        },
+        "patchName": {
+          "const": "cold_wall"
+        },
+        "patchType": {
+          "const": "wall"
+        },
+        "region": {
+          "const": "cold"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "solidHotInterface": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "interface.hot_solid"
+        },
+        "patchName": {
+          "const": "solid_to_hot"
+        },
+        "patchType": {
+          "const": "interface"
+        },
+        "region": {
+          "const": "solid"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "solidColdInterface": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "interface.cold_solid"
+        },
+        "patchName": {
+          "const": "solid_to_cold"
+        },
+        "patchType": {
+          "const": "interface"
+        },
+        "region": {
+          "const": "solid"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "solidExternalWall": {
+      "type": "object",
+      "required": [
+        "geomRef",
+        "patchName",
+        "patchType",
+        "region"
+      ],
+      "properties": {
+        "geomRef": {
+          "const": "wall.solid.external"
+        },
+        "patchName": {
+          "const": "solid_external"
+        },
+        "patchType": {
+          "const": "wall"
+        },
+        "region": {
+          "const": "solid"
+        },
+        "foamType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "v": 1,
+  "seq": 1,
+  "ts": "2026-08-14T12:00:00Z",
+  "type": "progress",
+  "payload": { "iter": 1200, "maxIters": 2000, "etaS": 800 }
+}

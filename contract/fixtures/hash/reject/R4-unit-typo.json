@@ -1,0 +1,9 @@
+{
+  "fixtureId": "R4",
+  "decision": "reject",
+  "description": "unit spelling is enforced by the authoring input schema",
+  "sourceFixture": "A1",
+  "target": "geometry",
+  "set": { "/payload/cellSizeM/valueM": { "value": 4, "unit": "MM" } },
+  "expected": { "errorCode": "INPUT_SCHEMA_INVALID", "validationMode": "input" }
+}

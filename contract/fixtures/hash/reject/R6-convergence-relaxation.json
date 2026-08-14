@@ -1,0 +1,9 @@
+{
+  "fixtureId": "R6",
+  "decision": "reject",
+  "description": "frozen convergence constants cannot be relaxed by input",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "set": { "/payload/convergence/windowMeanDriftPct": 0.6 },
+  "expected": { "errorCode": "INPUT_SCHEMA_INVALID" }
+}

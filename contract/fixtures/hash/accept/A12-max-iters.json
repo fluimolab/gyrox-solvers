@@ -1,0 +1,19 @@
+{
+  "fixtureId": "A12",
+  "decision": "accept",
+  "description": "maxIters is hash-participating SolveSpec data",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "variants": [
+    {
+      "name": "anchor-2000",
+      "expectedHash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d"
+    },
+    {
+      "name": "changed-2500",
+      "set": { "/payload/limits/maxIters": 2500 },
+      "expectedHash": "0bf692e82a776c59a6702490bbb407e860ea5daa8ecdc070a88d8915a9015407"
+    }
+  ],
+  "expected": { "relation": "different" }
+}

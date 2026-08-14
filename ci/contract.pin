@@ -1,5 +1,5 @@
 {
-  "gyroxCommitSha": "<오케스트레이터 기입 자리>",
-  "contractTreeSha256": "7e8802da0811c1e05d570941e105f072bc6d5065f8b2094cdc9ef29c2ab2217d",
+  "gyroxCommitSha": "1cccc41249a5af8d31c5f56e088a2549f082dd93",
+  "contractTreeSha256": "c0cad807987a0d062d187a228d011e308ac589f688332de878892afa37b8ec65",
   "treeHashAlgo": "sha256"
 }

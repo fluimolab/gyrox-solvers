@@ -1,0 +1,9 @@
+{
+  "outcome": "SUCCEEDED_WITH_WARNINGS",
+  "exitCode": 10,
+  "metrics": {
+    "wallClockS": 479880,
+    "peakRssBytes": 44199960576
+  },
+  "warnings": ["nonconverged-partial"]
+}

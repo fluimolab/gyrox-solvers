@@ -1,0 +1,25 @@
+{
+  "fixtureId": "A6",
+  "decision": "accept",
+  "description": "schemaVersion participates in the canonical preimage",
+  "sourceFixture": "A1",
+  "target": "geometry",
+  "variants": [
+    {
+      "name": "registered-v1",
+      "schemaVersion": 1,
+      "hashMode": "specHash",
+      "expectedHash": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c"
+    },
+    {
+      "name": "version-probe-v2",
+      "schemaVersion": 2,
+      "hashMode": "canonical-version-probe",
+      "expectedHash": "3092acc32cc346f1cd83b55de95ec7d28b1afabae4020e152cf1dbcf0fb73095"
+    }
+  ],
+  "expected": {
+    "relation": "different",
+    "note": "No v2 schema exists in S0; the v2 probe changes only the validated v1 canonical envelope before the production JCS+SHA-256 stages."
+  }
+}

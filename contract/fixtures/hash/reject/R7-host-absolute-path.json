@@ -1,0 +1,25 @@
+{
+  "fixtureId": "R7",
+  "decision": "reject",
+  "description": "work-request paths must remain workspace-relative",
+  "validationKind": "work-request",
+  "input": {
+    "contractVersion": 1,
+    "stage": "solve",
+    "specs": {
+      "solve": {
+        "kind": "solve-spec",
+        "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "inputs": [
+      {
+        "kind": "mesh",
+        "hash": "1111111111111111111111111111111111111111111111111111111111111111",
+        "path": "/host/case/polyMesh"
+      }
+    ],
+    "limits": { "cpuCores": 4, "memBytes": 1073741824 }
+  },
+  "expected": { "valid": false, "errorKeyword": "pattern" }
+}

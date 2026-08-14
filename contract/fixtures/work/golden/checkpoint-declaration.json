@@ -1,0 +1,11 @@
+{
+  "path": "checkpoints/iteration-1500.tar",
+  "bytes": 1048576,
+  "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "iter": 1500,
+  "physT": 1500,
+  "specHash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d",
+  "decompN": 28,
+  "timeName": "1500",
+  "regions": ["hot", "cold", "solid"]
+}

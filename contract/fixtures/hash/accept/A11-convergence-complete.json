@@ -1,0 +1,33 @@
+{
+  "fixtureId": "A11",
+  "decision": "accept",
+  "description": "all 19 frozen convergence fields are explicit in A1 and survive materialization",
+  "noticeMarker": "D8-2",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "expected": {
+    "hash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d",
+    "fieldCount": 19,
+    "fields": [
+      "windowIters",
+      "windowMeanDriftPct",
+      "windowMeanSpanPct",
+      "windowMeanTailW",
+      "transientFrac",
+      "windowMeanMinIters",
+      "instSpanPct",
+      "judgedQoI",
+      "tOutDriftK",
+      "tOutSpanK",
+      "ebMaxPct",
+      "ebWarnPct",
+      "massImbalanceMaxPct",
+      "signSanity",
+      "finiteRequired",
+      "signRules",
+      "minIterationsForJudgment",
+      "residualBlowupFactor",
+      "divergenceCheckScope"
+    ]
+  }
+}

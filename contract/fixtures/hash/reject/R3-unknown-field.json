@@ -1,0 +1,9 @@
+{
+  "fixtureId": "R3",
+  "decision": "reject",
+  "description": "canonical inputs are closed",
+  "sourceFixture": "A1",
+  "target": "geometry",
+  "set": { "/payload/unknownField": true },
+  "expected": { "errorCode": "INPUT_SCHEMA_INVALID" }
+}

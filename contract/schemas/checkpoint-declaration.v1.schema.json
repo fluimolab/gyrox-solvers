@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/checkpoint-declaration/v1",
+  "title": "Checkpoint declaration v1",
+  "type": "object",
+  "required": [
+    "path",
+    "bytes",
+    "sha256",
+    "iter",
+    "physT",
+    "specHash",
+    "decompN",
+    "timeName",
+    "regions"
+  ],
+  "properties": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "iter": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "physT": {
+      "type": "number"
+    },
+    "specHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "decompN": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "timeName": {
+      "type": "string"
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "hot",
+          "cold",
+          "solid"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,79 @@
+[
+  {
+    "geomRef": "interface.hot_solid",
+    "patchName": "hot_to_solid",
+    "patchType": "interface",
+    "region": "hot",
+    "foamType": "mappedWall"
+  },
+  {
+    "geomRef": "port.hot.inlet",
+    "patchName": "hot_inlet",
+    "patchType": "inlet",
+    "region": "hot",
+    "foamType": "patch"
+  },
+  {
+    "geomRef": "port.hot.outlet",
+    "patchName": "hot_outlet",
+    "patchType": "outlet",
+    "region": "hot",
+    "foamType": "patch"
+  },
+  {
+    "geomRef": "wall.hot",
+    "patchName": "hot_wall",
+    "patchType": "wall",
+    "region": "hot",
+    "foamType": "wall"
+  },
+  {
+    "geomRef": "interface.cold_solid",
+    "patchName": "cold_to_solid",
+    "patchType": "interface",
+    "region": "cold",
+    "foamType": "mappedWall"
+  },
+  {
+    "geomRef": "port.cold.inlet",
+    "patchName": "cold_inlet",
+    "patchType": "inlet",
+    "region": "cold",
+    "foamType": "patch"
+  },
+  {
+    "geomRef": "port.cold.outlet",
+    "patchName": "cold_outlet",
+    "patchType": "outlet",
+    "region": "cold",
+    "foamType": "patch"
+  },
+  {
+    "geomRef": "wall.cold",
+    "patchName": "cold_wall",
+    "patchType": "wall",
+    "region": "cold",
+    "foamType": "wall"
+  },
+  {
+    "geomRef": "interface.hot_solid",
+    "patchName": "solid_to_hot",
+    "patchType": "interface",
+    "region": "solid",
+    "foamType": "mappedWall"
+  },
+  {
+    "geomRef": "interface.cold_solid",
+    "patchName": "solid_to_cold",
+    "patchType": "interface",
+    "region": "solid",
+    "foamType": "mappedWall"
+  },
+  {
+    "geomRef": "wall.solid.external",
+    "patchName": "solid_external",
+    "patchType": "wall",
+    "region": "solid",
+    "foamType": "wall"
+  }
+]

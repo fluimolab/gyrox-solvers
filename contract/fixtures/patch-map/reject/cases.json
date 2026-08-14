@@ -1,0 +1,77 @@
+{
+  "fixtureId": "CT-PM-reject",
+  "base": "../accept/phase-c-cl2.json",
+  "lengthPreservingRule": "missing, pair-loss, duplicate, binding, name-swap, wall-replacement, unknown-value, and missing-field cases retain 11 rows",
+  "cases": [
+    {
+      "id": "unknown-geom-ref",
+      "operation": { "kind": "set", "index": 1, "field": "geomRef", "value": "port.unknown.inlet" },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "missing-port-row",
+      "operation": { "kind": "replace-with-clone", "index": 1, "cloneIndex": 2 },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "missing-interface-pair",
+      "operation": { "kind": "replace-with-clone", "index": 8, "cloneIndex": 9 },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "duplicate-row",
+      "operation": { "kind": "replace-with-clone", "index": 3, "cloneIndex": 1 },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "misbound-port-region",
+      "operation": { "kind": "set", "index": 1, "field": "region", "value": "cold" },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "swapped-patch-names",
+      "operation": { "kind": "swap-field", "leftIndex": 1, "rightIndex": 2, "field": "patchName" },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "replaced-wall-row",
+      "operation": {
+        "kind": "replace",
+        "index": 3,
+        "value": {
+          "geomRef": "wall.extra",
+          "patchName": "extra_wall",
+          "patchType": "wall",
+          "region": "hot",
+          "foamType": "wall"
+        }
+      },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "unknown-region",
+      "operation": { "kind": "set", "index": 1, "field": "region", "value": "warm" },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "missing-required-field",
+      "operation": { "kind": "delete-field", "index": 1, "field": "patchType" },
+      "expectedLength": 11,
+      "expectedValid": false
+    },
+    {
+      "id": "extra-twelfth-row",
+      "operation": { "kind": "append-clone", "cloneIndex": 1 },
+      "expectedLength": 12,
+      "expectedValid": false
+    }
+  ]
+}

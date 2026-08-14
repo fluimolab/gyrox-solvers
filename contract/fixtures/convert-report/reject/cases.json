@@ -1,0 +1,79 @@
+{
+  "fixtureId": "CT-CR-reject",
+  "bases": {
+    "cube": "../accept/phase-c-cl2.json",
+    "axis": "../accept/non-cubic-axis-boundary.json"
+  },
+  "cases": [
+    {
+      "id": "missing-port-areas",
+      "base": "cube",
+      "operation": { "kind": "delete", "path": "/portAreasM2" },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "missing-port-area-key",
+      "base": "cube",
+      "operation": { "kind": "delete", "path": "/portAreasM2/port.cold.outlet" },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "zero-area",
+      "base": "cube",
+      "operation": { "kind": "set", "path": "/portAreasM2/port.hot.inlet", "value": 0 },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "negative-area",
+      "base": "cube",
+      "operation": { "kind": "set", "path": "/portAreasM2/port.hot.inlet", "value": -0.0001 },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "face-area-upper-bound",
+      "base": "cube",
+      "operation": { "kind": "set", "path": "/portAreasM2/port.hot.inlet", "value": 1000000000 },
+      "expected": { "schemaValid": true, "meshQaValid": false }
+    },
+    {
+      "id": "wrong-normal-axis-bound",
+      "base": "axis",
+      "operation": { "kind": "set", "path": "/portAreasM2/port.cold.outlet", "value": 0.00121 },
+      "expected": { "schemaValid": true, "meshQaValid": false }
+    },
+    {
+      "id": "missing-mesh-combined-sha",
+      "base": "cube",
+      "operation": { "kind": "delete", "path": "/meshCombinedSha" },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "non-string-mesh-combined-sha",
+      "base": "cube",
+      "operation": { "kind": "set", "path": "/meshCombinedSha", "value": 7 },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "non-hex-mesh-combined-sha",
+      "base": "cube",
+      "operation": {
+        "kind": "set",
+        "path": "/meshCombinedSha",
+        "value": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+      },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "short-mesh-combined-sha",
+      "base": "cube",
+      "operation": { "kind": "set", "path": "/meshCombinedSha", "value": "0123abcd" },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "unknown-top-level-field",
+      "base": "cube",
+      "operation": { "kind": "set", "path": "/extra", "value": true },
+      "expected": { "schemaValid": false }
+    }
+  ]
+}

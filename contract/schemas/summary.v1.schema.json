@@ -1,0 +1,447 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/summary/v1",
+  "title": "Run summary v1",
+  "$comment": "ADR-006 D8-2",
+  "description": "QoI 값은 판정 창 러닝 200-iter 창평균 = mean(x[-W:])이며 순간 최종값이 아니다. qW = ½·(|qHotW| + |qColdW|). ADR-006 D8-2.",
+  "type": "object",
+  "required": [
+    "dpHotPa",
+    "dpColdPa",
+    "mdotHotKgS",
+    "mdotColdKgS",
+    "fFactor",
+    "qW",
+    "qHotW",
+    "qColdW",
+    "effectiveness",
+    "ntu",
+    "uaWK",
+    "jFactor",
+    "tOutHotK",
+    "tOutColdK",
+    "energyBalancePct",
+    "converged",
+    "convergenceAxes",
+    "convergenceNotice",
+    "iterations",
+    "wallClockS",
+    "cells",
+    "windowMeanConverged",
+    "dpHotWindowMeanConverged",
+    "verification"
+  ],
+  "properties": {
+    "dpHotPa": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "dpColdPa": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "mdotHotKgS": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "mdotColdKgS": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "fFactor": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "qW": {
+      "description": "qW = ½·(|qHotW| + |qColdW|). ADR-006 D8-2.",
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "qHotW": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "qColdW": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "effectiveness": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "ntu": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "uaWK": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "jFactor": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "tOutHotK": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "tOutColdK": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "energyBalancePct": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "converged": {
+      "$ref": "#/$defs/booleanOrNull"
+    },
+    "convergenceAxes": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/convergenceAxes"
+        }
+      ]
+    },
+    "convergenceNotice": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "noticeId"
+          ],
+          "properties": {
+            "noticeId": {
+              "const": "nonconverged-partial"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "iterations": {
+      "$ref": "#/$defs/integerOrNull"
+    },
+    "wallClockS": {
+      "$ref": "#/$defs/numberOrNull"
+    },
+    "cells": {
+      "$ref": "#/$defs/integerOrNull"
+    },
+    "windowMeanConverged": {
+      "$ref": "#/$defs/booleanOrNull"
+    },
+    "dpHotWindowMeanConverged": {
+      "$ref": "#/$defs/booleanOrNull"
+    },
+    "verification": {
+      "$ref": "#/$defs/verification"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "numberOrNull": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "integerOrNull": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "booleanOrNull": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "passDrift": {
+      "type": "object",
+      "required": [
+        "pass",
+        "driftPct"
+      ],
+      "properties": {
+        "pass": {
+          "type": "boolean"
+        },
+        "driftPct": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "passSpan": {
+      "type": "object",
+      "required": [
+        "pass",
+        "spanPct"
+      ],
+      "properties": {
+        "pass": {
+          "type": "boolean"
+        },
+        "spanPct": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "perQoiAxis": {
+      "type": "object",
+      "description": "진단값 — 정확도·불확실도 대역이 아님 (ADR-006 D8-1a).",
+      "required": [
+        "drift",
+        "span",
+        "instSpanPct",
+        "amplitudePct"
+      ],
+      "properties": {
+        "drift": {
+          "$ref": "#/$defs/passDrift"
+        },
+        "span": {
+          "$ref": "#/$defs/passSpan"
+        },
+        "instSpanPct": {
+          "type": "number"
+        },
+        "amplitudePct": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "temperatureAxis": {
+      "type": "object",
+      "required": [
+        "driftK",
+        "spanK",
+        "pass"
+      ],
+      "properties": {
+        "driftK": {
+          "type": "number"
+        },
+        "spanK": {
+          "type": "number"
+        },
+        "pass": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "convergenceAxes": {
+      "type": "object",
+      "description": "진단값 — 정확도·불확실도 대역이 아님 (ADR-006 D8-1a).",
+      "required": [
+        "perQoI",
+        "tOutHot",
+        "tOutCold",
+        "eb",
+        "mass",
+        "sign",
+        "finite",
+        "insufficient"
+      ],
+      "properties": {
+        "perQoI": {
+          "type": "object",
+          "required": [
+            "dpHotPa",
+            "dpColdPa",
+            "qW"
+          ],
+          "properties": {
+            "dpHotPa": {
+              "$ref": "#/$defs/perQoiAxis"
+            },
+            "dpColdPa": {
+              "$ref": "#/$defs/perQoiAxis"
+            },
+            "qW": {
+              "$ref": "#/$defs/perQoiAxis"
+            }
+          },
+          "additionalProperties": false
+        },
+        "tOutHot": {
+          "$ref": "#/$defs/temperatureAxis"
+        },
+        "tOutCold": {
+          "$ref": "#/$defs/temperatureAxis"
+        },
+        "eb": {
+          "type": "object",
+          "required": [
+            "windowMeanPct",
+            "flag",
+            "pass"
+          ],
+          "properties": {
+            "windowMeanPct": {
+              "type": "number"
+            },
+            "flag": {
+              "enum": [
+                "ok",
+                "warn",
+                "owner_escalate"
+              ]
+            },
+            "pass": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "mass": {
+          "type": "object",
+          "required": [
+            "hotPct",
+            "coldPct",
+            "pass"
+          ],
+          "properties": {
+            "hotPct": {
+              "type": "number"
+            },
+            "coldPct": {
+              "type": "number"
+            },
+            "pass": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "sign": {
+          "type": "object",
+          "required": [
+            "pass"
+          ],
+          "properties": {
+            "pass": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "finite": {
+          "type": "object",
+          "required": [
+            "pass"
+          ],
+          "properties": {
+            "pass": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "insufficient": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dpHot",
+        "dpCold",
+        "thermal",
+        "holds"
+      ],
+      "properties": {
+        "dpHot": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "verified_fixture_limited"
+                },
+                "bandPct": {
+                  "const": 0.25
+                },
+                "fixtureId": {
+                  "const": "gyroid-core-30@v1"
+                },
+                "anchorLevel": {
+                  "const": "CL2"
+                }
+              },
+              "required": [
+                "status",
+                "bandPct",
+                "fixtureId",
+                "anchorLevel"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "regression_only"
+                }
+              },
+              "required": [
+                "status"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "dpCold": {
+          "const": {
+            "status": "judgment_not_established",
+            "ref": "D-M06-1"
+          }
+        },
+        "thermal": {
+          "const": {
+            "status": "unverified_underprediction",
+            "noticeId": "D8-2",
+            "dm051": true
+          }
+        },
+        "holds": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "axis": {
+                    "type": "string"
+                  },
+                  "ref": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "axis",
+                  "ref"
+                ],
+                "additionalProperties": false
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

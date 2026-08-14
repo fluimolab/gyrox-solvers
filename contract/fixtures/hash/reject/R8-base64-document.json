@@ -1,0 +1,19 @@
+{
+  "fixtureId": "R8",
+  "decision": "reject",
+  "description": "ProjectDocument stores artifact references rather than embedded data URIs",
+  "validationKind": "project-document",
+  "input": {
+    "schemaVersion": 1,
+    "rootId": "root",
+    "nodes": {
+      "root": {
+        "type": "geometry",
+        "parentId": null,
+        "params": { "blob": "data:application/octet-stream;base64,AAEC" },
+        "meta": {}
+      }
+    }
+  },
+  "expected": { "valid": false, "errorKeyword": "not" }
+}

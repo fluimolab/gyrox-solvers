@@ -1,0 +1,32 @@
+{
+  "fixtureId": "CT-CR-axis-boundary",
+  "geometry": {
+    "kind": "geometry-spec",
+    "schemaVersion": 1,
+    "payload": {
+      "pattern": "gyroid",
+      "cellSizeM": { "kind": "const", "valueM": 0.004 },
+      "wallThicknessM": { "kind": "const", "valueM": 0.0004 },
+      "splitting": "fullwall",
+      "envelope": { "kind": "box", "sizeM": [0.03, 0.04, 0.05] },
+      "ports": [
+        { "id": "cold-inlet", "domain": "cold", "face": "+y" },
+        { "id": "cold-outlet", "domain": "cold", "face": "-z" },
+        { "id": "hot-inlet", "domain": "hot", "face": "-x" },
+        { "id": "hot-outlet", "domain": "hot", "face": "+x" }
+      ]
+    }
+  },
+  "report": {
+    "schemaVersion": 1,
+    "meshCombinedSha": "9f3eceb5c7b9443bcfe9253b0bdfb91dd9571c4331d7b3d022dfc0cff36236c1",
+    "portAreasM2": {
+      "port.hot.inlet": 0.002,
+      "port.hot.outlet": 0.002,
+      "port.cold.inlet": 0.0015,
+      "port.cold.outlet": 0.0012
+    },
+    "diagnostics": {}
+  },
+  "expected": { "schemaValid": true, "meshQaValid": true }
+}

@@ -1,0 +1,27 @@
+{
+  "fixtureId": "A9",
+  "decision": "accept",
+  "description": "changing voxel pitch changes DiscretizationSpec without changing GeometrySpec",
+  "sourceFixture": "A1",
+  "variants": [
+    {
+      "name": "baseline",
+      "expectedHashes": {
+        "geometry": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c",
+        "discretization": "e4bfc0402dbeb8e07dd889962b1108e31f712bc8965599f8a220ec7471b38815"
+      }
+    },
+    {
+      "name": "voxel-pitch-200um",
+      "set": { "discretization:/payload/voxelPitchM": 0.0002 },
+      "expectedHashes": {
+        "geometry": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c",
+        "discretization": "b16de52d35a1ca669619c41b0154638bc055b788018512a388138614b4bbf93f"
+      }
+    }
+  ],
+  "expected": {
+    "geometryRelation": "equal",
+    "discretizationRelation": "different"
+  }
+}

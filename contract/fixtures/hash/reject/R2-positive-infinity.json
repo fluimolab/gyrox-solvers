@@ -1,0 +1,9 @@
+{
+  "fixtureId": "R2",
+  "decision": "reject",
+  "description": "positive infinity is not an I-JSON number",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "setToken": { "/payload/bc/0/tK": "+Infinity" },
+  "expected": { "errorCode": "NON_FINITE" }
+}

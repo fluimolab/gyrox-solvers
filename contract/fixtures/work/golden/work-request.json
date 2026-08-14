@@ -1,0 +1,34 @@
+{
+  "contractVersion": 1,
+  "stage": "solve",
+  "specs": {
+    "geometry": {
+      "kind": "geometry-spec",
+      "hash": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c"
+    },
+    "discretization": {
+      "kind": "discretization-spec",
+      "hash": "e4bfc0402dbeb8e07dd889962b1108e31f712bc8965599f8a220ec7471b38815"
+    },
+    "solve": {
+      "kind": "solve-spec",
+      "hash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d"
+    },
+    "post": {
+      "kind": "post-spec",
+      "hash": "50a010dd49da635960234e107b641d9bd101f3f938153fcb67c7737f5d570893"
+    }
+  },
+  "inputs": [
+    {
+      "kind": "mesh",
+      "hash": "9f3eceb5c7b9443bcfe9253b0bdfb91dd9571c4331d7b3d022dfc0cff36236c1",
+      "path": "mesh/polyMesh.tar"
+    }
+  ],
+  "limits": {
+    "cpuCores": 28,
+    "memBytes": 59055800320,
+    "checkpointIntervalSec": 900
+  }
+}

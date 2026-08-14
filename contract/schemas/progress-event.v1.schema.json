@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/progress-event/v1",
+  "title": "Versioned NDJSON progress event v1",
+  "$comment": "ADR-006 D8-2: progress payloads do not carry QoI values",
+  "type": "object",
+  "required": [
+    "v",
+    "ts",
+    "type",
+    "payload"
+  ],
+  "properties": {
+    "v": {
+      "const": 1
+    },
+    "seq": {
+      "type": "integer",
+      "not": {
+        "const": 0
+      }
+    },
+    "ts": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "payload": {}
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "progress"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/progress"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "residual"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/residual"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "checkpoint"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/checkpoint"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "log"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/log"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "phase"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/phase"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "progress": {
+      "type": "object",
+      "required": [
+        "iter",
+        "maxIters"
+      ],
+      "properties": {
+        "iter": {
+          "type": "integer"
+        },
+        "maxIters": {
+          "type": "integer"
+        },
+        "etaS": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "residual": {
+      "type": "object",
+      "required": [
+        "iter",
+        "region",
+        "field",
+        "initial"
+      ],
+      "properties": {
+        "iter": {
+          "type": "integer"
+        },
+        "region": {
+          "enum": [
+            "hot",
+            "cold",
+            "solid"
+          ]
+        },
+        "field": {
+          "enum": [
+            "p_rgh",
+            "Ux",
+            "Uy",
+            "Uz",
+            "h"
+          ]
+        },
+        "initial": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "checkpoint": {
+      "type": "object",
+      "required": [
+        "path",
+        "bytes",
+        "sha256",
+        "iter",
+        "physT",
+        "specHash",
+        "decompN",
+        "timeName",
+        "regions"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "iter": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "physT": {
+          "type": "number"
+        },
+        "specHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "decompN": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timeName": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "hot",
+              "cold",
+              "solid"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "log": {
+      "type": "object",
+      "required": [
+        "level",
+        "code"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "code": {
+          "enum": [
+            "ndjson-parse-error",
+            "checkpoint-io-error",
+            "solver-warning",
+            "render-warning"
+          ]
+        },
+        "parseError": {
+          "type": "boolean"
+        },
+        "lineNo": {
+          "type": "integer"
+        },
+        "bytes": {
+          "type": "integer"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "phase": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "render",
+            "decompose",
+            "solve",
+            "reconstruct",
+            "extract"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

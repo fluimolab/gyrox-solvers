@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/work-result/v1",
+  "title": "/work result v1",
+  "type": "object",
+  "required": [
+    "outcome",
+    "exitCode",
+    "metrics",
+    "warnings"
+  ],
+  "properties": {
+    "outcome": {
+      "enum": [
+        "SUCCEEDED",
+        "SUCCEEDED_WITH_WARNINGS",
+        "INVALID_INPUT",
+        "GEOMETRY_GATE_FAILED",
+        "MESH_QA_FAILED",
+        "PHYSICS_DIVERGED",
+        "RESOURCE_EXHAUSTED",
+        "CANCELED",
+        "INFRASTRUCTURE_FAILED"
+      ]
+    },
+    "exitCode": {
+      "type": "integer"
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "wallClockS"
+      ],
+      "properties": {
+        "wallClockS": {
+          "type": "number",
+          "minimum": 0
+        },
+        "peakRssBytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

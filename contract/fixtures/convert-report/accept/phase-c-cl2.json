@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "meshCombinedSha": "9f3eceb5c7b9443bcfe9253b0bdfb91dd9571c4331d7b3d022dfc0cff36236c1",
+  "portAreasM2": {
+    "port.hot.inlet": 0.00034439,
+    "port.hot.outlet": 0.00030523,
+    "port.cold.inlet": 0.0003405,
+    "port.cold.outlet": 0.00030811
+  },
+  "diagnostics": {
+    "source": "Phase C CL2 nFaces multiplied by voxelPitchM squared",
+    "voxelPitchM": 0.0001
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "fixtureId": "CT-VER-reject",
+  "noticeMarker": "D8-2",
+  "base": "runner-base.json#/value",
+  "cases": [
+    {
+      "id": "runner-claims-verified-dp-hot",
+      "operation": {
+        "kind": "set",
+        "path": "/verification/dpHot",
+        "value": {
+          "status": "verified_fixture_limited",
+          "bandPct": 0.25,
+          "fixtureId": "gyroid-core-30@v1",
+          "anchorLevel": "CL2"
+        }
+      },
+      "expected": { "schemaValid": true, "runnerPolicyValid": false }
+    },
+    {
+      "id": "dp-hot-one-of-extra-field",
+      "operation": { "kind": "set", "path": "/verification/dpHot/bandPct", "value": 0.25 },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "dp-cold-constant-mutated",
+      "operation": { "kind": "set", "path": "/verification/dpCold/ref", "value": "other" },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "thermal-constant-mutated",
+      "operation": { "kind": "set", "path": "/verification/thermal/dm051", "value": false },
+      "expected": { "schemaValid": false }
+    }
+  ]
+}

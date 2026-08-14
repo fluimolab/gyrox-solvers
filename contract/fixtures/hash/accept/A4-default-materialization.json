@@ -1,0 +1,39 @@
+{
+  "fixtureId": "A4",
+  "decision": "accept",
+  "description": "omitted and explicitly supplied S0 defaults hash identically",
+  "sourceFixture": "A1",
+  "variants": [
+    {
+      "name": "omitted",
+      "delete": {
+        "geometry": [
+          "/payload/pattern",
+          "/payload/cellSizeM/kind",
+          "/payload/wallThicknessM/kind",
+          "/payload/splitting",
+          "/payload/envelope/kind"
+        ],
+        "discretization": ["/payload/route", "/payload/qa"],
+        "solve": [
+          "/payload/backend",
+          "/payload/solver",
+          "/payload/numerics",
+          "/payload/convergence"
+        ],
+        "post": ["/payload/tier1", "/payload/tier2"]
+      },
+      "expectedHashes": {
+        "geometry": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c",
+        "discretization": "e4bfc0402dbeb8e07dd889962b1108e31f712bc8965599f8a220ec7471b38815",
+        "solve": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d",
+        "post": "50a010dd49da635960234e107b641d9bd101f3f938153fcb67c7737f5d570893"
+      }
+    },
+    {
+      "name": "explicit",
+      "expectedHashesFrom": "A1"
+    }
+  ],
+  "expected": { "relation": "equal-per-kind" }
+}

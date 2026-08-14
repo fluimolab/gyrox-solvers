@@ -1,0 +1,38 @@
+{
+  "fixtureId": "CT-GS-port-permutation",
+  "description": "resolver id sorting makes semantically identical port permutations hash identically",
+  "inputs": [
+    {
+      "kind": "geometry-spec",
+      "schemaVersion": 1,
+      "payload": {
+        "cellSizeM": { "valueM": 0.004 },
+        "wallThicknessM": { "valueM": 0.0004 },
+        "envelope": { "sizeM": [0.03, 0.03, 0.03] },
+        "ports": [
+          { "id": "cold-inlet", "domain": "cold", "face": "+x" },
+          { "id": "cold-outlet", "domain": "cold", "face": "-x" },
+          { "id": "hot-inlet", "domain": "hot", "face": "-x" },
+          { "id": "hot-outlet", "domain": "hot", "face": "+x" }
+        ]
+      }
+    },
+    {
+      "kind": "geometry-spec",
+      "schemaVersion": 1,
+      "payload": {
+        "cellSizeM": { "valueM": 0.004 },
+        "wallThicknessM": { "valueM": 0.0004 },
+        "envelope": { "sizeM": [0.03, 0.03, 0.03] },
+        "ports": [
+          { "id": "hot-outlet", "domain": "hot", "face": "+x" },
+          { "id": "cold-inlet", "domain": "cold", "face": "+x" },
+          { "id": "hot-inlet", "domain": "hot", "face": "-x" },
+          { "id": "cold-outlet", "domain": "cold", "face": "-x" }
+        ]
+      }
+    }
+  ],
+  "normalization": "sort payload.ports by id before specHash",
+  "expectedNormalizedHash": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c"
+}

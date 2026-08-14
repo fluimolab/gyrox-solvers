@@ -1,0 +1,19 @@
+{
+  "fixtureId": "A7",
+  "decision": "accept",
+  "description": "object key insertion order does not affect JCS",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "variants": [
+    {
+      "name": "source-order",
+      "expectedHash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d"
+    },
+    {
+      "name": "reverse-object-key-order-recursively",
+      "transform": "reverse-object-keys",
+      "expectedHash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d"
+    }
+  ],
+  "expected": { "relation": "equal" }
+}

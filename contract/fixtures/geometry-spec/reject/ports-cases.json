@@ -1,0 +1,26 @@
+{
+  "fixtureId": "CT-GS-reject",
+  "base": "../accept/ports-permutations.json#/inputs/0",
+  "cases": [
+    {
+      "id": "duplicate-id",
+      "operation": { "kind": "replace-with-clone", "index": 1, "cloneIndex": 0 },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "misbound-domain",
+      "operation": { "kind": "set", "index": 2, "field": "domain", "value": "cold" },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "all-ids-not-covered",
+      "operation": { "kind": "replace-with-clone", "index": 3, "cloneIndex": 2 },
+      "expected": { "schemaValid": false }
+    },
+    {
+      "id": "same-domain-face-conflict",
+      "operation": { "kind": "set", "index": 3, "field": "face", "value": "-x" },
+      "expected": { "schemaValid": true, "crossFieldValid": false, "errorCode": "PORT_FACE_CONFLICT" }
+    }
+  ]
+}

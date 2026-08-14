@@ -1,0 +1,3075 @@
+{
+  "$comment": "ADR-006 D8-2: QoI identifiers are contract data, not new verification claims.",
+  "x-gyrox-generated-by": "packages/contracts/src/codegen/generate.ts",
+  "components": {
+    "schemas": {
+      "GeometrySpecV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/geometry-spec/v1",
+        "title": "GeometrySpec v1 canonical envelope",
+        "type": "object",
+        "required": [
+          "kind",
+          "schemaVersion",
+          "payload"
+        ],
+        "properties": {
+          "kind": {
+            "const": "geometry-spec"
+          },
+          "schemaVersion": {
+            "const": 1
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "pattern",
+              "cellSizeM",
+              "wallThicknessM",
+              "splitting",
+              "envelope",
+              "ports"
+            ],
+            "properties": {
+              "pattern": {
+                "const": "gyroid"
+              },
+              "cellSizeM": {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "valueM"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "const"
+                  },
+                  "valueM": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "additionalProperties": false
+              },
+              "wallThicknessM": {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "valueM"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "const"
+                  },
+                  "valueM": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "additionalProperties": false
+              },
+              "splitting": {
+                "const": "fullwall"
+              },
+              "envelope": {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "sizeM"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "box"
+                  },
+                  "sizeM": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  }
+                },
+                "additionalProperties": false
+              },
+              "ports": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "hot-inlet"
+                        },
+                        "domain": {
+                          "const": "hot"
+                        },
+                        "face": {
+                          "enum": [
+                            "-x",
+                            "+x",
+                            "-y",
+                            "+y",
+                            "-z",
+                            "+z"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "domain",
+                        "face"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "hot-outlet"
+                        },
+                        "domain": {
+                          "const": "hot"
+                        },
+                        "face": {
+                          "enum": [
+                            "-x",
+                            "+x",
+                            "-y",
+                            "+y",
+                            "-z",
+                            "+z"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "domain",
+                        "face"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "cold-inlet"
+                        },
+                        "domain": {
+                          "const": "cold"
+                        },
+                        "face": {
+                          "enum": [
+                            "-x",
+                            "+x",
+                            "-y",
+                            "+y",
+                            "-z",
+                            "+z"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "domain",
+                        "face"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "cold-outlet"
+                        },
+                        "domain": {
+                          "const": "cold"
+                        },
+                        "face": {
+                          "enum": [
+                            "-x",
+                            "+x",
+                            "-y",
+                            "+y",
+                            "-z",
+                            "+z"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "domain",
+                        "face"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "hot-inlet"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "hot-outlet"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "cold-inlet"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "const": "cold-outlet"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "DiscretizationSpecV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/discretization-spec/v1",
+        "title": "DiscretizationSpec v1 canonical envelope",
+        "type": "object",
+        "required": [
+          "kind",
+          "schemaVersion",
+          "payload"
+        ],
+        "properties": {
+          "kind": {
+            "const": "discretization-spec"
+          },
+          "schemaVersion": {
+            "const": 1
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "route",
+              "voxelPitchM",
+              "qa"
+            ],
+            "properties": {
+              "route": {
+                "const": "voxel-hexa"
+              },
+              "voxelPitchM": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "qa": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "maxNonOrtho": {
+                    "const": 65
+                  },
+                  "maxBoundarySkewness": {
+                    "const": 20
+                  },
+                  "maxInternalSkewness": {
+                    "const": 4
+                  },
+                  "maxConcave": {
+                    "const": 80
+                  },
+                  "minVol": {
+                    "const": 1e-18
+                  },
+                  "minTetQuality": {
+                    "const": 1e-15
+                  },
+                  "minArea": {
+                    "const": -1
+                  },
+                  "minTwist": {
+                    "const": 0.02
+                  },
+                  "minDeterminant": {
+                    "const": 0.001
+                  },
+                  "minFaceWeight": {
+                    "const": 0.05
+                  },
+                  "minVolRatio": {
+                    "const": 0.01
+                  },
+                  "minTriangleTwist": {
+                    "const": -1
+                  },
+                  "minEdgeLength": {
+                    "const": -1
+                  }
+                },
+                "required": [
+                  "maxNonOrtho",
+                  "maxBoundarySkewness",
+                  "maxInternalSkewness",
+                  "maxConcave",
+                  "minVol",
+                  "minTetQuality",
+                  "minArea",
+                  "minTwist",
+                  "minDeterminant",
+                  "minFaceWeight",
+                  "minVolRatio",
+                  "minTriangleTwist",
+                  "minEdgeLength"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "SolveSpecV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/solve-spec/v1",
+        "title": "SolveSpec v1 canonical envelope",
+        "$comment": "ADR-006 D8-2",
+        "$defs": {
+          "PresetRef": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "catalogId",
+              "version"
+            ],
+            "properties": {
+              "catalogId": {
+                "enum": [
+                  "water-60c",
+                  "water-20c",
+                  "aluminum",
+                  "cht-simple-v1"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "FluidProps": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rhoKgM3",
+              "cpJKgK",
+              "muPaS",
+              "prandtl"
+            ],
+            "properties": {
+              "rhoKgM3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "cpJKgK": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "muPaS": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "prandtl": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "SolidProps": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rhoKgM3",
+              "cpJKgK",
+              "kWMK"
+            ],
+            "properties": {
+              "rhoKgM3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "cpJKgK": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "kWMK": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "NumericsBody": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "energyCouplingIters",
+              "hTol",
+              "writePrecision",
+              "relaxation"
+            ],
+            "properties": {
+              "energyCouplingIters": {
+                "const": 25
+              },
+              "hTol": {
+                "const": 0.000001
+              },
+              "writePrecision": {
+                "const": 10
+              },
+              "relaxation": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fluid",
+                  "solid"
+                ],
+                "properties": {
+                  "fluid": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "rho",
+                      "pRgh",
+                      "U",
+                      "h"
+                    ],
+                    "properties": {
+                      "rho": {
+                        "const": 1
+                      },
+                      "pRgh": {
+                        "const": 0.7
+                      },
+                      "U": {
+                        "const": 0.3
+                      },
+                      "h": {
+                        "const": 0.5
+                      }
+                    }
+                  },
+                  "solid": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "h"
+                    ],
+                    "properties": {
+                      "h": {
+                        "const": 0.7
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "schemaVersion",
+          "payload"
+        ],
+        "properties": {
+          "kind": {
+            "const": "solve-spec"
+          },
+          "schemaVersion": {
+            "const": 1
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "backend",
+              "solver",
+              "materials",
+              "bc",
+              "numerics",
+              "convergence",
+              "limits"
+            ],
+            "properties": {
+              "backend": {
+                "const": "openfoam-cht"
+              },
+              "solver": {
+                "const": "chtMultiRegionSimpleFoam"
+              },
+              "materials": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "hot",
+                  "cold",
+                  "solid"
+                ],
+                "properties": {
+                  "hot": {
+                    "$ref": "#/$defs/FluidProps"
+                  },
+                  "cold": {
+                    "$ref": "#/$defs/FluidProps"
+                  },
+                  "solid": {
+                    "$ref": "#/$defs/SolidProps"
+                  }
+                }
+              },
+              "bc": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "featureRef",
+                      "kind",
+                      "mdotKgS",
+                      "tK"
+                    ],
+                    "properties": {
+                      "featureRef": {
+                        "const": "port:hot-inlet"
+                      },
+                      "kind": {
+                        "const": "flowRateInlet"
+                      },
+                      "mdotKgS": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "tK": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "featureRef",
+                      "kind",
+                      "mdotKgS",
+                      "tK"
+                    ],
+                    "properties": {
+                      "featureRef": {
+                        "const": "port:cold-inlet"
+                      },
+                      "kind": {
+                        "const": "flowRateInlet"
+                      },
+                      "mdotKgS": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "tK": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "numerics": {
+                "$ref": "#/$defs/NumericsBody"
+              },
+              "convergence": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "windowIters": {
+                    "const": 200
+                  },
+                  "windowMeanDriftPct": {
+                    "const": 0.5
+                  },
+                  "windowMeanSpanPct": {
+                    "const": 0.5
+                  },
+                  "windowMeanTailW": {
+                    "const": 200
+                  },
+                  "transientFrac": {
+                    "const": 0.2
+                  },
+                  "windowMeanMinIters": {
+                    "const": 500
+                  },
+                  "instSpanPct": {
+                    "const": 0.5
+                  },
+                  "judgedQoI": {
+                    "const": [
+                      "dpHotPa",
+                      "dpColdPa",
+                      "qW"
+                    ]
+                  },
+                  "tOutDriftK": {
+                    "const": 0.1
+                  },
+                  "tOutSpanK": {
+                    "const": 0.1
+                  },
+                  "ebMaxPct": {
+                    "const": 1
+                  },
+                  "ebWarnPct": {
+                    "const": 0.7
+                  },
+                  "massImbalanceMaxPct": {
+                    "const": 0.1
+                  },
+                  "signSanity": {
+                    "const": true
+                  },
+                  "finiteRequired": {
+                    "const": true
+                  },
+                  "signRules": {
+                    "const": {
+                      "flowDirection": {
+                        "hot": {
+                          "inlet": "negative",
+                          "outlet": "positive"
+                        },
+                        "cold": {
+                          "inlet": "negative",
+                          "outlet": "positive"
+                        }
+                      },
+                      "pressureDirection": {
+                        "dpHotPa": "positive",
+                        "dpColdPa": "positive"
+                      },
+                      "wallHeatFluxDirection": {
+                        "hot": "negative",
+                        "cold": "positive"
+                      }
+                    }
+                  },
+                  "minIterationsForJudgment": {
+                    "const": 400
+                  },
+                  "residualBlowupFactor": {
+                    "const": 1000
+                  },
+                  "divergenceCheckScope": {
+                    "const": "judgedQoI+signRules"
+                  }
+                },
+                "required": [
+                  "windowIters",
+                  "windowMeanDriftPct",
+                  "windowMeanSpanPct",
+                  "windowMeanTailW",
+                  "transientFrac",
+                  "windowMeanMinIters",
+                  "instSpanPct",
+                  "judgedQoI",
+                  "tOutDriftK",
+                  "tOutSpanK",
+                  "ebMaxPct",
+                  "ebWarnPct",
+                  "massImbalanceMaxPct",
+                  "signSanity",
+                  "finiteRequired",
+                  "signRules",
+                  "minIterationsForJudgment",
+                  "residualBlowupFactor",
+                  "divergenceCheckScope"
+                ]
+              },
+              "limits": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "maxIters"
+                ],
+                "properties": {
+                  "maxIters": {
+                    "type": "integer",
+                    "minimum": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostSpecV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/post-spec/v1",
+        "title": "PostSpec v1 canonical envelope",
+        "$comment": "ADR-006 D8-2",
+        "type": "object",
+        "required": [
+          "kind",
+          "schemaVersion",
+          "payload"
+        ],
+        "properties": {
+          "kind": {
+            "const": "post-spec"
+          },
+          "schemaVersion": {
+            "const": 1
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "tier1": {
+                "const": {
+                  "summary": true,
+                  "timeseries": true
+                }
+              },
+              "tier2": {
+                "const": {
+                  "slices": [
+                    {
+                      "axis": "z",
+                      "offsetM": 0.015,
+                      "fields": [
+                        "p",
+                        "T"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "tier1",
+              "tier2"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "RunManifestV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/run-manifest/v1",
+        "title": "RunManifest v1",
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "specs",
+          "executorPolicy"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "specs": {
+            "type": "object",
+            "required": [
+              "geometry",
+              "discretization",
+              "solve",
+              "post"
+            ],
+            "properties": {
+              "geometry": {
+                "$ref": "#/$defs/geometryRef"
+              },
+              "discretization": {
+                "$ref": "#/$defs/discretizationRef"
+              },
+              "solve": {
+                "$ref": "#/$defs/solveRef"
+              },
+              "post": {
+                "$ref": "#/$defs/postRef"
+              }
+            },
+            "additionalProperties": false
+          },
+          "executorPolicy": {
+            "type": "object",
+            "required": [
+              "maxWallClockSec",
+              "resourceClass",
+              "checkpointIntervalSec",
+              "judgmentSlackIters"
+            ],
+            "properties": {
+              "maxWallClockSec": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "resourceClass": {
+                "enum": [
+                  "small",
+                  "medium",
+                  "large"
+                ]
+              },
+              "checkpointIntervalSec": {
+                "const": 900
+              },
+              "judgmentSlackIters": {
+                "const": 50
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "geometryRef": {
+            "type": "object",
+            "required": [
+              "kind",
+              "hash"
+            ],
+            "properties": {
+              "kind": {
+                "const": "geometry-spec"
+              },
+              "hash": {
+                "$ref": "#/$defs/sha256"
+              }
+            },
+            "additionalProperties": false
+          },
+          "discretizationRef": {
+            "type": "object",
+            "required": [
+              "kind",
+              "hash"
+            ],
+            "properties": {
+              "kind": {
+                "const": "discretization-spec"
+              },
+              "hash": {
+                "$ref": "#/$defs/sha256"
+              }
+            },
+            "additionalProperties": false
+          },
+          "solveRef": {
+            "type": "object",
+            "required": [
+              "kind",
+              "hash"
+            ],
+            "properties": {
+              "kind": {
+                "const": "solve-spec"
+              },
+              "hash": {
+                "$ref": "#/$defs/sha256"
+              }
+            },
+            "additionalProperties": false
+          },
+          "postRef": {
+            "type": "object",
+            "required": [
+              "kind",
+              "hash"
+            ],
+            "properties": {
+              "kind": {
+                "const": "post-spec"
+              },
+              "hash": {
+                "$ref": "#/$defs/sha256"
+              }
+            },
+            "additionalProperties": false
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "ProjectDocumentV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/project-document/v1",
+        "title": "ProjectDocument v1",
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "nodes",
+          "rootId"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "nodes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1
+            },
+            "additionalProperties": {
+              "$ref": "#/$defs/node"
+            }
+          },
+          "rootId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "node": {
+            "type": "object",
+            "required": [
+              "type",
+              "parentId",
+              "params",
+              "meta"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "parentId": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "params": {
+                "$ref": "#/$defs/jsonObject"
+              },
+              "meta": {
+                "$ref": "#/$defs/jsonObject"
+              }
+            },
+            "additionalProperties": false
+          },
+          "jsonObject": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/jsonValue"
+            }
+          },
+          "jsonValue": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "not": {
+                  "pattern": "^[dD][aA][tT][aA]:"
+                }
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/jsonValue"
+                }
+              },
+              {
+                "$ref": "#/$defs/jsonObject"
+              }
+            ]
+          }
+        }
+      },
+      "WorkRequestV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/work-request/v1",
+        "title": "/work request v1",
+        "type": "object",
+        "required": [
+          "contractVersion",
+          "stage",
+          "specs",
+          "inputs",
+          "limits"
+        ],
+        "properties": {
+          "contractVersion": {
+            "const": 1
+          },
+          "stage": {
+            "enum": [
+              "geometry",
+              "mesh",
+              "solve",
+              "post"
+            ]
+          },
+          "specs": {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+              "geometry": {
+                "$ref": "#/$defs/specRef"
+              },
+              "discretization": {
+                "$ref": "#/$defs/specRef"
+              },
+              "solve": {
+                "$ref": "#/$defs/specRef"
+              },
+              "post": {
+                "$ref": "#/$defs/specRef"
+              }
+            },
+            "additionalProperties": false
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "hash",
+                "path"
+              ],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "hash": {
+                  "$ref": "#/$defs/sha256"
+                },
+                "path": {
+                  "$ref": "#/$defs/inputPath"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "limits": {
+            "type": "object",
+            "required": [
+              "cpuCores",
+              "memBytes"
+            ],
+            "properties": {
+              "cpuCores": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "memBytes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "checkpointIntervalSec": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "specRef": {
+            "type": "object",
+            "required": [
+              "kind",
+              "hash"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "geometry-spec",
+                  "discretization-spec",
+                  "solve-spec",
+                  "post-spec"
+                ]
+              },
+              "hash": {
+                "$ref": "#/$defs/sha256"
+              }
+            },
+            "additionalProperties": false
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "inputPath": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+          }
+        }
+      },
+      "WorkResultV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/work-result/v1",
+        "title": "/work result v1",
+        "type": "object",
+        "required": [
+          "outcome",
+          "exitCode",
+          "metrics",
+          "warnings"
+        ],
+        "properties": {
+          "outcome": {
+            "enum": [
+              "SUCCEEDED",
+              "SUCCEEDED_WITH_WARNINGS",
+              "INVALID_INPUT",
+              "GEOMETRY_GATE_FAILED",
+              "MESH_QA_FAILED",
+              "PHYSICS_DIVERGED",
+              "RESOURCE_EXHAUSTED",
+              "CANCELED",
+              "INFRASTRUCTURE_FAILED"
+            ]
+          },
+          "exitCode": {
+            "type": "integer"
+          },
+          "metrics": {
+            "type": "object",
+            "required": [
+              "wallClockS"
+            ],
+            "properties": {
+              "wallClockS": {
+                "type": "number",
+                "minimum": 0
+              },
+              "peakRssBytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "OutputManifestV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/output-manifest/v1",
+        "title": "/work output manifest v1",
+        "type": "object",
+        "required": [
+          "files"
+        ],
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "path",
+                "mediaType",
+                "bytes",
+                "sha256"
+              ],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+                },
+                "mediaType": {
+                  "type": "string",
+                  "pattern": "^[^/\\s]+/[^/\\s]+$"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "units": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "coordinateSystem": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "semanticRole": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "field",
+                          "slice",
+                          "volume",
+                          "wall-field",
+                          "wall-mesh"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "units",
+                      "coordinateSystem"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "type": "object",
+                    "anyOf": [
+                      {
+                        "required": [
+                          "units"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "coordinateSystem"
+                        ]
+                      }
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "units",
+                      "coordinateSystem"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProgressEventV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/progress-event/v1",
+        "title": "Versioned NDJSON progress event v1",
+        "$comment": "ADR-006 D8-2: progress payloads do not carry QoI values",
+        "type": "object",
+        "required": [
+          "v",
+          "ts",
+          "type",
+          "payload"
+        ],
+        "properties": {
+          "v": {
+            "const": 1
+          },
+          "seq": {
+            "type": "integer",
+            "not": {
+              "const": 0
+            }
+          },
+          "ts": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "payload": {}
+        },
+        "additionalProperties": true,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "progress"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "$ref": "#/$defs/progress"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "residual"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "$ref": "#/$defs/residual"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "checkpoint"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "$ref": "#/$defs/checkpoint"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "log"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "$ref": "#/$defs/log"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "phase"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "$ref": "#/$defs/phase"
+                }
+              }
+            }
+          }
+        ],
+        "$defs": {
+          "progress": {
+            "type": "object",
+            "required": [
+              "iter",
+              "maxIters"
+            ],
+            "properties": {
+              "iter": {
+                "type": "integer"
+              },
+              "maxIters": {
+                "type": "integer"
+              },
+              "etaS": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "residual": {
+            "type": "object",
+            "required": [
+              "iter",
+              "region",
+              "field",
+              "initial"
+            ],
+            "properties": {
+              "iter": {
+                "type": "integer"
+              },
+              "region": {
+                "enum": [
+                  "hot",
+                  "cold",
+                  "solid"
+                ]
+              },
+              "field": {
+                "enum": [
+                  "p_rgh",
+                  "Ux",
+                  "Uy",
+                  "Uz",
+                  "h"
+                ]
+              },
+              "initial": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "checkpoint": {
+            "type": "object",
+            "required": [
+              "path",
+              "bytes",
+              "sha256",
+              "iter",
+              "physT",
+              "specHash",
+              "decompN",
+              "timeName",
+              "regions"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "iter": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "physT": {
+                "type": "number"
+              },
+              "specHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "decompN": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timeName": {
+                "type": "string"
+              },
+              "regions": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "hot",
+                    "cold",
+                    "solid"
+                  ]
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "log": {
+            "type": "object",
+            "required": [
+              "level",
+              "code"
+            ],
+            "properties": {
+              "level": {
+                "enum": [
+                  "info",
+                  "warn",
+                  "error"
+                ]
+              },
+              "code": {
+                "enum": [
+                  "ndjson-parse-error",
+                  "checkpoint-io-error",
+                  "solver-warning",
+                  "render-warning"
+                ]
+              },
+              "parseError": {
+                "type": "boolean"
+              },
+              "lineNo": {
+                "type": "integer"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "phase": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "enum": [
+                  "render",
+                  "decompose",
+                  "solve",
+                  "reconstruct",
+                  "extract"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "CheckpointDeclarationV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/checkpoint-declaration/v1",
+        "title": "Checkpoint declaration v1",
+        "type": "object",
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "iter",
+          "physT",
+          "specHash",
+          "decompN",
+          "timeName",
+          "regions"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "iter": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "physT": {
+            "type": "number"
+          },
+          "specHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "decompN": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "timeName": {
+            "type": "string"
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "hot",
+                "cold",
+                "solid"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostManifestV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/post-manifest/v1",
+        "title": "Post artifact manifest v1",
+        "$comment": "ADR-006 D8-2",
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "items"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "hash",
+                "field",
+                "units",
+                "location",
+                "range"
+              ],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "units": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "location": {
+                  "enum": [
+                    "cell",
+                    "point"
+                  ]
+                },
+                "range": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SummaryV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/summary/v1",
+        "title": "Run summary v1",
+        "$comment": "ADR-006 D8-2",
+        "description": "QoI 값은 판정 창 러닝 200-iter 창평균 = mean(x[-W:])이며 순간 최종값이 아니다. qW = ½·(|qHotW| + |qColdW|). ADR-006 D8-2.",
+        "type": "object",
+        "required": [
+          "dpHotPa",
+          "dpColdPa",
+          "mdotHotKgS",
+          "mdotColdKgS",
+          "fFactor",
+          "qW",
+          "qHotW",
+          "qColdW",
+          "effectiveness",
+          "ntu",
+          "uaWK",
+          "jFactor",
+          "tOutHotK",
+          "tOutColdK",
+          "energyBalancePct",
+          "converged",
+          "convergenceAxes",
+          "convergenceNotice",
+          "iterations",
+          "wallClockS",
+          "cells",
+          "windowMeanConverged",
+          "dpHotWindowMeanConverged",
+          "verification"
+        ],
+        "properties": {
+          "dpHotPa": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "dpColdPa": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "mdotHotKgS": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "mdotColdKgS": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "fFactor": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "qW": {
+            "description": "qW = ½·(|qHotW| + |qColdW|). ADR-006 D8-2.",
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "qHotW": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "qColdW": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "effectiveness": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "ntu": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "uaWK": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "jFactor": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "tOutHotK": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "tOutColdK": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "energyBalancePct": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "converged": {
+            "$ref": "#/$defs/booleanOrNull"
+          },
+          "convergenceAxes": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/convergenceAxes"
+              }
+            ]
+          },
+          "convergenceNotice": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "noticeId"
+                ],
+                "properties": {
+                  "noticeId": {
+                    "const": "nonconverged-partial"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "iterations": {
+            "$ref": "#/$defs/integerOrNull"
+          },
+          "wallClockS": {
+            "$ref": "#/$defs/numberOrNull"
+          },
+          "cells": {
+            "$ref": "#/$defs/integerOrNull"
+          },
+          "windowMeanConverged": {
+            "$ref": "#/$defs/booleanOrNull"
+          },
+          "dpHotWindowMeanConverged": {
+            "$ref": "#/$defs/booleanOrNull"
+          },
+          "verification": {
+            "$ref": "#/$defs/verification"
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "numberOrNull": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "integerOrNull": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "booleanOrNull": {
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "passDrift": {
+            "type": "object",
+            "required": [
+              "pass",
+              "driftPct"
+            ],
+            "properties": {
+              "pass": {
+                "type": "boolean"
+              },
+              "driftPct": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "passSpan": {
+            "type": "object",
+            "required": [
+              "pass",
+              "spanPct"
+            ],
+            "properties": {
+              "pass": {
+                "type": "boolean"
+              },
+              "spanPct": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "perQoiAxis": {
+            "type": "object",
+            "description": "진단값 — 정확도·불확실도 대역이 아님 (ADR-006 D8-1a).",
+            "required": [
+              "drift",
+              "span",
+              "instSpanPct",
+              "amplitudePct"
+            ],
+            "properties": {
+              "drift": {
+                "$ref": "#/$defs/passDrift"
+              },
+              "span": {
+                "$ref": "#/$defs/passSpan"
+              },
+              "instSpanPct": {
+                "type": "number"
+              },
+              "amplitudePct": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "temperatureAxis": {
+            "type": "object",
+            "required": [
+              "driftK",
+              "spanK",
+              "pass"
+            ],
+            "properties": {
+              "driftK": {
+                "type": "number"
+              },
+              "spanK": {
+                "type": "number"
+              },
+              "pass": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "convergenceAxes": {
+            "type": "object",
+            "description": "진단값 — 정확도·불확실도 대역이 아님 (ADR-006 D8-1a).",
+            "required": [
+              "perQoI",
+              "tOutHot",
+              "tOutCold",
+              "eb",
+              "mass",
+              "sign",
+              "finite",
+              "insufficient"
+            ],
+            "properties": {
+              "perQoI": {
+                "type": "object",
+                "required": [
+                  "dpHotPa",
+                  "dpColdPa",
+                  "qW"
+                ],
+                "properties": {
+                  "dpHotPa": {
+                    "$ref": "#/$defs/perQoiAxis"
+                  },
+                  "dpColdPa": {
+                    "$ref": "#/$defs/perQoiAxis"
+                  },
+                  "qW": {
+                    "$ref": "#/$defs/perQoiAxis"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "tOutHot": {
+                "$ref": "#/$defs/temperatureAxis"
+              },
+              "tOutCold": {
+                "$ref": "#/$defs/temperatureAxis"
+              },
+              "eb": {
+                "type": "object",
+                "required": [
+                  "windowMeanPct",
+                  "flag",
+                  "pass"
+                ],
+                "properties": {
+                  "windowMeanPct": {
+                    "type": "number"
+                  },
+                  "flag": {
+                    "enum": [
+                      "ok",
+                      "warn",
+                      "owner_escalate"
+                    ]
+                  },
+                  "pass": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "mass": {
+                "type": "object",
+                "required": [
+                  "hotPct",
+                  "coldPct",
+                  "pass"
+                ],
+                "properties": {
+                  "hotPct": {
+                    "type": "number"
+                  },
+                  "coldPct": {
+                    "type": "number"
+                  },
+                  "pass": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "sign": {
+                "type": "object",
+                "required": [
+                  "pass"
+                ],
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "finite": {
+                "type": "object",
+                "required": [
+                  "pass"
+                ],
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "insufficient": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "verification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dpHot",
+              "dpCold",
+              "thermal",
+              "holds"
+            ],
+            "properties": {
+              "dpHot": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "const": "verified_fixture_limited"
+                      },
+                      "bandPct": {
+                        "const": 0.25
+                      },
+                      "fixtureId": {
+                        "const": "gyroid-core-30@v1"
+                      },
+                      "anchorLevel": {
+                        "const": "CL2"
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "bandPct",
+                      "fixtureId",
+                      "anchorLevel"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "const": "regression_only"
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "dpCold": {
+                "const": {
+                  "status": "judgment_not_established",
+                  "ref": "D-M06-1"
+                }
+              },
+              "thermal": {
+                "const": {
+                  "status": "unverified_underprediction",
+                  "noticeId": "D8-2",
+                  "dm051": true
+                }
+              },
+              "holds": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "axis": {
+                          "type": "string"
+                        },
+                        "ref": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "axis",
+                        "ref"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ResourceEstimateV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/resource-estimate/v1",
+        "title": "ResourceEstimate v1",
+        "type": "object",
+        "required": [
+          "cells",
+          "ram",
+          "disk",
+          "wallClock",
+          "bucket",
+          "feasible",
+          "warnings"
+        ],
+        "properties": {
+          "cells": {
+            "type": "number",
+            "minimum": 0
+          },
+          "ram": {
+            "$ref": "#/$defs/range"
+          },
+          "disk": {
+            "$ref": "#/$defs/range"
+          },
+          "wallClock": {
+            "$ref": "#/$defs/range"
+          },
+          "bucket": {
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "feasible": {
+            "type": "boolean"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "action": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "range": {
+            "type": "object",
+            "required": [
+              "min",
+              "max"
+            ],
+            "properties": {
+              "min": {
+                "type": "number",
+                "minimum": 0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "ExportBundleV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/export-bundle/v1",
+        "title": "Export bundle manifest v1",
+        "$comment": "ADR-006 D8-2: exported results carry the canonical notice identifiers",
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "revision",
+          "recipe",
+          "artifacts",
+          "notices"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recipe": {
+            "$ref": "#/$defs/ref"
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/ref"
+            }
+          },
+          "notices": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "D8-2",
+                "dp-hot-fixture-limited",
+                "dp-cold-not-established",
+                "nonconverged-partial",
+                "governance-hold"
+              ]
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "ref": {
+            "type": "object",
+            "required": [
+              "kind",
+              "hash"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "PatchMapV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/patch-map/v1",
+        "title": "M1 fixed-topology patch-map v1",
+        "type": "array",
+        "minItems": 11,
+        "maxItems": 11,
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hotInterface"
+            },
+            {
+              "$ref": "#/$defs/hotInlet"
+            },
+            {
+              "$ref": "#/$defs/hotOutlet"
+            },
+            {
+              "$ref": "#/$defs/hotWall"
+            },
+            {
+              "$ref": "#/$defs/coldInterface"
+            },
+            {
+              "$ref": "#/$defs/coldInlet"
+            },
+            {
+              "$ref": "#/$defs/coldOutlet"
+            },
+            {
+              "$ref": "#/$defs/coldWall"
+            },
+            {
+              "$ref": "#/$defs/solidHotInterface"
+            },
+            {
+              "$ref": "#/$defs/solidColdInterface"
+            },
+            {
+              "$ref": "#/$defs/solidExternalWall"
+            }
+          ]
+        },
+        "allOf": [
+          {
+            "contains": {
+              "$ref": "#/$defs/hotInterface"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/hotInlet"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/hotOutlet"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/hotWall"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/coldInterface"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/coldInlet"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/coldOutlet"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/coldWall"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/solidHotInterface"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/solidColdInterface"
+            }
+          },
+          {
+            "contains": {
+              "$ref": "#/$defs/solidExternalWall"
+            }
+          }
+        ],
+        "$defs": {
+          "hotInterface": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "interface.hot_solid"
+              },
+              "patchName": {
+                "const": "hot_to_solid"
+              },
+              "patchType": {
+                "const": "interface"
+              },
+              "region": {
+                "const": "hot"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "hotInlet": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "port.hot.inlet"
+              },
+              "patchName": {
+                "const": "hot_inlet"
+              },
+              "patchType": {
+                "const": "inlet"
+              },
+              "region": {
+                "const": "hot"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "hotOutlet": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "port.hot.outlet"
+              },
+              "patchName": {
+                "const": "hot_outlet"
+              },
+              "patchType": {
+                "const": "outlet"
+              },
+              "region": {
+                "const": "hot"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "hotWall": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "wall.hot"
+              },
+              "patchName": {
+                "const": "hot_wall"
+              },
+              "patchType": {
+                "const": "wall"
+              },
+              "region": {
+                "const": "hot"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "coldInterface": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "interface.cold_solid"
+              },
+              "patchName": {
+                "const": "cold_to_solid"
+              },
+              "patchType": {
+                "const": "interface"
+              },
+              "region": {
+                "const": "cold"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "coldInlet": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "port.cold.inlet"
+              },
+              "patchName": {
+                "const": "cold_inlet"
+              },
+              "patchType": {
+                "const": "inlet"
+              },
+              "region": {
+                "const": "cold"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "coldOutlet": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "port.cold.outlet"
+              },
+              "patchName": {
+                "const": "cold_outlet"
+              },
+              "patchType": {
+                "const": "outlet"
+              },
+              "region": {
+                "const": "cold"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "coldWall": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "wall.cold"
+              },
+              "patchName": {
+                "const": "cold_wall"
+              },
+              "patchType": {
+                "const": "wall"
+              },
+              "region": {
+                "const": "cold"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "solidHotInterface": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "interface.hot_solid"
+              },
+              "patchName": {
+                "const": "solid_to_hot"
+              },
+              "patchType": {
+                "const": "interface"
+              },
+              "region": {
+                "const": "solid"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "solidColdInterface": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "interface.cold_solid"
+              },
+              "patchName": {
+                "const": "solid_to_cold"
+              },
+              "patchType": {
+                "const": "interface"
+              },
+              "region": {
+                "const": "solid"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "solidExternalWall": {
+            "type": "object",
+            "required": [
+              "geomRef",
+              "patchName",
+              "patchType",
+              "region"
+            ],
+            "properties": {
+              "geomRef": {
+                "const": "wall.solid.external"
+              },
+              "patchName": {
+                "const": "solid_external"
+              },
+              "patchType": {
+                "const": "wall"
+              },
+              "region": {
+                "const": "solid"
+              },
+              "foamType": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "ConvertReportV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/convert-report/v1",
+        "title": "Mesh converter report v1",
+        "$comment": "ADR-006 D8-2: diagnostics must not contain QoI names or values",
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "meshCombinedSha",
+          "portAreasM2",
+          "diagnostics"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "meshCombinedSha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "portAreasM2": {
+            "type": "object",
+            "required": [
+              "port.hot.inlet",
+              "port.hot.outlet",
+              "port.cold.inlet",
+              "port.cold.outlet"
+            ],
+            "properties": {
+              "port.hot.inlet": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "port.hot.outlet": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "port.cold.inlet": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "port.cold.outlet": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "diagnostics": {
+            "type": "object",
+            "description": "Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."
+          }
+        },
+        "additionalProperties": false
+      },
+      "SolveReportV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/solve-report/v1",
+        "title": "Solve runner report v1",
+        "$comment": "ADR-006 D8-2: diagnostics must not contain QoI names or values",
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "renderFingerprint",
+          "diagnostics"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "renderFingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "diagnostics": {
+            "type": "object",
+            "description": "Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."
+          }
+        },
+        "additionalProperties": false
+      },
+      "SystemEventV1": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://gyrox.dev/schemas/system-event/v1",
+        "title": "Worker system event v1",
+        "$comment": "ADR-006 D8-2: closed sys.* payloads carry no QoI fields and are not projected to SSE",
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "payload"
+            ],
+            "properties": {
+              "type": {
+                "const": "sys.issuance-denied"
+              },
+              "payload": {
+                "$ref": "#/$defs/issuanceDenied"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "payload"
+            ],
+            "properties": {
+              "type": {
+                "const": "sys.stage-contention"
+              },
+              "payload": {
+                "$ref": "#/$defs/stageContention"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "payload"
+            ],
+            "properties": {
+              "type": {
+                "const": "sys.operator-required"
+              },
+              "payload": {
+                "$ref": "#/$defs/operatorRequired"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "$defs": {
+          "stage": {
+            "enum": [
+              "geometry",
+              "mesh",
+              "solve",
+              "post"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "nullableString": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "issuanceDenied": {
+            "type": "object",
+            "required": [
+              "stage",
+              "cause"
+            ],
+            "properties": {
+              "stage": {
+                "$ref": "#/$defs/stage"
+              },
+              "cause": {
+                "enum": [
+                  "governance-hold",
+                  "governance-drift",
+                  "quarantine",
+                  "pin-null"
+                ]
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "stageContention": {
+            "type": "object",
+            "required": [
+              "stage",
+              "attempts",
+              "elapsedSec"
+            ],
+            "properties": {
+              "stage": {
+                "$ref": "#/$defs/stage"
+              },
+              "attempts": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "elapsedSec": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "labels": {
+            "type": "object",
+            "properties": {
+              "gyrox.run_id": {
+                "$ref": "#/$defs/nullableString"
+              },
+              "stage": {
+                "$ref": "#/$defs/nullableString"
+              },
+              "attempt_id": {
+                "$ref": "#/$defs/nullableString"
+              },
+              "fencing_token": {
+                "$ref": "#/$defs/nullableString"
+              }
+            },
+            "additionalProperties": false
+          },
+          "snapshot": {
+            "type": "object",
+            "required": [
+              "labels",
+              "state",
+              "imageDigest"
+            ],
+            "properties": {
+              "labels": {
+                "$ref": "#/$defs/labels"
+              },
+              "state": {
+                "enum": [
+                  "created",
+                  "running",
+                  "paused",
+                  "restarting",
+                  "removing",
+                  "exited",
+                  "dead"
+                ]
+              },
+              "imageDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "operatorRequired": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "stage",
+                  "cause",
+                  "containerRef",
+                  "snapshot"
+                ],
+                "properties": {
+                  "stage": {
+                    "$ref": "#/$defs/stage"
+                  },
+                  "cause": {
+                    "enum": [
+                      "label-mismatch",
+                      "inconsistent-container"
+                    ]
+                  },
+                  "containerRef": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "snapshot": {
+                    "$ref": "#/$defs/snapshot"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "required": [
+                  "stage",
+                  "cause",
+                  "recordedInputManifestHash",
+                  "recomputedHash"
+                ],
+                "properties": {
+                  "stage": {
+                    "$ref": "#/$defs/stage"
+                  },
+                  "cause": {
+                    "const": "staging-hash-mismatch"
+                  },
+                  "recordedInputManifestHash": {
+                    "$ref": "#/$defs/sha256"
+                  },
+                  "recomputedHash": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

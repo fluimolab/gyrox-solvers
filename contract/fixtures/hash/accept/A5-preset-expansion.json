@@ -1,0 +1,47 @@
+{
+  "fixtureId": "A5",
+  "decision": "accept",
+  "description": "PresetRef and its catalog body materialize to the same SolveSpec",
+  "noticeMarker": "D8-2",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "variants": [
+    {
+      "name": "preset-refs",
+      "expectedHash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d"
+    },
+    {
+      "name": "expanded",
+      "set": {
+        "/payload/materials/hot": {
+          "rhoKgM3": 983.2,
+          "cpJKgK": 4183,
+          "muPaS": 0.000467,
+          "prandtl": 2.99
+        },
+        "/payload/materials/cold": {
+          "rhoKgM3": 998.2,
+          "cpJKgK": 4182,
+          "muPaS": 0.001002,
+          "prandtl": 7.01
+        },
+        "/payload/materials/solid": {
+          "rhoKgM3": 2700,
+          "cpJKgK": 900,
+          "kWMK": 237
+        },
+        "/payload/numerics": {
+          "energyCouplingIters": 25,
+          "hTol": 0.000001,
+          "writePrecision": 10,
+          "relaxation": {
+            "fluid": { "rho": 1, "pRgh": 0.7, "U": 0.3, "h": 0.5 },
+            "solid": { "h": 0.7 }
+          }
+        }
+      },
+      "expectedHash": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d"
+    }
+  ],
+  "expected": { "relation": "equal" }
+}

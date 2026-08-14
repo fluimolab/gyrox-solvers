@@ -1,0 +1,35 @@
+{
+  "fixtureId": "CT-SR-reject",
+  "base": "../accept/base.json",
+  "cases": [
+    {
+      "id": "missing-render-fingerprint",
+      "operation": { "kind": "delete", "path": "/renderFingerprint" },
+      "expectedValid": false
+    },
+    {
+      "id": "non-string-render-fingerprint",
+      "operation": { "kind": "set", "path": "/renderFingerprint", "value": 7 },
+      "expectedValid": false
+    },
+    {
+      "id": "non-hex-render-fingerprint",
+      "operation": {
+        "kind": "set",
+        "path": "/renderFingerprint",
+        "value": "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg"
+      },
+      "expectedValid": false
+    },
+    {
+      "id": "short-render-fingerprint",
+      "operation": { "kind": "set", "path": "/renderFingerprint", "value": "abcd" },
+      "expectedValid": false
+    },
+    {
+      "id": "unknown-top-level-field",
+      "operation": { "kind": "set", "path": "/extra", "value": true },
+      "expectedValid": false
+    }
+  ]
+}

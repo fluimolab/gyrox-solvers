@@ -1,0 +1,20 @@
+{
+  "fixtureId": "A10",
+  "decision": "accept",
+  "description": "PreviewSettings is external to the four hashed spec envelopes",
+  "sourceFixture": "A1",
+  "target": "geometry",
+  "variants": [
+    {
+      "name": "no-preview",
+      "previewSettings": null,
+      "expectedHash": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c"
+    },
+    {
+      "name": "with-nonparticipating-preview",
+      "previewSettings": { "dragResolution": 24, "idleResolution": 128 },
+      "expectedHash": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c"
+    }
+  ],
+  "expected": { "relation": "equal", "previewInCanonical": false }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/convert-report/v1",
+  "title": "Mesh converter report v1",
+  "$comment": "ADR-006 D8-2: diagnostics must not contain QoI names or values",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "meshCombinedSha",
+    "portAreasM2",
+    "diagnostics"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "meshCombinedSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "portAreasM2": {
+      "type": "object",
+      "required": [
+        "port.hot.inlet",
+        "port.hot.outlet",
+        "port.cold.inlet",
+        "port.cold.outlet"
+      ],
+      "properties": {
+        "port.hot.inlet": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "port.hot.outlet": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "port.cold.inlet": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "port.cold.outlet": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,131 @@
+{
+  "fixtureId": "A1",
+  "decision": "accept",
+  "description": "gyroid-core-30 v1 and S0-EXEC-PLAN §2 transcribed 4-spec baseline",
+  "noticeMarker": "D8-2",
+  "inputs": {
+    "geometry": {
+      "kind": "geometry-spec",
+      "schemaVersion": 1,
+      "payload": {
+        "pattern": "gyroid",
+        "cellSizeM": { "kind": "const", "valueM": 0.004 },
+        "wallThicknessM": { "kind": "const", "valueM": 0.0004 },
+        "splitting": "fullwall",
+        "envelope": { "kind": "box", "sizeM": [0.03, 0.03, 0.03] },
+        "ports": [
+          { "id": "cold-inlet", "domain": "cold", "face": "+x" },
+          { "id": "cold-outlet", "domain": "cold", "face": "-x" },
+          { "id": "hot-inlet", "domain": "hot", "face": "-x" },
+          { "id": "hot-outlet", "domain": "hot", "face": "+x" }
+        ]
+      }
+    },
+    "discretization": {
+      "kind": "discretization-spec",
+      "schemaVersion": 1,
+      "payload": {
+        "route": "voxel-hexa",
+        "voxelPitchM": 0.0001,
+        "qa": {
+          "maxNonOrtho": 65,
+          "maxBoundarySkewness": 20,
+          "maxInternalSkewness": 4,
+          "maxConcave": 80,
+          "minVol": 1e-18,
+          "minTetQuality": 1e-15,
+          "minArea": -1,
+          "minTwist": 0.02,
+          "minDeterminant": 0.001,
+          "minFaceWeight": 0.05,
+          "minVolRatio": 0.01,
+          "minTriangleTwist": -1,
+          "minEdgeLength": -1
+        }
+      }
+    },
+    "solve": {
+      "kind": "solve-spec",
+      "schemaVersion": 1,
+      "payload": {
+        "backend": "openfoam-cht",
+        "solver": "chtMultiRegionSimpleFoam",
+        "materials": {
+          "hot": { "catalogId": "water-60c", "version": 1 },
+          "cold": { "catalogId": "water-20c", "version": 1 },
+          "solid": { "catalogId": "aluminum", "version": 1 }
+        },
+        "bc": [
+          {
+            "featureRef": "port:hot-inlet",
+            "kind": "flowRateInlet",
+            "mdotKgS": 0.023490376702,
+            "tK": 333.15
+          },
+          {
+            "featureRef": "port:cold-inlet",
+            "kind": "flowRateInlet",
+            "mdotKgS": 0.023821510837,
+            "tK": 293.15
+          }
+        ],
+        "numerics": { "catalogId": "cht-simple-v1", "version": 1 },
+        "convergence": {
+          "windowIters": 200,
+          "windowMeanDriftPct": 0.5,
+          "windowMeanSpanPct": 0.5,
+          "windowMeanTailW": 200,
+          "transientFrac": 0.2,
+          "windowMeanMinIters": 500,
+          "instSpanPct": 0.5,
+          "judgedQoI": ["dpHotPa", "dpColdPa", "qW"],
+          "tOutDriftK": 0.1,
+          "tOutSpanK": 0.1,
+          "ebMaxPct": 1,
+          "ebWarnPct": 0.7,
+          "massImbalanceMaxPct": 0.1,
+          "signSanity": true,
+          "finiteRequired": true,
+          "signRules": {
+            "flowDirection": {
+              "hot": { "inlet": "negative", "outlet": "positive" },
+              "cold": { "inlet": "negative", "outlet": "positive" }
+            },
+            "pressureDirection": {
+              "dpHotPa": "positive",
+              "dpColdPa": "positive"
+            },
+            "wallHeatFluxDirection": {
+              "hot": "negative",
+              "cold": "positive"
+            }
+          },
+          "minIterationsForJudgment": 400,
+          "residualBlowupFactor": 1000,
+          "divergenceCheckScope": "judgedQoI+signRules"
+        },
+        "limits": { "maxIters": 2000 }
+      }
+    },
+    "post": {
+      "kind": "post-spec",
+      "schemaVersion": 1,
+      "payload": {
+        "tier1": { "summary": true, "timeseries": true },
+        "tier2": {
+          "slices": [
+            { "axis": "z", "offsetM": 0.015, "fields": ["p", "T"] }
+          ]
+        }
+      }
+    }
+  },
+  "expected": {
+    "hashes": {
+      "geometry": "c7d910f2d501409c5000f2159fe16db8002ca05f2cd77e6147908d05285d9c5c",
+      "discretization": "e4bfc0402dbeb8e07dd889962b1108e31f712bc8965599f8a220ec7471b38815",
+      "solve": "783e2560900433851e69df7a1fbbaeab469edcf5bb43a0e9fb23400fe1a6161d",
+      "post": "50a010dd49da635960234e107b641d9bd101f3f938153fcb67c7737f5d570893"
+    }
+  }
+}

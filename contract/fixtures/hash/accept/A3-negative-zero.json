@@ -1,0 +1,22 @@
+{
+  "fixtureId": "A3",
+  "decision": "accept",
+  "description": "negative zero is canonicalized to positive zero",
+  "sourceFixture": "A1",
+  "target": "solve",
+  "variants": [
+    {
+      "name": "negative-zero",
+      "setToken": {
+        "/payload/bc/0/tK": { "valueToken": "-0", "unit": "degC" }
+      },
+      "expectedHash": "42e31bf77802cd1625486aeba98e2ab7581864c109e37edd167427c8c21d0528"
+    },
+    {
+      "name": "positive-zero",
+      "set": { "/payload/bc/0/tK": { "value": 0, "unit": "degC" } },
+      "expectedHash": "42e31bf77802cd1625486aeba98e2ab7581864c109e37edd167427c8c21d0528"
+    }
+  ],
+  "expected": { "relation": "equal", "normalizedTemperatureK": 273.15 }
+}

@@ -1,0 +1,7 @@
+{
+  "v": 1,
+  "seq": 2,
+  "ts": "2026-08-14T12:00:01Z",
+  "type": "residual",
+  "payload": { "iter": 1200, "region": "hot", "field": "p_rgh", "initial": 0.012 }
+}
