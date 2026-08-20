@@ -4,7 +4,7 @@
 > 커밋"). **본 문서의 케이스 등재는 불변이다** — 등재 후 파라미터 변경 금지, 미재현 시 실행계획 개정·새
 > ID·해당 캠페인 재수행(무단 조정 = 사전 등재 무효). ①′ 문서 리뷰(codex max)가 본 문서의 실재·산술을
 > 판정한다(미비 시 PR 병합 불가).
-> 스펙 표기: `gyrox` 본체 contracts 스키마(geometry-spec.v1·discretization-spec.v1·solve-spec.v1) 어휘.
+> 스펙 표기: `gyrox` 본체 contracts 스키마(geometry-spec.v1·discretization-spec.v1·solve-spec.v1·post-spec.v1) 어휘.
 > fixture 정본 = `gyrox` anchors ①(gyroid-core-30@v1 — envelope 0.03³·cell 4mm·wall 0.4mm·pitch 1e-4 m·
 > maxIters 2000·운전점 hot 0.023490376702 kg/s@333.15 K·cold 0.023821510837 kg/s@293.15 K).
 
@@ -50,14 +50,14 @@
 - 산술(등재 근거): n=600 → transientFrac 0.2 절단 후 480 ≥ 2W=400(insufficient 미발동)·600 ≥ 하한 550·
   minIterationsForJudgment 400 충족 — 리뷰 양측 산술 검증 완료(계획 §8).
 
-## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 8건 ID별 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N ≈ 64,000·t_iter ≈ 0.63 s·완주 ≈ 5.8 min < 기대 8 min·testTimeout 600 s 내 여유). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 ⓒ — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다)
+## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 9건 ID별(solve-bearing 8건) 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N ≈ 64,000·t_iter ≈ 0.63 s·완주 ≈ 5.8 min < 기대 8 min·testTimeout 600 s 내 여유). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 + §6.3 ⓒ(①′ R2 인용 정정) — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다)
 
 | ID | 기하 | maxIters | 종료조건(완주 여부) | 예상 소요 |
 |---|---|---|---|---|
-| XT-RR-01(취소·checkpoint 보존 V4) | EXT-A3 | 550 | 초기 iter 중 취소 발동 — 완주 불요·취소 체인 checkpoint 산출 | ≤2 min |
+| XT-RR-01(취소·checkpoint 보존 V4) | EXT-A3 | 550 | **progress iter ≥ 30 관측 시 취소 발동**(checkpoint iter = 취소 시점 — XT-RR-04 fixture 원천·i ≤ 50 관측 조건) — 완주 불요 | ≤2 min |
 | XT-RR-02(specHash 변조 exit 40) | EXT-A3 | 550 | 재개 스테이징 즉시 판정(XT-RR-01 산출 checkpoint 재사용·meta 변조) — 완주 불요 | ≤2 min |
 | XT-RR-03(sidecar 부재 콜드) | EXT-A3 | 550 | 콜드 재계산 개시 관측 — 완주 불요 | ≤3 min |
-| XT-RR-04(재개 소비 V5) | EXT-A3 | 550 | **완주 필요**(재개 후 잔여 완주·판정 창 리셋 확인 — checkpoint 원천 = XT-RR-01) | ≤8 min |
+| XT-RR-04(재개 소비 V5) | EXT-A3 | **600(재개 런)** | **러너 전용 재개 시험 명시(①′ R2 M2)** — executor 자격 선택 우회(자격 선택은 S3 더미 기검증·S4 이월 축 = **러너의 checkpoint 소비·판정 창 리셋**): checkpoint 원천 = XT-RR-01 취소 산출물(교차 fixture 재사용·iter i = 취소 시점 값 — 시험이 i ≤ 50 관측 조건 assert·산술 600 − i ≥ 550 병기)·/work/input 직접 스테이징 → 재개 완주·창 리셋 판정. **제품 경로 주기 checkpoint 재개는 소형 유도 불가**(주기 900 s 계약 상수 — 한계 정직 기재): 생산 축은 관통 캠페인(⑥ — 900 s 주기 다수 산출) 관측·소비 축은 본 러너 시험이 담당 | ≤8 min |
 | XT-RR-05(decompN 콜드) | EXT-A3 | 550 | 콜드 전환 관측 — 완주 불요 | ≤3 min |
 | XT-RR-06(캡·취소 동시) | EXT-A3 | 550 | 축소 maxWallClockSec 주입(시험 executorPolicy — 해시 불참여)·완주 불요 | ≤3 min |
 | XT-RR-07(mesh publish 실검증) | EXT-A3 mesh 산출 | — (solve 없음) | publish 가드 판정 | ≤2 min |
@@ -71,7 +71,11 @@
 
 ## 7. 4-spec canonical 전문 (①′ 리뷰 M1 처분 — 기계 판독 등재. 공통: geometry = EXT-A 기하·materials/numerics/convergence = fixture 전개값 불변·mdot = fixture × 면적비 0.16 **정확 십진 리터럴**(hot 0.00375846027232 · cold 0.00381144173392 — 축약 표기 금지))
 
-### 7.1 파일럿 (EXT-A·pitch 2e-4·maxIters 550)
+### 7.1 파일럿 (EXT-A·pitch 2e-4·maxIters 550) — resolver 산출 spec 해시(①′ R2 검증기 실측 등재): geometry `a9d780ba7f492e9849e370a388f51c4f098556c4606c7664a3df079da1b4798d` · discretization `b16de52d35a1ca669619c41b0154638bc055b788018512a388138614b4bbf93f` · solve `20f867b63871a487fba1d1babe048dfd2d9a6bc308e001e694ec934e842d5cb4` · post `50a010dd49da635960234e107b641d9bd101f3f938153fcb67c7737f5d570893`
+
+> post-spec `offsetM`은 **계약 const 0.015 전사**(스키마 상수 — ①′ R2 M1 정정). **파일럿·음성은 post 스테이지
+> 비실행**(solve 러너 단위 캠페인 축 — 단면 추출과 무관·4-spec 완결성은 해시·resolve 정합용). 변형 케이스
+> (§7.2·§7.3)의 spec 해시는 캠페인 `pre-run.json`이 기계 산출·결속.
 
 ```json
 {"geometry": {
@@ -262,7 +266,7 @@
       "p",
       "T"
      ],
-     "offsetM": 0.006
+     "offsetM": 0.015
     }
    ]
   }
@@ -271,18 +275,16 @@
 }}
 ```
 
-### 7.2 정상성 음성 (파일럿과 동일 — solve.limits.maxIters = 600만 상이)
+### 7.2 정상성 음성 — base = §7.1 전문·**RFC 6902 JSON Patch**(①′ R2 M3 — 기계 판독 형식)
 
 ```json
-{"solve.payload.limits": {"maxIters": 600}}
+[{"op": "replace", "path": "/solve/payload/limits/maxIters", "value": 600}]
 ```
 
-(그 외 3-spec + solve 잔여 필드 = §7.1 전문과 동일 — 전문 재게재 생략은 차이 1필드의 기계 명시로 갈음.)
-
-### 7.3 int-s4 소형 완주 기하 EXT-A3 (pitch 3e-4 — ①′ 리뷰 M2 처분: EXT-A2 폐기)
+### 7.3 int-s4 소형 완주 기하 EXT-A3 — base = §7.1 전문·**RFC 6902 JSON Patch**
 
 ```json
-{"discretization": {
+[{"op": "replace", "path": "/discretization", "value": {
  "kind": "discretization-spec",
  "payload": {
   "qa": {
@@ -304,9 +306,9 @@
   "voxelPitchM": 0.0003
  },
  "schemaVersion": 1
-}}
+}}]
 ```
 
-(geometry·solve(bc·mdot)·post = §7.1과 동일 — discretization pitch만 3e-4. N ≈ 1.728e-6/2.7e-11 = **64,000** ·
+(base의 그 외 3-spec 불변 — discretization pitch만 3e-4. N ≈ 1.728e-6/2.7e-11 = **64,000** ·
 t_iter ≈ 64000/(6334.6×16) ≈ **0.632 s** · 완주 550 iter ≈ **5.8 min**(기동·수확 여유 포함 ≤ testTimeout 600 s의
-시나리오는 없음 — 완주 시나리오도 8 min 기대 내·아래 §8 표).)
+초과 시나리오 없음 — 완주 시나리오도 8 min 기대 내·§5 표).)
