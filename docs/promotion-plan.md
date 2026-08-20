@@ -29,7 +29,7 @@
 
 ## 3. 파일럿 케이스 (E9 사정 입력 — CP-10)
 
-- **기하 = EXT-A** · **maxIters 550**(계약 하한 — 절단 후 440 ≥ 2W=400 성립·리뷰 검증 완료) · 운전점 =
+- **기하 = EXT-A** · **maxIters 550**(스키마 하한 500 + resolve 교차 가드 500+50 = **유효 실행 하한 550** — 두 하한 구분(①′ m1)·절단 후 440 ≥ 2W=400 성립) · 운전점 =
   fixture mdot × (0.012/0.03)² = **hot 3.7585e-3 kg/s@333.15 K·cold 3.8114e-3 kg/s@293.15 K**(면적비 축소 —
   BC 전 시간 상수) · numerics = 카탈로그 const(EC25 포함) · 분해수 16.
 - **예상 소요**: t_iter ≈ N/(6334.6×16) ≈ **2.1 s/iter** → 550 iter ≈ **20 min**(전처리·수확 포함 ≤1 h —
@@ -43,26 +43,270 @@
 
 - **기하 = EXT-A** · **maxIters 600 [초안 — 시험 fixture 파라미터]** · 운전점 = 파일럿과 동일(**BC 전 시간
   상수 — 시계열 forcing 없음**: 미정착 유도 축 = 짧은 maxIters의 초기 과도 구간 종료) · 분해수 16.
-- **기대 붕괴 축 = dpHot drift**: 판정 술어(S4-EXEC-PLAN §2 축자) = `convergenceAxes.perQoI.dpHotPa.drift.pass
+- **기대 붕괴 축 = dpHot drift/span 단독 붕괴**(①′ m2 표제 정합): 판정 술어(S4-EXEC-PLAN §2 축자) = `convergenceAxes.perQoI.dpHotPa.drift.pass
   = false ∨ span.pass = false` ∧ eb·mass·sign·finite 전부 pass ∧ ¬insufficient ∧ exit 10.
 - 이미지 digest = 실행 전 `pre-run.json` 고정(빌드 record 참조 — 최종 cp-manifest가 해시·조상 검증).
 - **미재현 처분**: 케이스 무단 조정 금지 — 실행계획 개정·새 ID·해당 캠페인 재수행.
 - 산술(등재 근거): n=600 → transientFrac 0.2 절단 후 480 ≥ 2W=400(insufficient 미발동)·600 ≥ 하한 550·
   minIterationsForJudgment 400 충족 — 리뷰 양측 산술 검증 완료(계획 §8).
 
-## 5. int-s4 소형 솔브 기하 (참고 — 시험 fixture 축)
+## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 8건 ID별 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N ≈ 64,000·t_iter ≈ 0.63 s·완주 ≈ 5.8 min < 기대 8 min·testTimeout 600 s 내 여유). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 ⓒ — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다)
 
-실 러너 integration(XT-RR solve-bearing 8건)의 기하 = EXT-A·maxIters 550~600 대역(케이스별 시험 파일이
-등재값 인용) — 예상 케이스당 ≈20~25 min은 D-I24 testTimeout 600 s와 별개 축(시험은 취소·checkpoint 등
-**완주 불요 시나리오**가 다수: 취소는 grace 내 종결·checkpoint는 주기 1회 산출 시점까지만 — 완주 필요
-시나리오(재개 소비 등)는 시험 내 maxIters 하한 550 축소 기하(pitch 2.5e-4 → N ≈ 110,592·t_iter ≈ 1.1 s →
-완주 ≈10 min)를 별도 등재값으로 사용).
-
-| id | envelope | pitch | N(근사) | t_iter(근사) | 용도 |
-|---|---|---|---|---|---|
-| **EXT-A2** | [0.012, 0.012, 0.012]·cell 4 mm·wall 0.4 mm | 2.5e-4 m | ≈110,592 | ≈1.1 s | int-s4 완주 필요 시나리오 전속 |
+| ID | 기하 | maxIters | 종료조건(완주 여부) | 예상 소요 |
+|---|---|---|---|---|
+| XT-RR-01(취소·checkpoint 보존 V4) | EXT-A3 | 550 | 초기 iter 중 취소 발동 — 완주 불요·취소 체인 checkpoint 산출 | ≤2 min |
+| XT-RR-02(specHash 변조 exit 40) | EXT-A3 | 550 | 재개 스테이징 즉시 판정(XT-RR-01 산출 checkpoint 재사용·meta 변조) — 완주 불요 | ≤2 min |
+| XT-RR-03(sidecar 부재 콜드) | EXT-A3 | 550 | 콜드 재계산 개시 관측 — 완주 불요 | ≤3 min |
+| XT-RR-04(재개 소비 V5) | EXT-A3 | 550 | **완주 필요**(재개 후 잔여 완주·판정 창 리셋 확인 — checkpoint 원천 = XT-RR-01) | ≤8 min |
+| XT-RR-05(decompN 콜드) | EXT-A3 | 550 | 콜드 전환 관측 — 완주 불요 | ≤3 min |
+| XT-RR-06(캡·취소 동시) | EXT-A3 | 550 | 축소 maxWallClockSec 주입(시험 executorPolicy — 해시 불참여)·완주 불요 | ≤3 min |
+| XT-RR-07(mesh publish 실검증) | EXT-A3 mesh 산출 | — (solve 없음) | publish 가드 판정 | ≤2 min |
+| XT-RR-08(관통 manifest 대조) | EXT-A3 | 550 | **완주 필요**(4스테이지 관통·manifest 대조) | ≤8 min |
+| XT-RR-09(estimate 정합) | EXT-A3 | 550 | 제출·admit 단계 판정 — solve 기동 불요 | ≤1 min |
 
 ## 6. 산출·기록
 
 ⒜⒝ 산출 = `gyrox/m1/s4-campaign/promotion-{a,b}.json`(캠페인 러너 기계 생성·CP-01/02) · 본 문서의 케이스
 등재값은 CP 매니페스트·pre-run.json이 spec 해시로 결속 · 실측 확정치는 `S4-EXEC-PLAN §10`에 전사.
+
+## 7. 4-spec canonical 전문 (①′ 리뷰 M1 처분 — 기계 판독 등재. 공통: geometry = EXT-A 기하·materials/numerics/convergence = fixture 전개값 불변·mdot = fixture × 면적비 0.16 **정확 십진 리터럴**(hot 0.00375846027232 · cold 0.00381144173392 — 축약 표기 금지))
+
+### 7.1 파일럿 (EXT-A·pitch 2e-4·maxIters 550)
+
+```json
+{"geometry": {
+ "kind": "geometry-spec",
+ "payload": {
+  "cellSizeM": {
+   "kind": "const",
+   "valueM": 0.004
+  },
+  "envelope": {
+   "kind": "box",
+   "sizeM": [
+    0.012,
+    0.012,
+    0.012
+   ]
+  },
+  "pattern": "gyroid",
+  "ports": [
+   {
+    "domain": "cold",
+    "face": "+x",
+    "id": "cold-inlet"
+   },
+   {
+    "domain": "cold",
+    "face": "-x",
+    "id": "cold-outlet"
+   },
+   {
+    "domain": "hot",
+    "face": "-x",
+    "id": "hot-inlet"
+   },
+   {
+    "domain": "hot",
+    "face": "+x",
+    "id": "hot-outlet"
+   }
+  ],
+  "splitting": "fullwall",
+  "wallThicknessM": {
+   "kind": "const",
+   "valueM": 0.0004
+  }
+ },
+ "schemaVersion": 1
+},
+ "discretization": {
+ "kind": "discretization-spec",
+ "payload": {
+  "qa": {
+   "maxBoundarySkewness": 20,
+   "maxConcave": 80,
+   "maxInternalSkewness": 4,
+   "maxNonOrtho": 65,
+   "minArea": -1,
+   "minDeterminant": 0.001,
+   "minEdgeLength": -1,
+   "minFaceWeight": 0.05,
+   "minTetQuality": 1e-15,
+   "minTriangleTwist": -1,
+   "minTwist": 0.02,
+   "minVol": 1e-18,
+   "minVolRatio": 0.01
+  },
+  "route": "voxel-hexa",
+  "voxelPitchM": 0.0002
+ },
+ "schemaVersion": 1
+},
+ "solve": {
+ "kind": "solve-spec",
+ "payload": {
+  "backend": "openfoam-cht",
+  "bc": [
+   {
+    "featureRef": "port:hot-inlet",
+    "kind": "flowRateInlet",
+    "mdotKgS": 0.00375846027232,
+    "tK": 333.15
+   },
+   {
+    "featureRef": "port:cold-inlet",
+    "kind": "flowRateInlet",
+    "mdotKgS": 0.00381144173392,
+    "tK": 293.15
+   }
+  ],
+  "convergence": {
+   "divergenceCheckScope": "judgedQoI+signRules",
+   "ebMaxPct": 1,
+   "ebWarnPct": 0.7,
+   "finiteRequired": true,
+   "instSpanPct": 0.5,
+   "judgedQoI": [
+    "dpHotPa",
+    "dpColdPa",
+    "qW"
+   ],
+   "massImbalanceMaxPct": 0.1,
+   "minIterationsForJudgment": 400,
+   "residualBlowupFactor": 1000,
+   "signRules": {
+    "flowDirection": {
+     "cold": {
+      "inlet": "negative",
+      "outlet": "positive"
+     },
+     "hot": {
+      "inlet": "negative",
+      "outlet": "positive"
+     }
+    },
+    "pressureDirection": {
+     "dpColdPa": "positive",
+     "dpHotPa": "positive"
+    },
+    "wallHeatFluxDirection": {
+     "cold": "positive",
+     "hot": "negative"
+    }
+   },
+   "signSanity": true,
+   "tOutDriftK": 0.1,
+   "tOutSpanK": 0.1,
+   "transientFrac": 0.2,
+   "windowIters": 200,
+   "windowMeanDriftPct": 0.5,
+   "windowMeanMinIters": 500,
+   "windowMeanSpanPct": 0.5,
+   "windowMeanTailW": 200
+  },
+  "limits": {
+   "maxIters": 550
+  },
+  "materials": {
+   "cold": {
+    "cpJKgK": 4182,
+    "muPaS": 0.001002,
+    "prandtl": 7.01,
+    "rhoKgM3": 998.2
+   },
+   "hot": {
+    "cpJKgK": 4183,
+    "muPaS": 0.000467,
+    "prandtl": 2.99,
+    "rhoKgM3": 983.2
+   },
+   "solid": {
+    "cpJKgK": 900,
+    "kWMK": 237,
+    "rhoKgM3": 2700
+   }
+  },
+  "numerics": {
+   "energyCouplingIters": 25,
+   "hTol": 1e-06,
+   "relaxation": {
+    "fluid": {
+     "U": 0.3,
+     "h": 0.5,
+     "pRgh": 0.7,
+     "rho": 1
+    },
+    "solid": {
+     "h": 0.7
+    }
+   },
+   "writePrecision": 10
+  },
+  "solver": "chtMultiRegionSimpleFoam"
+ },
+ "schemaVersion": 1
+},
+ "post": {
+ "kind": "post-spec",
+ "payload": {
+  "tier1": {
+   "summary": true,
+   "timeseries": true
+  },
+  "tier2": {
+   "slices": [
+    {
+     "axis": "z",
+     "fields": [
+      "p",
+      "T"
+     ],
+     "offsetM": 0.006
+    }
+   ]
+  }
+ },
+ "schemaVersion": 1
+}}
+```
+
+### 7.2 정상성 음성 (파일럿과 동일 — solve.limits.maxIters = 600만 상이)
+
+```json
+{"solve.payload.limits": {"maxIters": 600}}
+```
+
+(그 외 3-spec + solve 잔여 필드 = §7.1 전문과 동일 — 전문 재게재 생략은 차이 1필드의 기계 명시로 갈음.)
+
+### 7.3 int-s4 소형 완주 기하 EXT-A3 (pitch 3e-4 — ①′ 리뷰 M2 처분: EXT-A2 폐기)
+
+```json
+{"discretization": {
+ "kind": "discretization-spec",
+ "payload": {
+  "qa": {
+   "maxBoundarySkewness": 20,
+   "maxConcave": 80,
+   "maxInternalSkewness": 4,
+   "maxNonOrtho": 65,
+   "minArea": -1,
+   "minDeterminant": 0.001,
+   "minEdgeLength": -1,
+   "minFaceWeight": 0.05,
+   "minTetQuality": 1e-15,
+   "minTriangleTwist": -1,
+   "minTwist": 0.02,
+   "minVol": 1e-18,
+   "minVolRatio": 0.01
+  },
+  "route": "voxel-hexa",
+  "voxelPitchM": 0.0003
+ },
+ "schemaVersion": 1
+}}
+```
+
+(geometry·solve(bc·mdot)·post = §7.1과 동일 — discretization pitch만 3e-4. N ≈ 1.728e-6/2.7e-11 = **64,000** ·
+t_iter ≈ 64000/(6334.6×16) ≈ **0.632 s** · 완주 550 iter ≈ **5.8 min**(기동·수확 여유 포함 ≤ testTimeout 600 s의
+시나리오는 없음 — 완주 시나리오도 8 min 기대 내·아래 §8 표).)
