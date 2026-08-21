@@ -1,11 +1,27 @@
-# S4(G2) 실배선 판단 기록(S4-EXEC-PLAN E8): 이미지 빌드가 본체(사설) named context를 요구하므로 CI
-# 빌드 불가 — digest 기록의 정본 = 캠페인 ⓪ 기계 기록(image-build-record.json·3식별자·CP 매니페스트 결속).
-# 본 워크플로는 dispatch 전용 유지 — self-hosted 도입 시 재회부.
+# S4(G2) 실배선(P-M03 처분): runtime 타깃은 gyrox 컨텍스트 불요 — CI가 빌드·식별자 기록 산출.
+# full/test 이미지·캠페인 3식별자 기록의 정본은 캠페인 ⓪(image-build-record.json·CP 매니페스트 결속).
 name: image-build
 on:
+  pull_request:
   workflow_dispatch: {}
 jobs:
-  placeholder:
+  build-runtime:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "S4(G2) 발효 전 자리 — 이미지 빌드 파이프라인은 S4에서 배선된다"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build runtime image
+        run: make build IMAGE=gyrox/solvers:ci
+      - name: Record image identifiers
+        run: |
+          mkdir -p reports
+          docker image inspect gyrox/solvers:ci --format '{{json .}}' | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          print(json.dumps({'fullImageId': d['Id'], 'repoDigests': d.get('RepoDigests') or None, 'baseAnchor3': 'sha256:33fb575aa9980d2bc42fd58c75ae698c489293ba30c991380fe3f899c622f319'}, indent=1))" > reports/image-build-ci-record.json
+          cat reports/image-build-ci-record.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-build-ci-record
+          path: reports/image-build-ci-record.json

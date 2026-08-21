@@ -1,12 +1,20 @@
-# S4 실배선 판단 기록(S4-EXEC-PLAN E8·ⓓ″): make test의 시험 payload는 본체(사설) M0 수용 기록을
-# named build context로 굽는다(Dockerfile test 스테이지 — untracked labels.vti 포함). 따라서 CI에서는
-# 빌드 자체가 불가하며, S7 자립 판정의 정본 = 캠페인 ⑧ 로컬 재실행·리포트 해시 결속(CP 매니페스트·E8).
-# 본 워크플로는 dispatch 전용 유지 — 실행 환경이 갖춰진 self-hosted 도입 시 재회부.
+# S4 실배선(P-M03 처분): CI 축 = gyrox 사설 컨텍스트 불요 서브셋(test-ci — `-m "not m0_assets"`).
+# 전체 make test(m0 수용 기록 포함 — S7 자립 판정 정본)는 캠페인 ⑧ 로컬 재실행·리포트 해시 결속(CP 매니페스트).
 name: make-test
 on:
+  pull_request:
   workflow_dispatch: {}
 jobs:
-  placeholder:
+  make-test-ci:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "S4 발효 전 자리 — DETAIL §1.4 make test는 S4에서 배선된다"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build and run CI-subset tests in image
+        run: make test-ci CI_JUNIT_OUT=$PWD/reports/make-test-ci-report.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: make-test-ci-report
+          path: reports/make-test-ci-report.xml
