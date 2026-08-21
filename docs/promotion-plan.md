@@ -69,7 +69,7 @@
 ⒜⒝ 산출 = `gyrox/m1/s4-campaign/promotion-{a,b}.json`(캠페인 러너 기계 생성·CP-01/02) · 본 문서의 케이스
 등재값은 CP 매니페스트·pre-run.json이 spec 해시로 결속 · 실측 확정치는 `S4-EXEC-PLAN §10`에 전사.
 
-## 7. 4-spec canonical 전문 (①′ 리뷰 M1 처분 — 기계 판독 등재. 공통(§7.1~7.3): geometry = EXT-A 기하·materials/numerics/convergence = fixture 전개값 불변·mdot = fixture × 면적비 0.16 정확 십진 리터럴(hot 0.00375846027232 · cold 0.00381144173392) — **예외 §7.4 = EXT-A4 전용 기하·면적비 0.18**. 변형(§7.2·§7.3·§7.4) spec 해시 = pre-run.json 기계 산출·결속)
+## 7. 4-spec canonical 전문 (①′ 리뷰 M1 처분 — 기계 판독 등재. 공통 base = §7.1(EXT-A·면적비 0.16 — hot 0.00375846027232·cold 0.00381144173392)·materials/numerics/convergence = fixture 전개값 불변. **변형별 면적비·mdot(R5 재선정)**: §7.3 EXT-A3 = 0.09 / §7.4 EXT-A4 = 0.15 — 각 Patch에 정확 십진 리터럴 편입. 변형 spec 해시 = pre-run.json 기계 산출·결속)
 
 ### 7.1 파일럿 (EXT-A·pitch 2e-4·maxIters 550) — resolver 산출 spec 해시(①′ R2 검증기 실측 등재): geometry `a9d780ba7f492e9849e370a388f51c4f098556c4606c7664a3df079da1b4798d` · discretization `b16de52d35a1ca669619c41b0154638bc055b788018512a388138614b4bbf93f` · solve `20f867b63871a487fba1d1babe048dfd2d9a6bc308e001e694ec934e842d5cb4` · post `50a010dd49da635960234e107b641d9bd101f3f938153fcb67c7737f5d570893`
 
