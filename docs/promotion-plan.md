@@ -50,7 +50,7 @@
 - 산술(등재 근거): n=600 → transientFrac 0.2 절단 후 480 ≥ 2W=400(insufficient 미발동)·600 ≥ 하한 550·
   minIterationsForJudgment 400 충족 — 리뷰 양측 산술 검증 완료(계획 §8).
 
-## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 9건 ID별(solve-bearing 8건) 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N ≈ 64,000·t_iter ≈ 0.63 s·완주 ≈ 5.8 min < 기대 8 min·testTimeout 600 s 내 여유). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 + §6.3 ⓒ(①′ R2 인용 정정) — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다))
+## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 9건 ID별(solve-bearing 8건) 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N = 46,656·t_iter ≈ 0.46 s·완주 ≈ 4.2 min·testTimeout 600 s 내 여유 347 s). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 + §6.3 ⓒ(①′ R2 인용 정정) — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다))
 
 | ID | 기하 | maxIters | 종료조건(완주 여부) | 예상 소요 |
 |---|---|---|---|---|
@@ -61,7 +61,7 @@
 | XT-RR-05(decompN 콜드) | EXT-A3 | 550 | **RR-01 산출 checkpoint+유효 sidecar 재사용·specHash `20f867…` 불변·decompN만 불일치(checkpoint 16 → 재개 분해수 8 주입)** — exit 40 미발동 ∧ 콜드 재계산 전환 assert·완주 불요(①′ R4 명세) | ≤3 min |
 | XT-RR-06(캡·취소 동시) | EXT-A3 | 550 | 축소 maxWallClockSec 주입(시험 executorPolicy — 해시 불참여)·완주 불요 | ≤3 min |
 | XT-RR-07(mesh publish 실검증) | EXT-A3 mesh 산출 | — (solve 없음) | publish 가드 판정 | ≤2 min |
-| XT-RR-08(관통 manifest 대조) | **EXT-A4**(§7.4 — post z=0.015 단면 내부 성립·①′ R4 축소 재선정) | 550 | **완주 필요**(4스테이지 관통·manifest 대조 — post 실행 포함·testTimeout 600 s 기본값 내 산술 성립) | ≤8 min(solve ≈4.9 min+전후처리 — 파일럿 검증) |
+| XT-RR-08(관통 manifest 대조) | **EXT-A4**(§7.4 — post z=0.015 내부 성립·①′ R5 재선정) | 550 | **완주 필요**(4스테이지 관통·manifest 대조 — post 실행 포함·testTimeout 600 s 기본값 내 산술 성립) | ≤8 min(solve ≈5.9 min+여유 248 s — 파일럿 검증) |
 | XT-RR-09(estimate 정합) | EXT-A3 | 550 | 제출·admit 단계 판정 — solve 기동 불요 | ≤1 min |
 
 ## 6. 산출·기록
@@ -281,10 +281,13 @@
 [{"op": "replace", "path": "/solve/payload/limits/maxIters", "value": 600}]
 ```
 
-### 7.3 int-s4 소형 완주 기하 EXT-A3 — base = §7.1 전문·**RFC 6902 JSON Patch**
+### 7.3 int-s4 소형 완주 기하 EXT-A3 — base = §7.1 전문·**RFC 6902 JSON Patch**(①′ R5 재선정 — **geometry 하드 가드 `wall < 1.5×pitch` 충족**: pitch 2.5e-4·1.5×0.25 mm = 0.375 ≤ wall 0.4 mm·envelope [0.009]³ = 36³ 정수 분할·인렛 면적비 0.09 mdot 재산정)
 
 ```json
-[{"op": "replace", "path": "/discretization", "value": {
+[{"op": "replace", "path": "/geometry/payload/envelope/sizeM", "value": [0.009, 0.009, 0.009]},
+ {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.00211413390318},
+ {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.00214393597533},
+ {"op": "replace", "path": "/discretization", "value": {
  "kind": "discretization-spec",
  "payload": {
   "qa": {
@@ -303,26 +306,25 @@
    "minVolRatio": 0.01
   },
   "route": "voxel-hexa",
-  "voxelPitchM": 0.0003
+  "voxelPitchM": 0.00025
  },
  "schemaVersion": 1
 }}]
 ```
 
-(적용 대상 ID별 Patch 규칙(①′ R3 M1 지시 — "그 외 불변" 문언 대체): XT-RR-01·02·03·04·05·06·09 = base(§7.1) + 본 §7.3 Patch(disc 3e-4)·solve maxIters 550 = base 그대로 / XT-RR-08 = §7.4 / XT-RR-07 = §7.3의 mesh 산출까지만. N ≈ 1.728e-6/2.7e-11 = **64,000** ·
-t_iter ≈ 64000/(6334.6×16) ≈ **0.632 s** · 완주 550 iter ≈ **5.8 min**(기동·수확 여유 포함 ≤ testTimeout 600 s의
-초과 시나리오 없음 — 완주 시나리오도 8 min 기대 내·§5 표).)
+(적용 대상 ID별 Patch 규칙(①′ R3 M1 지시): XT-RR-01·02·03·04·05·06·09 = base(§7.1) + 본 §7.3 Patch·solve
+maxIters 550 = base 그대로 / XT-RR-08 = §7.4 / XT-RR-07 = §7.3의 mesh 산출까지만. **N = 36³ = 46,656 ·
+t_iter ≈ 0.460 s · 완주 550 ≈ 253 s(4.2 min)** — testTimeout 600 s 내 여유 347 s(§5 표).)
 
-### 7.4 XT-RR-08 전용 기하 EXT-A4 — base = §7.1 전문·RFC 6902 JSON Patch (①′ R4 M 처분 — 축소 재선정: envelope [0.009, 0.009, 0.018](pitch 3e-4 정수 분할 30×30×60)·post z=0.015 내부 성립·인렛 면적 y·z = 0.009×0.018 = 1.62e-4 m² → 면적비 0.18·**900 s 문구 철회 — D-I24 testTimeout 600 s 기본값 내 산술 성립**)
+### 7.4 XT-RR-08 전용 기하 EXT-A4 — base = §7.1 전문·RFC 6902 JSON Patch (①′ R5 재선정 — 하드 가드 충족 pitch 2.5e-4·envelope [0.0075, 0.0075, 0.018](30×30×72 정수 분할)·post z=0.015 내부 성립·인렛 면적 y·z = 0.0075×0.018 = 1.35e-4 m² → 면적비 0.15·900 s 문구 철회 유지)
 
 ```json
-[{"op": "replace", "path": "/geometry/payload/envelope/sizeM", "value": [0.009, 0.009, 0.018]},
- {"op": "replace", "path": "/discretization/payload/voxelPitchM", "value": 0.0003},
- {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.00422826780636},
- {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.00428787195066}]
+[{"op": "replace", "path": "/geometry/payload/envelope/sizeM", "value": [0.0075, 0.0075, 0.018]},
+ {"op": "replace", "path": "/discretization/payload/voxelPitchM", "value": 0.00025},
+ {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.0035235565053},
+ {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.00357322662555}]
 ```
 
-(N = 30×30×60 = **54,000** · t_iter ≈ 54000/(6334.6×16) ≈ **0.533 s** · 완주 550 ≈ **293 s(4.9 min)** —
-전후처리·기동·수확 여유 **307 s** 내 상한: 파일럿 phase별 실측이 이 여유의 충분성을 검증(§3 provenance —
-초과 반증 시 본 문서 개정·재수행). mdot = fixture × 0.18 정확 십진 리터럴. 변형 spec 해시 4종은 pre-run.json
-기계 산출·결속(§7 머리말 규칙 — §7.2·§7.3과 동일).)
+(N = 30×30×72 = **64,800** · t_iter ≈ **0.639 s** · 완주 550 ≈ **352 s(5.9 min)** — 전후처리·기동·수확 여유
+**248 s**: 파일럿 phase별 실측이 충분성 검증(초과 반증 시 본 문서 개정·재수행). mdot = fixture × 0.15 정확
+십진 리터럴. 변형 spec 해시 = pre-run.json 기계 산출·결속.)
