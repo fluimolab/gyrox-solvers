@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/run-manifest/v1",
+  "title": "RunManifest v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "specs",
+    "executorPolicy"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "specs": {
+      "type": "object",
+      "required": [
+        "geometry",
+        "discretization",
+        "solve",
+        "post"
+      ],
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/geometryRef"
+        },
+        "discretization": {
+          "$ref": "#/$defs/discretizationRef"
+        },
+        "solve": {
+          "$ref": "#/$defs/solveRef"
+        },
+        "post": {
+          "$ref": "#/$defs/postRef"
+        }
+      },
+      "additionalProperties": false
+    },
+    "executorPolicy": {
+      "type": "object",
+      "required": [
+        "maxWallClockSec",
+        "resourceClass",
+        "checkpointIntervalSec",
+        "judgmentSlackIters"
+      ],
+      "properties": {
+        "maxWallClockSec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "resourceClass": {
+          "enum": [
+            "small",
+            "medium",
+            "large"
+          ]
+        },
+        "checkpointIntervalSec": {
+          "const": 900
+        },
+        "judgmentSlackIters": {
+          "const": 50
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "geometryRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "hash"
+      ],
+      "properties": {
+        "kind": {
+          "const": "geometry-spec"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": false
+    },
+    "discretizationRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "hash"
+      ],
+      "properties": {
+        "kind": {
+          "const": "discretization-spec"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": false
+    },
+    "solveRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "hash"
+      ],
+      "properties": {
+        "kind": {
+          "const": "solve-spec"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": false
+    },
+    "postRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "hash"
+      ],
+      "properties": {
+        "kind": {
+          "const": "post-spec"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

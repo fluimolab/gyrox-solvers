@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/system-event/v1",
+  "title": "Worker system event v1",
+  "$comment": "ADR-006 D8-2: closed sys.* payloads carry no QoI fields and are not projected to SSE",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "payload"
+      ],
+      "properties": {
+        "type": {
+          "const": "sys.issuance-denied"
+        },
+        "payload": {
+          "$ref": "#/$defs/issuanceDenied"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "payload"
+      ],
+      "properties": {
+        "type": {
+          "const": "sys.stage-contention"
+        },
+        "payload": {
+          "$ref": "#/$defs/stageContention"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "type",
+        "payload"
+      ],
+      "properties": {
+        "type": {
+          "const": "sys.operator-required"
+        },
+        "payload": {
+          "$ref": "#/$defs/operatorRequired"
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "stage": {
+      "enum": [
+        "geometry",
+        "mesh",
+        "solve",
+        "post"
+      ]
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullableString": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "issuanceDenied": {
+      "type": "object",
+      "required": [
+        "stage",
+        "cause"
+      ],
+      "properties": {
+        "stage": {
+          "$ref": "#/$defs/stage"
+        },
+        "cause": {
+          "enum": [
+            "governance-hold",
+            "governance-drift",
+            "quarantine",
+            "pin-null"
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "stageContention": {
+      "type": "object",
+      "required": [
+        "stage",
+        "attempts",
+        "elapsedSec"
+      ],
+      "properties": {
+        "stage": {
+          "$ref": "#/$defs/stage"
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedSec": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "labels": {
+      "type": "object",
+      "properties": {
+        "gyrox.run_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "stage": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "fencing_token": {
+          "$ref": "#/$defs/nullableString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "required": [
+        "labels",
+        "state",
+        "imageDigest"
+      ],
+      "properties": {
+        "labels": {
+          "$ref": "#/$defs/labels"
+        },
+        "state": {
+          "enum": [
+            "created",
+            "running",
+            "paused",
+            "restarting",
+            "removing",
+            "exited",
+            "dead"
+          ]
+        },
+        "imageDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "operatorRequired": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "stage",
+            "cause",
+            "containerRef",
+            "snapshot"
+          ],
+          "properties": {
+            "stage": {
+              "$ref": "#/$defs/stage"
+            },
+            "cause": {
+              "enum": [
+                "label-mismatch",
+                "inconsistent-container"
+              ]
+            },
+            "containerRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "snapshot": {
+              "$ref": "#/$defs/snapshot"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "stage",
+            "cause",
+            "recordedInputManifestHash",
+            "recomputedHash"
+          ],
+          "properties": {
+            "stage": {
+              "$ref": "#/$defs/stage"
+            },
+            "cause": {
+              "const": "staging-hash-mismatch"
+            },
+            "recordedInputManifestHash": {
+              "$ref": "#/$defs/sha256"
+            },
+            "recomputedHash": {
+              "$ref": "#/$defs/sha256"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

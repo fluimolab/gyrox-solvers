@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/geometry-spec/v1",
+  "title": "GeometrySpec v1 canonical envelope",
+  "type": "object",
+  "required": [
+    "kind",
+    "schemaVersion",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "const": "geometry-spec"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "pattern",
+        "cellSizeM",
+        "wallThicknessM",
+        "splitting",
+        "envelope",
+        "ports"
+      ],
+      "properties": {
+        "pattern": {
+          "const": "gyroid"
+        },
+        "cellSizeM": {
+          "type": "object",
+          "required": [
+            "kind",
+            "valueM"
+          ],
+          "properties": {
+            "kind": {
+              "const": "const"
+            },
+            "valueM": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "wallThicknessM": {
+          "type": "object",
+          "required": [
+            "kind",
+            "valueM"
+          ],
+          "properties": {
+            "kind": {
+              "const": "const"
+            },
+            "valueM": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "splitting": {
+          "const": "fullwall"
+        },
+        "envelope": {
+          "type": "object",
+          "required": [
+            "kind",
+            "sizeM"
+          ],
+          "properties": {
+            "kind": {
+              "const": "box"
+            },
+            "sizeM": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "additionalProperties": false
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "hot-inlet"
+                  },
+                  "domain": {
+                    "const": "hot"
+                  },
+                  "face": {
+                    "enum": [
+                      "-x",
+                      "+x",
+                      "-y",
+                      "+y",
+                      "-z",
+                      "+z"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "domain",
+                  "face"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "hot-outlet"
+                  },
+                  "domain": {
+                    "const": "hot"
+                  },
+                  "face": {
+                    "enum": [
+                      "-x",
+                      "+x",
+                      "-y",
+                      "+y",
+                      "-z",
+                      "+z"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "domain",
+                  "face"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "cold-inlet"
+                  },
+                  "domain": {
+                    "const": "cold"
+                  },
+                  "face": {
+                    "enum": [
+                      "-x",
+                      "+x",
+                      "-y",
+                      "+y",
+                      "-z",
+                      "+z"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "domain",
+                  "face"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "cold-outlet"
+                  },
+                  "domain": {
+                    "const": "cold"
+                  },
+                  "face": {
+                    "enum": [
+                      "-x",
+                      "+x",
+                      "-y",
+                      "+y",
+                      "-z",
+                      "+z"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "domain",
+                  "face"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "hot-inlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "hot-outlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "cold-inlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "cold-outlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
