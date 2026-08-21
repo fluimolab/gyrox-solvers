@@ -7,6 +7,7 @@ import pytest
 from openfoam.solve.judge import judge_csv
 
 
+@pytest.mark.m0_assets
 @pytest.mark.parametrize("_case", [None], ids=["[SR-05]"])
 def test_axis_separation(_case, gyrox_root, convergence):
     golden_path = gyrox_root / "m0/m04/runs/phaseC/results/window-analysis-C.json"

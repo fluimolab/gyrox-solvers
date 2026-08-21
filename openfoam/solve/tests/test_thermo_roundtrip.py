@@ -7,6 +7,7 @@ import pytest
 from openfoam.solve.renderer import render_case
 
 
+@pytest.mark.m0_assets
 @pytest.mark.parametrize("_case", [None], ids=["[SR-02]"])
 def test_material_roundtrip(_case, tmp_path, solve_document, patch_map, gyrox_root):
     render_case(solve_document, patch_map, tmp_path, cores=8, write_interval=500)

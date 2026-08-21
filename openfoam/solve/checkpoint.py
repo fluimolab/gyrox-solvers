@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tarfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,16 +22,30 @@ class ResumeDecision:
     message: str | None = None
 
 
-def _checkpoint_members(case: Path, time_name: str) -> list[Path]:
+def validate_processor_mesh(case: Path, decomp_n: int) -> None:
+    expected = {f"processor{index}" for index in range(decomp_n)}
+    actual = {path.name for path in case.glob("processor*") if path.is_dir()}
+    if actual != expected:
+        raise ValueError(f"processor decomposition mismatch: expected {sorted(expected)}, got {sorted(actual)}")
+    for processor in sorted(expected):
+        for region in REGIONS:
+            mesh = case / processor / "constant" / region / "polyMesh"
+            if not mesh.is_dir():
+                raise FileNotFoundError(f"processor mesh absent: {mesh}")
+
+
+def _checkpoint_members(case: Path, time_name: str, decomp_n: int) -> list[Path]:
     members: set[Path] = set()
-    for base in (case, *sorted(case.glob("processor*"))):
+    for base in (case / f"processor{index}" for index in range(decomp_n)):
         time_dir = base / time_name
         if not time_dir.is_dir():
-            continue
+            raise FileNotFoundError(f"checkpoint processor time absent: {time_dir}")
         for region in REGIONS:
             region_dir = time_dir / region
             if not region_dir.is_dir():
                 raise FileNotFoundError(f"checkpoint region absent: {region_dir}")
+            if any(path.name.endswith((".tmp", ".part")) for path in region_dir.rglob("*")):
+                raise ValueError(f"checkpoint write is incomplete: {region_dir}")
             members.add(region_dir)
     return sorted(members, key=lambda path: path.relative_to(case).as_posix())
 
@@ -45,15 +60,22 @@ def produce_checkpoint(
     phys_t: float,
     time_name: str,
 ) -> dict[str, Any]:
-    members = _checkpoint_members(case, time_name)
+    members = _checkpoint_members(case, time_name, decomp_n)
     if not members:
         raise FileNotFoundError(f"no regional time directories for {time_name}")
     checkpoint_dir = output_root / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     tar_path = checkpoint_dir / f"checkpoint-{iteration}.tar"
-    with tarfile.open(tar_path, "w") as archive:
-        for member in members:
-            archive.add(member, arcname=member.relative_to(case).as_posix(), recursive=True)
+    if tar_path.exists():
+        raise FileExistsError(f"checkpoint iteration already declared: {iteration}")
+    temporary = checkpoint_dir / f".{tar_path.name}.{os.getpid()}.tmp"
+    try:
+        with tarfile.open(temporary, "w") as archive:
+            for member in members:
+                archive.add(member, arcname=member.relative_to(case).as_posix(), recursive=True)
+        temporary.replace(tar_path)
+    finally:
+        temporary.unlink(missing_ok=True)
     declaration = {
         "path": tar_path.relative_to(output_root).as_posix(),
         "bytes": tar_path.stat().st_size,
@@ -80,13 +102,36 @@ def resume_checkpoint(case: Path, archive: Path, sidecar: Path, *, spec_hash: st
         return ResumeDecision("reject", exit_code=40, message="checkpoint spec hash mismatch")
     if metadata["decompN"] != decomp_n:
         return ResumeDecision("cold", message="checkpoint decomposition mismatch")
-    if not archive.is_file() or sha256_file(archive) != metadata["sha256"]:
+    if (
+        not archive.is_file()
+        or archive.stat().st_size != metadata["bytes"]
+        or sha256_file(archive) != metadata["sha256"]
+    ):
         return ResumeDecision("cold", message="checkpoint archive absent or corrupt")
+    validate_processor_mesh(case, decomp_n)
     with tarfile.open(archive, "r") as source:
         root = case.resolve()
+        expected_roots = {
+            (f"processor{index}", metadata["timeName"], region)
+            for index in range(decomp_n)
+            for region in REGIONS
+        }
+        seen_roots: set[tuple[str, str, str]] = set()
         for member in source.getmembers():
             target = (case / member.name).resolve()
             if target != root and root not in target.parents:
                 raise ValueError(f"unsafe checkpoint member: {member.name}")
+            parts = Path(member.name).parts
+            member_root = tuple(parts[:3])
+            if len(parts) < 3 or member_root not in expected_roots:
+                raise ValueError(f"checkpoint contains non-time overlay member: {member.name}")
+            seen_roots.add(member_root)
+        if seen_roots != expected_roots:
+            missing = sorted(expected_roots - seen_roots)
+            raise ValueError(f"checkpoint time overlay is incomplete: {missing}")
         source.extractall(case, filter="data")
+    for processor, time_name, region in expected_roots:
+        if not (case / processor / time_name / region).is_dir():
+            raise FileNotFoundError(f"checkpoint region absent after overlay: {processor}/{time_name}/{region}")
+    validate_processor_mesh(case, decomp_n)
     return ResumeDecision("resume")

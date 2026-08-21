@@ -134,7 +134,42 @@ def _normalize_foam(text: str) -> str:
     return " ".join(text.split())
 
 
+def _foam_word(path: Path, key: str) -> str:
+    match = re.search(rf"\b{re.escape(key)}\s+([^\s;]+)\s*;", _normalize_foam(path.read_text(encoding="utf-8")))
+    if match is None:
+        raise ValueError(f"required OpenFOAM entry absent: {path}: {key}")
+    return match.group(1)
+
+
+def _named_block(text: str, name: str) -> str:
+    match = re.search(rf"\b{re.escape(name)}\s*\{{", text)
+    if match is None:
+        raise ValueError(f"required function object absent: {name}")
+    start = match.end()
+    depth = 1
+    for index in range(start, len(text)):
+        if text[index] == "{":
+            depth += 1
+        elif text[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:index]
+    raise ValueError(f"unterminated function object: {name}")
+
+
+def _operational_contract(case: Path) -> None:
+    control = (case / "system/controlDict").read_text(encoding="utf-8")
+    if not re.search(r'^\s*#include\s+"functions\.cfg"\s*$', control, re.M):
+        raise ValueError("controlDict must preload functions.cfg")
+    functions = _normalize_foam((case / "system/functions.cfg").read_text(encoding="utf-8"))
+    for name in ("whf_hot", "whf_cold"):
+        block = _named_block(functions, name)
+        if not re.search(r"\btype\s+wallHeatFlux\s*;", block) or not re.search(r"\blog\s+yes\s*;", block):
+            raise ValueError(f"{name} must be a logging wallHeatFlux function object")
+
+
 def _fingerprint(case: Path, spec: dict[str, Any]) -> str:
+    _operational_contract(case)
     schemes = {}
     for relative in (
         "system/fvSchemes", "system/hot/fvSchemes", "system/cold/fvSchemes", "system/solid/fvSchemes",
@@ -156,18 +191,25 @@ def _fingerprint(case: Path, spec: dict[str, Any]) -> str:
             "0/solid/T", "0/solid/p",
         )
     }
+    decompose_paths = (
+        "system/decomposeParDict", "system/hot/decomposeParDict",
+        "system/cold/decomposeParDict", "system/solid/decomposeParDict",
+    )
+    decomposition = {relative: _foam_word(case / relative, "method") for relative in decompose_paths}
+    if any(method != "hierarchical" for method in decomposition.values()):
+        raise ValueError(f"all decomposition methods must be hierarchical: {decomposition}")
     whitelist = {
         "schemes": schemes,
         "solutions": solutions,
         "relaxation": spec["numerics"]["relaxation"],
         "energyCouplingIters": spec["numerics"]["energyCouplingIters"],
         "hTol": spec["numerics"]["hTol"],
-        "writePrecision": spec["numerics"]["writePrecision"],
+        "writePrecision": int(_foam_word(case / "system/controlDict", "writePrecision")),
         "boundaryConditions": spec["bc"],
         "boundaryDictionaries": boundary_dictionaries,
         "outletTemplate": {"kind": "inletOutlet", "pressure": "fixedValue"},
         "thermophysicalProperties": thermo,
-        "decompositionMethod": "hierarchical",
+        "decompositionMethods": decomposition,
     }
     canonical = json.dumps(whitelist, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(canonical.encode()).hexdigest()

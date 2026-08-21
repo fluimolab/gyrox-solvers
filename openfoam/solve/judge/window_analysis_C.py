@@ -43,7 +43,7 @@ ALIASES = {
 
 def _number(row: dict[str, Any], key: str) -> float | None:
     raw = row.get(key, row.get(ALIASES.get(key, "")))
-    if raw in (None, "", "nan"):
+    if raw in (None, ""):
         return None
     try:
         return float(raw)
@@ -110,24 +110,34 @@ def _finite(rows: list[dict[str, Any]], keys: Iterable[str]) -> bool:
     return True
 
 
-def _sign_ok(rows: list[dict[str, Any]], window: int, minimum: int) -> bool:
+SIGN_PREDICATES = {
+    "dpHotPa": lambda value: value > 0,
+    "dpColdPa": lambda value: value > 0,
+    "monitor_mdotHotInSignedKgS": lambda value: value < 0,
+    "monitor_mdotHotOutSignedKgS": lambda value: value > 0,
+    "monitor_mdotColdInSignedKgS": lambda value: value < 0,
+    "monitor_mdotColdOutSignedKgS": lambda value: value > 0,
+    "qHotW": lambda value: value < 0,
+    "qColdW": lambda value: value > 0,
+}
+
+
+def _sign_status(rows: list[dict[str, Any]], window: int, minimum: int) -> tuple[bool, bool]:
+    """Return ``(complete, pass)`` for the required signed judgment window.
+
+    Missing sign samples are evidence insufficiency, not a physics violation.  A
+    sign violation is only actionable after every required series has all W
+    samples in the same complete judgment window.
+    """
     if not _window_complete(rows, window, minimum):
-        return True
-    predicates = {
-        "dpHotPa": lambda value: value > 0,
-        "dpColdPa": lambda value: value > 0,
-        "monitor_mdotHotInSignedKgS": lambda value: value < 0,
-        "monitor_mdotHotOutSignedKgS": lambda value: value > 0,
-        "monitor_mdotColdInSignedKgS": lambda value: value < 0,
-        "monitor_mdotColdOutSignedKgS": lambda value: value > 0,
-        "qHotW": lambda value: value < 0,
-        "qColdW": lambda value: value > 0,
-    }
-    for key, predicate in predicates.items():
+        return False, False
+    for key, predicate in SIGN_PREDICATES.items():
         values = [_number(row, key) for row in rows[-window:]]
-        if any(value is not None for value in values) and not all(value is not None and predicate(value) for value in values):
-            return False
-    return True
+        if not all(value is not None and math.isfinite(value) for value in values):
+            return False, False
+        if not all(predicate(value) for value in values if value is not None):
+            return True, False
+    return True, True
 
 
 def _residual_blowup(rows: list[dict[str, Any]], window: int, factor: float, minimum: int) -> bool:
@@ -164,21 +174,36 @@ def judge_rows(rows: list[dict[str, Any]], convergence: dict[str, Any]) -> Judge
         "dpColdPa": _series(judged_rows, "dpColdPa"),
         "qW": _q_series(judged_rows),
     }
-    all_finite = _finite(rows, (*q_series, "qHotW", "qColdW", "tOutHotK", "tOutColdK", "energyBalancePct", "massHotPct", "massColdPct"))
-    sign_ok = _sign_ok(rows, window, int(convergence["minIterationsForJudgment"]))
+    all_finite = _finite(rows, (
+        *SIGN_PREDICATES, "tOutHotK", "tOutColdK",
+        "energyBalancePct", "massHotPct", "massColdPct",
+    ))
+    sign_complete, sign_ok = _sign_status(
+        judged_rows, window, int(convergence["minIterationsForJudgment"]),
+    )
     blowup = _residual_blowup(rows, window, float(convergence["residualBlowupFactor"]), int(convergence["minIterationsForJudgment"]))
-    diverged = (bool(convergence["finiteRequired"]) and not all_finite) or (bool(convergence["signSanity"]) and not sign_ok) or blowup
+    diverged = (
+        (bool(convergence["finiteRequired"]) and not all_finite)
+        or (bool(convergence["signSanity"]) and sign_complete and not sign_ok)
+        or blowup
+    )
 
     q_stats = {key: _wm_stats(values, window) for key, values in q_series.items()}
     t_hot = _wm_stats(_series(judged_rows, "tOutHotK"), window, kelvin=True)
     t_cold = _wm_stats(_series(judged_rows, "tOutColdK"), window, kelvin=True)
-    eb_values = _series(judged_rows, "energyBalancePct", absolute=True)
-    mass_hot_values = _series(judged_rows, "massHotPct", absolute=True)
-    mass_cold_values = _series(judged_rows, "massColdPct", absolute=True)
-    eb_mean = statistics.fmean(eb_values[-window:]) if len(eb_values) >= window else None
-    mass_hot = statistics.fmean(mass_hot_values[-window:]) if len(mass_hot_values) >= window else None
-    mass_cold = statistics.fmean(mass_cold_values[-window:]) if len(mass_cold_values) >= window else None
-    insufficient = any(value is None for value in q_stats.values()) or t_hot is None or t_cold is None or None in (eb_mean, mass_hot, mass_cold)
+    eb_stats = _wm_stats(_series(judged_rows, "energyBalancePct", absolute=True), window)
+    mass_hot_stats = _wm_stats(_series(judged_rows, "massHotPct", absolute=True), window)
+    mass_cold_stats = _wm_stats(_series(judged_rows, "massColdPct", absolute=True), window)
+    eb_mean = eb_stats["windowMean"] if eb_stats is not None else None
+    mass_hot = mass_hot_stats["windowMean"] if mass_hot_stats is not None else None
+    mass_cold = mass_cold_stats["windowMean"] if mass_cold_stats is not None else None
+    insufficient = (
+        any(value is None for value in q_stats.values())
+        or t_hot is None
+        or t_cold is None
+        or None in (eb_mean, mass_hot, mass_cold)
+        or (bool(convergence["signSanity"]) and not sign_complete)
+    )
 
     per_qoi: dict[str, Any] = {}
     mean_pass: dict[str, bool] = {}

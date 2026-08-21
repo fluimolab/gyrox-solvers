@@ -7,6 +7,7 @@ import pytest
 from openfoam.solve.judge import judge_csv
 
 
+@pytest.mark.m0_assets
 @pytest.mark.parametrize("_case", [None], ids=["[SR-04]"])
 def test_recorded_window(_case, gyrox_root, convergence):
     csv_path = gyrox_root / "m0/m04/runs/phaseC/results/extract/CL2/timeseries.csv"

@@ -22,6 +22,9 @@ TITLES = {
     "test_patchmap_validate": "[SR-11] map revalidation",
     "test_verification": "[SR-12] conservative verification",
     "test_policy_passthrough": "[SR-13] policy transcription",
+    "test_progress_stream": "[SR-14] live progress parser",
+    "test_runner_integration": "[SR-15] runner process integration",
+    "test_nonfinite_execute": "[SR-16] non-finite execute precedence",
 }
 
 

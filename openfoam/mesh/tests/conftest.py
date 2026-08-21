@@ -13,6 +13,8 @@ TITLES = {
     "test_meshqa": "[MC-04] quality verdict",
     "test_qoi_scan": "[MC-05] diagnostic vocabulary scan",
     "test_pins": "[MC-06] runtime pins",
+    "test_port_topology": "[MC-07] counterflow-x topology",
+    "test_generated_contract": "[MC-08] generated contract consumer",
 }
 
 
@@ -22,6 +24,11 @@ def pytest_collection_modifyitems(items):
         if title:
             item._nodeid = f"{item.path.as_posix()}::{title}"
             item.name = title
+
+
+@pytest.fixture(scope="session")
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
 
 
 @pytest.fixture(scope="session")
