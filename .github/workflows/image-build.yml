@@ -1,4 +1,6 @@
-# S4(G2) 발효 전 자리 워크플로 — 자동 트리거 없음(S0). base/case 레이어 분리·digest 기록은 S4에서 배선.
+# S4(G2) 실배선 판단 기록(S4-EXEC-PLAN E8): 이미지 빌드가 본체(사설) named context를 요구하므로 CI
+# 빌드 불가 — digest 기록의 정본 = 캠페인 ⓪ 기계 기록(image-build-record.json·3식별자·CP 매니페스트 결속).
+# 본 워크플로는 dispatch 전용 유지 — self-hosted 도입 시 재회부.
 name: image-build
 on:
   workflow_dispatch: {}

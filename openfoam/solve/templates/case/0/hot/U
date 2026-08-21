@@ -1,0 +1,21 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/0.orig/hot/U @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+
+dimensions      [0 1 -1 0 0 0 0];
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    hot_inlet     { type flowRateInletVelocity; massFlowRate constant 0.023490376702; rhoInlet 983.2; value uniform (0.08 0 0); }
+    hot_outlet    { type inletOutlet; inletValue uniform (0 0 0); value uniform (0 0 0); }
+    hot_wall   { type noSlip; }
+    "hot_to_.*" { type noSlip; }
+}
+
+

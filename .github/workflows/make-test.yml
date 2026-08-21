@@ -1,4 +1,7 @@
-# S4 발효 전 자리 워크플로 — 자동 트리거 없음(S0). S4에서 make test(S7 자립) 실배선.
+# S4 실배선 판단 기록(S4-EXEC-PLAN E8·ⓓ″): make test의 시험 payload는 본체(사설) M0 수용 기록을
+# named build context로 굽는다(Dockerfile test 스테이지 — untracked labels.vti 포함). 따라서 CI에서는
+# 빌드 자체가 불가하며, S7 자립 판정의 정본 = 캠페인 ⑧ 로컬 재실행·리포트 해시 결속(CP 매니페스트·E8).
+# 본 워크플로는 dispatch 전용 유지 — 실행 환경이 갖춰진 self-hosted 도입 시 재회부.
 name: make-test
 on:
   workflow_dispatch: {}

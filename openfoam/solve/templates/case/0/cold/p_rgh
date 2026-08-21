@@ -1,0 +1,21 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/0.orig/cold/p_rgh @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p_rgh;
+}
+
+dimensions      [1 -1 -2 0 0 0 0];
+internalField   uniform 1e5;
+
+boundaryField
+{
+    cold_inlet     { type fixedFluxPressure; value uniform 1e5; }
+    cold_outlet    { type fixedValue; value uniform 1e5; }
+    cold_wall   { type fixedFluxPressure; value uniform 1e5; }
+    "cold_to_.*" { type fixedFluxPressure; value uniform 1e5; }
+}
+
+

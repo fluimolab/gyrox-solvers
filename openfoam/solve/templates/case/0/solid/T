@@ -1,0 +1,25 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/0.orig/solid/T @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+
+dimensions      [0 0 0 1 0 0 0];
+internalField   uniform 313.15;
+
+boundaryField
+{
+    solid_external { type zeroGradient; }   // bare cube 외곽 단열 (D-M0-6)
+    "solid_to_.*"
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        value           uniform 313.15;
+    }
+}
+
+
