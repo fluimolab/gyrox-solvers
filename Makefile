@@ -12,7 +12,11 @@ build:
 
 test:
 	@mkdir -p $(dir $(JUNIT_OUT))
-	docker build --build-context gyrox=../gyrox --target test -t $(TEST_IMAGE) .
+	@set -eu; \
+		runtime_id=$$(docker image inspect "$(IMAGE)" --format '{{.Id}}'); \
+		runtime_ref=gyrox/solvers:frozen-$${runtime_id#sha256:}; \
+		docker image tag "$$runtime_id" "$$runtime_ref"; \
+		docker build --build-arg "BASE_IMAGE=$(IMAGE)" --build-context "$(IMAGE)=docker-image://$$runtime_ref" --build-context gyrox=../gyrox --target test -t $(TEST_IMAGE) .
 	docker run --rm $(CONTRACT_MOUNT) -v $(dir $(JUNIT_OUT)):/out $(TEST_IMAGE) pytest /opt/solvers/tests --junitxml=/out/$(notdir $(JUNIT_OUT))
 
 test-ci:

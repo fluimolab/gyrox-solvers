@@ -3,7 +3,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import signal
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -16,7 +18,7 @@ import pytest
 from openfoam.common.progress import ProgressWriter
 from openfoam.common.schema_adapter import canonical_hash
 from openfoam.solve.renderer import render_case
-from openfoam.solve.runner import _run_solver_with_checkpoints
+from openfoam.solve.runner import _run_solver_with_checkpoints, map_process_exit
 
 
 def _write_tool(path: Path, source: str) -> None:
@@ -141,7 +143,7 @@ def test_actual_runner_progress_sigterm_final_checkpoint(repo_root, tmp_path, so
     assert checkpoint_events
     declaration = checkpoint_events[-1]["payload"]
     assert set(declaration) == {"path", "bytes", "sha256", "iter", "physT", "specHash", "decompN", "timeName", "regions"}
-    assert declaration["iter"] >= 20
+    assert 20 <= declaration["iter"] <= 30
     archive = work / "output" / declaration["path"]
     with tarfile.open(archive) as saved:
         names = saved.getnames()
@@ -238,3 +240,127 @@ def test_two_intervals_write_distinct_atomic_checkpoints(tmp_path, solve_documen
             any(name.startswith(f"processor0/{declaration['timeName']}/{region}") for name in names)
             for region in ("hot", "cold", "solid")
         )
+
+
+@pytest.mark.parametrize("mode", [
+    "partial-exit",
+    "partial-kill",
+    "partial-timeout",
+    "duplicate",
+])
+def test_non_graceful_or_duplicate_write_never_declares_checkpoint(
+    mode, tmp_path, solve_document, patch_map, monkeypatch, capsys,
+):
+    case, output = tmp_path / "case", tmp_path / "output"
+    render_case(solve_document, patch_map, case, cores=1, write_interval=500)
+    for region in ("hot", "cold", "solid"):
+        mesh = case / "processor0/constant" / region / "polyMesh"
+        mesh.mkdir(parents=True)
+    if mode == "duplicate":
+        for region in ("hot", "cold", "solid"):
+            field = case / "processor0/10" / region / "T"
+            field.parent.mkdir(parents=True)
+            field.write_text("previous complete field")
+    monkeypatch.setenv("FAKE_OPENFOAM_MODE", mode)
+    command = [sys.executable, str(Path(__file__).with_name("fake_openfoam_solver.py")), str(case)]
+
+    result = _run_solver_with_checkpoints(
+        command, case, output, ProgressWriter(), interval=0, spec_hash="a" * 64,
+        cores=1, max_iters=100000, write_grace=0.2,
+    )
+
+    assert result != 0
+    assert not list((output / "checkpoints").glob("*.tar"))
+    assert not (output / "checkpoints.ndjson").exists()
+    events = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line]
+    assert not [event for event in events if event["type"] == "checkpoint"]
+    warnings = [event for event in events if event["type"] == "log"]
+    assert warnings
+    assert all(event["payload"] == {"level": "warn", "code": "checkpoint-io-error"} for event in warnings)
+
+
+def test_pinned_icofoam_pid1_sigterm_waits_for_write_now(tmp_path, capsys):
+    """Exercise the real 2512 signal semantics used by the runtime image."""
+    if shutil.which("icoFoam") is None or shutil.which("blockMesh") is None:
+        pytest.skip("requires the pinned OpenFOAM runtime image")
+    assert os.getpid() == 1, "real OpenFOAM cancellation test must run as container PID 1"
+    tutorial_root = Path(os.environ["FOAM_TUTORIALS"])
+    source = tutorial_root / "incompressible/icoFoam/cavity/cavity"
+    case, output = tmp_path / "case", tmp_path / "output"
+    shutil.copytree(source, case)
+    control = case / "system/controlDict"
+    control.write_text(
+        control.read_text().replace("endTime         0.5;", "endTime         100000;")
+        .replace("writeInterval   20;", "writeInterval   100000;")
+    )
+    subprocess.run(["blockMesh", "-case", str(case)], check=True, capture_output=True, text=True)
+    for region in ("hot", "cold", "solid"):
+        (case / "processor0/constant" / region / "polyMesh").mkdir(parents=True)
+
+    wrapper = tmp_path / "ico-write-wrapper.py"
+    _write_tool(wrapper, """#!/usr/bin/env python3
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+case = Path(sys.argv[1])
+completed = subprocess.run(["icoFoam", "-case", str(case)])
+if completed.returncode == 0:
+    times = [path for path in case.iterdir() if path.is_dir() and path.name != "0"]
+    times = [path for path in times if path.name.replace(".", "", 1).isdigit()]
+    latest = max(times, key=lambda path: float(path.name))
+    for region in ("hot", "cold", "solid"):
+        target = case / "processor0" / latest.name / region
+        target.mkdir(parents=True, exist_ok=True)
+        for name in ("U", "p", "phi"):
+            shutil.copy2(latest / name, target / name)
+sys.exit(completed.returncode)
+""")
+    requested = threading.Event()
+    result: list[int] = []
+    previous_handler = signal.getsignal(signal.SIGTERM)
+    signal.signal(signal.SIGTERM, lambda _signum, _frame: requested.set())
+    thread = threading.Thread(target=lambda: result.append(_run_solver_with_checkpoints(
+        [sys.executable, str(wrapper), str(case)], case, output, ProgressWriter(),
+        interval=3600, spec_hash="a" * 64, cores=1, max_iters=100000,
+        terminate_requested=requested, write_grace=20,
+    )))
+    try:
+        thread.start()
+        log_path = output / "case/logs/cht.log"
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline:
+            if log_path.is_file() and re.search(r"^Time = 2[0-9](?:\.|$)", log_path.read_text(), re.M):
+                os.kill(os.getpid(), signal.SIGTERM)
+                break
+            time.sleep(0.02)
+        else:
+            pytest.fail("icoFoam did not reach cancellation window 20..29")
+        thread.join(timeout=30)
+    finally:
+        signal.signal(signal.SIGTERM, previous_handler)
+    assert not thread.is_alive()
+    assert result == [143]
+    assert map_process_exit(result[0]) == ("CANCELED", 143)
+
+    declarations = [json.loads(line) for line in (output / "checkpoints.ndjson").read_text().splitlines()]
+    assert len(declarations) == 1
+    declaration = declarations[0]
+    assert set(declaration) == {
+        "path", "bytes", "sha256", "iter", "physT", "specHash",
+        "decompN", "timeName", "regions",
+    }
+    assert 20 <= declaration["iter"] <= 30
+    with tarfile.open(output / declaration["path"]) as archive:
+        fields = {
+            Path(name).name for name in archive.getnames()
+            if Path(name).name in {"U", "p", "phi"}
+        }
+        members = archive.getnames()
+    assert fields == {"U", "p", "phi"}
+    assert sum(Path(name).name in {"U", "p", "phi"} for name in members) == 9
+    events = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line]
+    assert any(event["type"] == "progress" and 20 <= event["payload"]["iter"] <= 30 for event in events)
+    checkpoints = [event for event in events if event["type"] == "checkpoint"]
+    assert len(checkpoints) == 1 and checkpoints[0]["payload"] == declaration

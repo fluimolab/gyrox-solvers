@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import re
-import signal
 import sys
 import time
 from pathlib import Path
@@ -13,7 +12,6 @@ from pathlib import Path
 case = Path(sys.argv[1])
 mode = os.environ.get("FAKE_OPENFOAM_MODE", "complete")
 current = 0
-terminate = False
 
 
 def latest() -> int:
@@ -35,9 +33,12 @@ def write_time(iteration: int) -> None:
             (target / "T").write_text(f"iteration {iteration}\n")
 
 
-def handler(_signum, _frame) -> None:
-    global terminate
-    terminate = True
+def write_partial_time(iteration: int) -> None:
+    for processor in sorted(case.glob("processor*")):
+        for region in ("hot", "cold", "solid"):
+            target = processor / str(iteration) / region
+            target.mkdir(parents=True, exist_ok=True)
+            (target / "T").write_text("truncated normal-name field")
 
 
 def write_dat(name: str, rows: list[tuple[float, ...]], header: str = "Time value") -> None:
@@ -70,14 +71,23 @@ def write_post_processing(start: int, end: int) -> None:
     write_dat("whf_cold", [(i, 0.0, 0.0, 0.0, 1500.0) for i in range(start, end + 1)], "Time min max average integral")
 
 
-signal.signal(signal.SIGTERM, handler)
 start = latest() + 1
 end = 550 if mode == "complete" else 100000
 for current in range(start, end + 1):
     print(f"Time = {current}", flush=True)
     print("Solving for fluid region hot", flush=True)
     print("smoothSolver: Solving for p_rgh, Initial residual = 0.001, Final residual = 0.0001, No Iterations 1", flush=True)
-    if terminate or "stopAt          writeNow;" in (case / "system/controlDict").read_text():
+    if "stopAt          writeNow;" in (case / "system/controlDict").read_text():
+        if mode == "duplicate":
+            sys.exit(0)
+        if mode in {"partial-exit", "partial-kill", "partial-timeout"}:
+            write_partial_time(current)
+            if mode == "partial-exit":
+                sys.exit(7)
+            if mode == "partial-kill":
+                os.kill(os.getpid(), 9)
+            while True:
+                time.sleep(1)
         write_time(current)
         sys.exit(0)
     if mode != "complete":

@@ -50,6 +50,28 @@ def _checkpoint_members(case: Path, time_name: str, decomp_n: int) -> list[Path]
     return sorted(members, key=lambda path: path.relative_to(case).as_posix())
 
 
+def _read_declarations(path: Path) -> list[dict[str, Any]]:
+    if not path.is_file():
+        return []
+    declarations = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+    for declaration in declarations:
+        validate("checkpoint-declaration", declaration)
+    return declarations
+
+
+def _replace_declarations(path: Path, declarations: list[dict[str, Any]]) -> None:
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("w", encoding="utf-8") as stream:
+            for declaration in declarations:
+                stream.write(json.dumps(declaration, separators=(",", ":")) + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def produce_checkpoint(
     case: Path,
     output_root: Path,
@@ -66,31 +88,41 @@ def produce_checkpoint(
     checkpoint_dir = output_root / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     tar_path = checkpoint_dir / f"checkpoint-{iteration}.tar"
-    if tar_path.exists():
+    declaration_path = output_root / "checkpoints.ndjson"
+    declarations = _read_declarations(declaration_path)
+    if any(item["iter"] == iteration for item in declarations):
         raise FileExistsError(f"checkpoint iteration already declared: {iteration}")
+    # A previous process may have died after publishing the tar but before the
+    # atomic declaration replacement. Such an undeclared tar is safe to rebuild.
+    tar_path.unlink(missing_ok=True)
     temporary = checkpoint_dir / f".{tar_path.name}.{os.getpid()}.tmp"
+    published = False
     try:
         with tarfile.open(temporary, "w") as archive:
             for member in members:
                 archive.add(member, arcname=member.relative_to(case).as_posix(), recursive=True)
         temporary.replace(tar_path)
+        published = True
+        declaration = {
+            "path": tar_path.relative_to(output_root).as_posix(),
+            "bytes": tar_path.stat().st_size,
+            "sha256": sha256_file(tar_path),
+            "iter": iteration,
+            "physT": phys_t,
+            "specHash": spec_hash,
+            "decompN": decomp_n,
+            "timeName": time_name,
+            "regions": list(REGIONS),
+        }
+        validate("checkpoint-declaration", declaration)
+        _replace_declarations(declaration_path, [*declarations, declaration])
+        return declaration
+    except Exception:
+        if published:
+            tar_path.unlink(missing_ok=True)
+        raise
     finally:
         temporary.unlink(missing_ok=True)
-    declaration = {
-        "path": tar_path.relative_to(output_root).as_posix(),
-        "bytes": tar_path.stat().st_size,
-        "sha256": sha256_file(tar_path),
-        "iter": iteration,
-        "physT": phys_t,
-        "specHash": spec_hash,
-        "decompN": decomp_n,
-        "timeName": time_name,
-        "regions": list(REGIONS),
-    }
-    validate("checkpoint-declaration", declaration)
-    with (output_root / "checkpoints.ndjson").open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps(declaration, separators=(",", ":")) + "\n")
-    return declaration
 
 
 def resume_checkpoint(case: Path, archive: Path, sidecar: Path, *, spec_hash: str, decomp_n: int) -> ResumeDecision:

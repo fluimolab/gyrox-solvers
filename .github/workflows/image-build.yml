@@ -7,19 +7,56 @@ on:
 jobs:
   build-runtime:
     runs-on: ubuntu-latest
+    env:
+      BASE_ANCHOR_3: sha256:33fb575aa9980d2bc42fd58c75ae698c489293ba30c991380fe3f899c622f319
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: Build runtime image
         run: make build IMAGE=gyrox/solvers:ci
+      - name: Verify Dockerfile base identity and runtime ancestry
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
+          bases = re.findall(r"^FROM\s+(\S+)\s+AS\s+base\s*$", dockerfile, re.MULTILINE)
+          expected = f"opencfd/openfoam-default:2512@{os.environ['BASE_ANCHOR_3']}"
+          if bases != [expected]:
+              raise SystemExit(f"base anchor 3 mismatch: expected {expected!r}, got {bases!r}")
+          Path("reports").mkdir(exist_ok=True)
+          Path("reports/base-image-ref.txt").write_text(bases[0], encoding="utf-8")
+          PY
+          docker image inspect "$(cat reports/base-image-ref.txt)" > reports/base-inspect.json
+          docker image inspect gyrox/solvers:ci > reports/runtime-inspect.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          base = json.loads(Path("reports/base-inspect.json").read_text())[0]["RootFS"]["Layers"]
+          runtime = json.loads(Path("reports/runtime-inspect.json").read_text())[0]["RootFS"]["Layers"]
+          if runtime[:len(base)] != base:
+              raise SystemExit("runtime image does not descend from Dockerfile base anchor 3")
+          PY
       - name: Record image identifiers
         run: |
           mkdir -p reports
-          docker image inspect gyrox/solvers:ci --format '{{json .}}' | python3 -c "
-          import json,sys
-          d=json.load(sys.stdin)
-          print(json.dumps({'fullImageId': d['Id'], 'repoDigests': d.get('RepoDigests') or None, 'baseAnchor3': 'sha256:33fb575aa9980d2bc42fd58c75ae698c489293ba30c991380fe3f899c622f319'}, indent=1))" > reports/image-build-ci-record.json
+          docker image inspect gyrox/solvers:ci --format '{{json .}}' > reports/runtime-image.json
+          python3 - <<'PY' > reports/image-build-ci-record.json
+          import json
+          import os
+          from pathlib import Path
+
+          image = json.loads(Path("reports/runtime-image.json").read_text())
+          print(json.dumps({
+              "fullImageId": image["Id"],
+              "repoDigests": image.get("RepoDigests") or None,
+              "baseAnchor3": os.environ["BASE_ANCHOR_3"],
+          }, indent=1))
+          PY
           cat reports/image-build-ci-record.json
       - uses: actions/upload-artifact@v4
         with:

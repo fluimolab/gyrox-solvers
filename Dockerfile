@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.7
+ARG BASE_IMAGE=gyrox/solvers:local
 FROM opencfd/openfoam-default:2512@sha256:33fb575aa9980d2bc42fd58c75ae698c489293ba30c991380fe3f899c622f319 AS base
 
 USER root
@@ -28,7 +29,14 @@ RUN python3 -m pip install --break-system-packages --no-cache-dir pytest==8.4.2
 COPY pytest.ini /opt/solvers/pytest.ini
 RUN ln -s /opt/solvers/openfoam /opt/solvers/tests
 
-FROM test-ci AS test
+FROM ${BASE_IMAGE} AS test
+USER root
+WORKDIR /opt/solvers
+RUN python3 -m pip install --break-system-packages --no-cache-dir pytest==8.4.2
+COPY pytest.ini /opt/solvers/pytest.ini
+COPY openfoam/mesh/tests/ /opt/solvers/openfoam/mesh/tests/
+COPY openfoam/solve/tests/ /opt/solvers/openfoam/solve/tests/
+RUN ln -s /opt/solvers/openfoam /opt/solvers/tests
 ENV GYROX_SOURCE_ROOT=/opt/gyrox-m0
 # Local-only named context supplies immutable M0 acceptance records.
 COPY --from=gyrox m0/fixtures/gyroid-30-4-0.4/labels.vti /opt/gyrox-m0/m0/fixtures/gyroid-30-4-0.4/labels.vti

@@ -59,6 +59,8 @@ def map_process_exit(exit_code: int, *, oom_killed: bool = False) -> tuple[str, 
         return "PHYSICS_DIVERGED", 20
     if exit_code in (30, 40):
         return "INVALID_INPUT", exit_code
+    if exit_code == 143:
+        return "CANCELED", 143
     if exit_code == 137 and oom_killed:
         return "RESOURCE_EXHAUSTED", 137
     return "INFRASTRUCTURE_FAILED", exit_code
@@ -180,6 +182,19 @@ def _terminate_process_group(process: subprocess.Popen[str], *, grace: float) ->
         process.wait()
 
 
+def _wait_for_graceful_write(process: subprocess.Popen[str], *, grace: float) -> bool:
+    """Wait for OpenFOAM to consume writeNow; never turn SIGTERM into the write trigger."""
+    try:
+        return process.wait(timeout=grace) == 0
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+        return False
+
+
 def _stream_reader(process: subprocess.Popen[str], log: Any, lines: queue.Queue[str]) -> None:
     assert process.stdout is not None
     for line in process.stdout:
@@ -213,6 +228,7 @@ def _run_solver_with_checkpoints(
             reader.start()
             write_requested = False
             canceled = False
+            graceful_write = False
             while process.poll() is None:
                 try:
                     parser.consume(lines.get(timeout=0.1))
@@ -231,18 +247,18 @@ def _run_solver_with_checkpoints(
                 if requested.is_set():
                     canceled = True
                     _set_stop_at(case, "writeNow")
-                    _terminate_process_group(process, grace=write_grace)
+                    graceful_write = _wait_for_graceful_write(process, grace=write_grace)
+                    if not graceful_write:
+                        progress.emit("log", {"level": "warn", "code": "checkpoint-io-error"})
                     break
                 if now >= next_checkpoint:
                     write_requested = True
                     _set_stop_at(case, "writeNow")
                     break
             if write_requested and process.poll() is None:
-                try:
-                    process.wait(timeout=write_grace)
-                except subprocess.TimeoutExpired:
-                    progress.emit("log", {"level": "warn", "code": "checkpoint-write-timeout"})
-                    _terminate_process_group(process, grace=1.0)
+                graceful_write = _wait_for_graceful_write(process, grace=write_grace)
+                if not graceful_write:
+                    progress.emit("log", {"level": "warn", "code": "checkpoint-io-error"})
             reader.join(timeout=1)
             while not lines.empty():
                 parser.consume(lines.get_nowait())
@@ -250,6 +266,8 @@ def _run_solver_with_checkpoints(
                 return 20
 
             if write_requested or canceled:
+                if not graceful_write:
+                    return 1 if canceled else int(process.returncode or 1)
                 checkpoint_created = False
                 latest = _latest_time(case)
                 if latest is not None and latest[0] > last_declared:
@@ -267,9 +285,11 @@ def _run_solver_with_checkpoints(
                         if canceled:
                             return 1
                 elif latest is not None:
-                    progress.emit("log", {"level": "warn", "code": "checkpoint-duplicate-iteration"})
+                    progress.emit("log", {"level": "warn", "code": "checkpoint-io-error"})
                 if canceled:
                     return 143 if checkpoint_created else 1
+                if not checkpoint_created:
+                    return 1
                 next_checkpoint = time.monotonic() + interval
                 if parser.iteration < max_iters and process.returncode == 0:
                     continue
@@ -435,7 +455,7 @@ def execute(work_root: Path = WORK_ROOT, *, terminate_requested: threading.Event
             )
             raise RuntimeError("__solver_failed__")
         if solver_code == 143:
-            outcome, exit_code = "CANCELED", 143
+            outcome, exit_code = map_process_exit(solver_code)
             raise RuntimeError("__solver_failed__")
         if solver_code != 0:
             outcome, exit_code = map_process_exit(solver_code, oom_killed=_oom_killed())
