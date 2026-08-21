@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/discretization-spec/v1/input",
+  "title": "DiscretizationSpec v1 authoring input envelope",
+  "$defs": {
+    "length": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "m",
+                "mm",
+                "um"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxNonOrtho": {
+          "const": 65
+        },
+        "maxBoundarySkewness": {
+          "const": 20
+        },
+        "maxInternalSkewness": {
+          "const": 4
+        },
+        "maxConcave": {
+          "const": 80
+        },
+        "minVol": {
+          "const": 1e-18
+        },
+        "minTetQuality": {
+          "const": 1e-15
+        },
+        "minArea": {
+          "const": -1
+        },
+        "minTwist": {
+          "const": 0.02
+        },
+        "minDeterminant": {
+          "const": 0.001
+        },
+        "minFaceWeight": {
+          "const": 0.05
+        },
+        "minVolRatio": {
+          "const": 0.01
+        },
+        "minTriangleTwist": {
+          "const": -1
+        },
+        "minEdgeLength": {
+          "const": -1
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "kind",
+    "schemaVersion",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "const": "discretization-spec"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "voxelPitchM"
+      ],
+      "properties": {
+        "route": {
+          "const": "voxel-hexa"
+        },
+        "voxelPitchM": {
+          "$ref": "#/$defs/length"
+        },
+        "qa": {
+          "$ref": "#/$defs/qa"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/solve-report/v1",
+  "title": "Solve runner report v1",
+  "$comment": "ADR-006 D8-2: diagnostics must not contain QoI names or values",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "renderFingerprint",
+    "diagnostics"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "renderFingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."
+    }
+  },
+  "additionalProperties": false
+}

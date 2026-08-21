@@ -1,0 +1,109 @@
+{
+  "generatedBy": "packages/contracts/src/codegen/generate.ts",
+  "root": "packages/contracts/generated/python/",
+  "schemaCount": 19,
+  "contractKinds": [
+    "geometry-spec",
+    "discretization-spec",
+    "solve-spec",
+    "post-spec",
+    "run-manifest",
+    "project-document",
+    "work-request",
+    "work-result",
+    "output-manifest",
+    "progress-event",
+    "checkpoint-declaration",
+    "post-manifest",
+    "summary",
+    "resource-estimate",
+    "export-bundle",
+    "patch-map",
+    "convert-report",
+    "solve-report",
+    "system-event"
+  ],
+  "inputSchemaCount": 4,
+  "inputKinds": [
+    "geometry-spec",
+    "discretization-spec",
+    "solve-spec",
+    "post-spec"
+  ],
+  "consumers": {
+    "validators": [
+      "geometry-spec",
+      "discretization-spec",
+      "solve-spec",
+      "post-spec",
+      "run-manifest",
+      "project-document",
+      "work-request",
+      "work-result",
+      "output-manifest",
+      "progress-event",
+      "checkpoint-declaration",
+      "post-manifest",
+      "summary",
+      "resource-estimate",
+      "export-bundle",
+      "patch-map",
+      "convert-report",
+      "solve-report",
+      "system-event"
+    ],
+    "inputValidators": [
+      "geometry-spec",
+      "discretization-spec",
+      "solve-spec",
+      "post-spec"
+    ],
+    "canonicalJcsSha256": [
+      "geometry-spec",
+      "discretization-spec",
+      "solve-spec",
+      "post-spec"
+    ]
+  },
+  "coverage": {
+    "canonical": {
+      "expected": 19,
+      "consumed": 19
+    },
+    "input": {
+      "expected": 4,
+      "consumed": 4
+    }
+  },
+  "classification": "shared",
+  "files": [
+    "__init__.py",
+    "canonical.py",
+    "validator.py",
+    "schemas/geometry-spec.v1.schema.json",
+    "schemas/discretization-spec.v1.schema.json",
+    "schemas/solve-spec.v1.schema.json",
+    "schemas/post-spec.v1.schema.json",
+    "schemas/run-manifest.v1.schema.json",
+    "schemas/project-document.v1.schema.json",
+    "schemas/work-request.v1.schema.json",
+    "schemas/work-result.v1.schema.json",
+    "schemas/output-manifest.v1.schema.json",
+    "schemas/progress-event.v1.schema.json",
+    "schemas/checkpoint-declaration.v1.schema.json",
+    "schemas/post-manifest.v1.schema.json",
+    "schemas/summary.v1.schema.json",
+    "schemas/resource-estimate.v1.schema.json",
+    "schemas/export-bundle.v1.schema.json",
+    "schemas/patch-map.v1.schema.json",
+    "schemas/convert-report.v1.schema.json",
+    "schemas/solve-report.v1.schema.json",
+    "schemas/system-event.v1.schema.json",
+    "schemas/geometry-spec.v1.input.schema.json",
+    "schemas/discretization-spec.v1.input.schema.json",
+    "schemas/solve-spec.v1.input.schema.json",
+    "schemas/post-spec.v1.input.schema.json",
+    "README.md",
+    "codegen-index.python.v1.json"
+  ]
+}

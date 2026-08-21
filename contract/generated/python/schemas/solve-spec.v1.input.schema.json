@@ -1,0 +1,441 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/solve-spec/v1/input",
+  "title": "SolveSpec v1 authoring input envelope",
+  "$comment": "ADR-006 D8-2",
+  "$defs": {
+    "PresetRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalogId",
+        "version"
+      ],
+      "properties": {
+        "catalogId": {
+          "enum": [
+            "water-60c",
+            "water-20c",
+            "aluminum",
+            "cht-simple-v1"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "FluidProps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rhoKgM3",
+        "cpJKgK",
+        "muPaS",
+        "prandtl"
+      ],
+      "properties": {
+        "rhoKgM3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cpJKgK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "muPaS": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "prandtl": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "SolidProps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rhoKgM3",
+        "cpJKgK",
+        "kWMK"
+      ],
+      "properties": {
+        "rhoKgM3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cpJKgK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "kWMK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "NumericsBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "energyCouplingIters",
+        "hTol",
+        "writePrecision",
+        "relaxation"
+      ],
+      "properties": {
+        "energyCouplingIters": {
+          "const": 25
+        },
+        "hTol": {
+          "const": 0.000001
+        },
+        "writePrecision": {
+          "const": 10
+        },
+        "relaxation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fluid",
+            "solid"
+          ],
+          "properties": {
+            "fluid": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "rho",
+                "pRgh",
+                "U",
+                "h"
+              ],
+              "properties": {
+                "rho": {
+                  "const": 1
+                },
+                "pRgh": {
+                  "const": 0.7
+                },
+                "U": {
+                  "const": 0.3
+                },
+                "h": {
+                  "const": 0.5
+                }
+              }
+            },
+            "solid": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "h"
+              ],
+              "properties": {
+                "h": {
+                  "const": 0.7
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "massFlow": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "kg/s",
+                "g/s"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "temperature": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "K",
+                "degC"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ConvergenceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "windowIters": {
+          "const": 200
+        },
+        "windowMeanDriftPct": {
+          "const": 0.5
+        },
+        "windowMeanSpanPct": {
+          "const": 0.5
+        },
+        "windowMeanTailW": {
+          "const": 200
+        },
+        "transientFrac": {
+          "const": 0.2
+        },
+        "windowMeanMinIters": {
+          "const": 500
+        },
+        "instSpanPct": {
+          "const": 0.5
+        },
+        "judgedQoI": {
+          "const": [
+            "dpHotPa",
+            "dpColdPa",
+            "qW"
+          ]
+        },
+        "tOutDriftK": {
+          "const": 0.1
+        },
+        "tOutSpanK": {
+          "const": 0.1
+        },
+        "ebMaxPct": {
+          "const": 1
+        },
+        "ebWarnPct": {
+          "const": 0.7
+        },
+        "massImbalanceMaxPct": {
+          "const": 0.1
+        },
+        "signSanity": {
+          "const": true
+        },
+        "finiteRequired": {
+          "const": true
+        },
+        "signRules": {
+          "const": {
+            "flowDirection": {
+              "hot": {
+                "inlet": "negative",
+                "outlet": "positive"
+              },
+              "cold": {
+                "inlet": "negative",
+                "outlet": "positive"
+              }
+            },
+            "pressureDirection": {
+              "dpHotPa": "positive",
+              "dpColdPa": "positive"
+            },
+            "wallHeatFluxDirection": {
+              "hot": "negative",
+              "cold": "positive"
+            }
+          }
+        },
+        "minIterationsForJudgment": {
+          "const": 400
+        },
+        "residualBlowupFactor": {
+          "const": 1000
+        },
+        "divergenceCheckScope": {
+          "const": "judgedQoI+signRules"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "kind",
+    "schemaVersion",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "const": "solve-spec"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "materials",
+        "bc",
+        "limits"
+      ],
+      "properties": {
+        "backend": {
+          "const": "openfoam-cht"
+        },
+        "solver": {
+          "const": "chtMultiRegionSimpleFoam"
+        },
+        "materials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hot",
+            "cold",
+            "solid"
+          ],
+          "properties": {
+            "hot": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/PresetRef"
+                },
+                {
+                  "$ref": "#/$defs/FluidProps"
+                }
+              ]
+            },
+            "cold": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/PresetRef"
+                },
+                {
+                  "$ref": "#/$defs/FluidProps"
+                }
+              ]
+            },
+            "solid": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/PresetRef"
+                },
+                {
+                  "$ref": "#/$defs/SolidProps"
+                }
+              ]
+            }
+          }
+        },
+        "bc": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "featureRef",
+                "kind",
+                "mdotKgS",
+                "tK"
+              ],
+              "properties": {
+                "featureRef": {
+                  "const": "port:hot-inlet"
+                },
+                "kind": {
+                  "const": "flowRateInlet"
+                },
+                "mdotKgS": {
+                  "$ref": "#/$defs/massFlow"
+                },
+                "tK": {
+                  "$ref": "#/$defs/temperature"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "featureRef",
+                "kind",
+                "mdotKgS",
+                "tK"
+              ],
+              "properties": {
+                "featureRef": {
+                  "const": "port:cold-inlet"
+                },
+                "kind": {
+                  "const": "flowRateInlet"
+                },
+                "mdotKgS": {
+                  "$ref": "#/$defs/massFlow"
+                },
+                "tK": {
+                  "$ref": "#/$defs/temperature"
+                }
+              }
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "numerics": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PresetRef"
+            },
+            {
+              "$ref": "#/$defs/NumericsBody"
+            }
+          ]
+        },
+        "convergence": {
+          "$ref": "#/$defs/ConvergenceInput"
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxIters"
+          ],
+          "properties": {
+            "maxIters": {
+              "type": "integer",
+              "minimum": 500
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
