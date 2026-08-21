@@ -7,21 +7,19 @@ import pytest
 
 
 TITLES = {
-    "test_bytepreserve": "[MC-01] byte preservation",
-    "test_report": "[MC-02] report schema",
-    "test_hashcase": "[MC-03] combined hash transcription",
-    "test_meshqa": "[MC-04] quality verdict",
-    "test_qoi_scan": "[MC-05] diagnostic vocabulary scan",
-    "test_pins": "[MC-06] runtime pins",
-    "test_port_topology": "[MC-07] counterflow-x topology",
-    "test_generated_contract": "[MC-08] generated contract consumer",
+    "test_bytepreserve": "[MC-01] patch-map byte-diff 0",
+    "test_report": "[MC-02] convert-report 스키마 자기 검증",
+    "test_hashcase": "[MC-03] meshCombinedSha _hash_case 전사",
+    "test_meshqa": "[MC-04] checkMesh QA 판정기",
+    "test_qoi_scan": "[MC-05] diagnostics QoI 미탑재",
+    "test_pins": "[MC-06] PINNED.lock 실재·일치",
 }
 
 
 def pytest_collection_modifyitems(items):
     for item in items:
         title = TITLES.get(item.path.stem)
-        if title:
+        if title and title.split(" ", 1)[0] in item.name:
             item._nodeid = f"{item.path.as_posix()}::{title}"
             item.name = title
 
