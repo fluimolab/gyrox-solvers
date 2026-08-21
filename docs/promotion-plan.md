@@ -1,5 +1,9 @@
 # 경로 C 변환기·solve 러너 승격 계획 (S4 — 사전 등재 정본)
 
+> **QoI 표기 고지(ADR-006 D8-2)**: 본 문서의 QoI 토큰(dpHot·dpCold·qW 등)은 판정 술어·계약 어휘의 인용이며
+> 검증 주장이 아니다 — 열 QoI 미검증(`unverified_underprediction`)·dpCold 판정 불성립(`judgment_not_established`)
+> 상태 불변(게이트 ② FAIL 동결).
+
 > 근거: `gyrox/m1/S4-EXEC-PLAN.md` rev9 §0-②·DESIGN §7.2·DETAIL §7.2·§13-⑦("승격 계획 문서 — 이관 PR 이전
 > 커밋"). **본 문서의 케이스 등재는 불변이다** — 등재 후 파라미터 변경 금지, 미재현 시 실행계획 개정·새
 > ID·해당 캠페인 재수행(무단 조정 = 사전 등재 무효). ①′ 문서 리뷰(codex max)가 본 문서의 실재·산술을
