@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/work-request/v1",
+  "title": "/work request v1",
+  "type": "object",
+  "required": [
+    "contractVersion",
+    "stage",
+    "specs",
+    "inputs",
+    "limits"
+  ],
+  "properties": {
+    "contractVersion": {
+      "const": 1
+    },
+    "stage": {
+      "enum": [
+        "geometry",
+        "mesh",
+        "solve",
+        "post"
+      ]
+    },
+    "specs": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/specRef"
+        },
+        "discretization": {
+          "$ref": "#/$defs/specRef"
+        },
+        "solve": {
+          "$ref": "#/$defs/specRef"
+        },
+        "post": {
+          "$ref": "#/$defs/specRef"
+        }
+      },
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "hash",
+          "path"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hash": {
+            "$ref": "#/$defs/sha256"
+          },
+          "path": {
+            "$ref": "#/$defs/inputPath"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "cpuCores",
+        "memBytes"
+      ],
+      "properties": {
+        "cpuCores": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "memBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checkpointIntervalSec": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "specRef": {
+      "type": "object",
+      "required": [
+        "kind",
+        "hash"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "geometry-spec",
+            "discretization-spec",
+            "solve-spec",
+            "post-spec"
+          ]
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "inputPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+    }
+  }
+}

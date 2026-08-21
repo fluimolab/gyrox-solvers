@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/output-manifest/v1",
+  "title": "/work output manifest v1",
+  "type": "object",
+  "required": [
+    "files"
+  ],
+  "properties": {
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "path",
+          "mediaType",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+          },
+          "mediaType": {
+            "type": "string",
+            "pattern": "^[^/\\s]+/[^/\\s]+$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "units": {
+            "type": "string",
+            "minLength": 1
+          },
+          "coordinateSystem": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semanticRole": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "field",
+                    "slice",
+                    "volume",
+                    "wall-field",
+                    "wall-mesh"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "units",
+                "coordinateSystem"
+              ]
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "anyOf": [
+                {
+                  "required": [
+                    "units"
+                  ]
+                },
+                {
+                  "required": [
+                    "coordinateSystem"
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "required": [
+                "units",
+                "coordinateSystem"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}
