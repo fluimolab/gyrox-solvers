@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/export-bundle/v1",
+  "title": "Export bundle manifest v1",
+  "$comment": "ADR-006 D8-2: exported results carry the canonical notice identifiers",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "revision",
+    "recipe",
+    "artifacts",
+    "notices"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recipe": {
+      "$ref": "#/$defs/ref"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ref"
+      }
+    },
+    "notices": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "D8-2",
+          "dp-hot-fixture-limited",
+          "dp-cold-not-established",
+          "nonconverged-partial",
+          "governance-hold"
+        ]
+      },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "ref": {
+      "type": "object",
+      "required": [
+        "kind",
+        "hash"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

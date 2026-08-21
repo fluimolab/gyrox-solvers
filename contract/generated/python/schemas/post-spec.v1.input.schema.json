@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/post-spec/v1/input",
+  "title": "PostSpec v1 authoring input envelope",
+  "$comment": "ADR-006 D8-2",
+  "$defs": {
+    "length": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "m",
+                "mm",
+                "um"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "required": [
+    "kind",
+    "schemaVersion",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "const": "post-spec"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "tier1": {
+          "const": {
+            "summary": true,
+            "timeseries": true
+          }
+        },
+        "tier2": {
+          "type": "object",
+          "required": [
+            "slices"
+          ],
+          "properties": {
+            "slices": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "object",
+                  "required": [
+                    "axis",
+                    "offsetM",
+                    "fields"
+                  ],
+                  "properties": {
+                    "axis": {
+                      "const": "z"
+                    },
+                    "offsetM": {
+                      "$ref": "#/$defs/length"
+                    },
+                    "fields": {
+                      "const": [
+                        "p",
+                        "T"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ],
+              "items": false,
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

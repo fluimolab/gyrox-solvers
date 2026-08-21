@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/solve-spec/v1",
+  "title": "SolveSpec v1 canonical envelope",
+  "$comment": "ADR-006 D8-2",
+  "$defs": {
+    "PresetRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalogId",
+        "version"
+      ],
+      "properties": {
+        "catalogId": {
+          "enum": [
+            "water-60c",
+            "water-20c",
+            "aluminum",
+            "cht-simple-v1"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "FluidProps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rhoKgM3",
+        "cpJKgK",
+        "muPaS",
+        "prandtl"
+      ],
+      "properties": {
+        "rhoKgM3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cpJKgK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "muPaS": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "prandtl": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "SolidProps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rhoKgM3",
+        "cpJKgK",
+        "kWMK"
+      ],
+      "properties": {
+        "rhoKgM3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cpJKgK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "kWMK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "NumericsBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "energyCouplingIters",
+        "hTol",
+        "writePrecision",
+        "relaxation"
+      ],
+      "properties": {
+        "energyCouplingIters": {
+          "const": 25
+        },
+        "hTol": {
+          "const": 0.000001
+        },
+        "writePrecision": {
+          "const": 10
+        },
+        "relaxation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fluid",
+            "solid"
+          ],
+          "properties": {
+            "fluid": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "rho",
+                "pRgh",
+                "U",
+                "h"
+              ],
+              "properties": {
+                "rho": {
+                  "const": 1
+                },
+                "pRgh": {
+                  "const": 0.7
+                },
+                "U": {
+                  "const": 0.3
+                },
+                "h": {
+                  "const": 0.5
+                }
+              }
+            },
+            "solid": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "h"
+              ],
+              "properties": {
+                "h": {
+                  "const": 0.7
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "kind",
+    "schemaVersion",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "const": "solve-spec"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "solver",
+        "materials",
+        "bc",
+        "numerics",
+        "convergence",
+        "limits"
+      ],
+      "properties": {
+        "backend": {
+          "const": "openfoam-cht"
+        },
+        "solver": {
+          "const": "chtMultiRegionSimpleFoam"
+        },
+        "materials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hot",
+            "cold",
+            "solid"
+          ],
+          "properties": {
+            "hot": {
+              "$ref": "#/$defs/FluidProps"
+            },
+            "cold": {
+              "$ref": "#/$defs/FluidProps"
+            },
+            "solid": {
+              "$ref": "#/$defs/SolidProps"
+            }
+          }
+        },
+        "bc": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "featureRef",
+                "kind",
+                "mdotKgS",
+                "tK"
+              ],
+              "properties": {
+                "featureRef": {
+                  "const": "port:hot-inlet"
+                },
+                "kind": {
+                  "const": "flowRateInlet"
+                },
+                "mdotKgS": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "tK": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "featureRef",
+                "kind",
+                "mdotKgS",
+                "tK"
+              ],
+              "properties": {
+                "featureRef": {
+                  "const": "port:cold-inlet"
+                },
+                "kind": {
+                  "const": "flowRateInlet"
+                },
+                "mdotKgS": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "tK": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "numerics": {
+          "$ref": "#/$defs/NumericsBody"
+        },
+        "convergence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "windowIters": {
+              "const": 200
+            },
+            "windowMeanDriftPct": {
+              "const": 0.5
+            },
+            "windowMeanSpanPct": {
+              "const": 0.5
+            },
+            "windowMeanTailW": {
+              "const": 200
+            },
+            "transientFrac": {
+              "const": 0.2
+            },
+            "windowMeanMinIters": {
+              "const": 500
+            },
+            "instSpanPct": {
+              "const": 0.5
+            },
+            "judgedQoI": {
+              "const": [
+                "dpHotPa",
+                "dpColdPa",
+                "qW"
+              ]
+            },
+            "tOutDriftK": {
+              "const": 0.1
+            },
+            "tOutSpanK": {
+              "const": 0.1
+            },
+            "ebMaxPct": {
+              "const": 1
+            },
+            "ebWarnPct": {
+              "const": 0.7
+            },
+            "massImbalanceMaxPct": {
+              "const": 0.1
+            },
+            "signSanity": {
+              "const": true
+            },
+            "finiteRequired": {
+              "const": true
+            },
+            "signRules": {
+              "const": {
+                "flowDirection": {
+                  "hot": {
+                    "inlet": "negative",
+                    "outlet": "positive"
+                  },
+                  "cold": {
+                    "inlet": "negative",
+                    "outlet": "positive"
+                  }
+                },
+                "pressureDirection": {
+                  "dpHotPa": "positive",
+                  "dpColdPa": "positive"
+                },
+                "wallHeatFluxDirection": {
+                  "hot": "negative",
+                  "cold": "positive"
+                }
+              }
+            },
+            "minIterationsForJudgment": {
+              "const": 400
+            },
+            "residualBlowupFactor": {
+              "const": 1000
+            },
+            "divergenceCheckScope": {
+              "const": "judgedQoI+signRules"
+            }
+          },
+          "required": [
+            "windowIters",
+            "windowMeanDriftPct",
+            "windowMeanSpanPct",
+            "windowMeanTailW",
+            "transientFrac",
+            "windowMeanMinIters",
+            "instSpanPct",
+            "judgedQoI",
+            "tOutDriftK",
+            "tOutSpanK",
+            "ebMaxPct",
+            "ebWarnPct",
+            "massImbalanceMaxPct",
+            "signSanity",
+            "finiteRequired",
+            "signRules",
+            "minIterationsForJudgment",
+            "residualBlowupFactor",
+            "divergenceCheckScope"
+          ]
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxIters"
+          ],
+          "properties": {
+            "maxIters": {
+              "type": "integer",
+              "minimum": 500
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

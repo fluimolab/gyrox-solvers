@@ -94,8 +94,41 @@
       "system-event"
     ]
   },
+  "shared": {
+    "python": {
+      "root": "generated/python/",
+      "canonicalKinds": [
+        "geometry-spec",
+        "discretization-spec",
+        "solve-spec",
+        "post-spec",
+        "run-manifest",
+        "project-document",
+        "work-request",
+        "work-result",
+        "output-manifest",
+        "progress-event",
+        "checkpoint-declaration",
+        "post-manifest",
+        "summary",
+        "resource-estimate",
+        "export-bundle",
+        "patch-map",
+        "convert-report",
+        "solve-report",
+        "system-event"
+      ],
+      "inputKinds": [
+        "geometry-spec",
+        "discretization-spec",
+        "solve-spec",
+        "post-spec"
+      ],
+      "inventory": "generated/python/codegen-index.python.v1.json",
+      "exportClassification": "shared"
+    }
+  },
   "deferred": {
-    "csharp": "S2",
-    "python": "S4"
+    "csharp": "S2"
   }
 }

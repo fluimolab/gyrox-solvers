@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gyrox.dev/schemas/geometry-spec/v1/input",
+  "title": "GeometrySpec v1 authoring input envelope",
+  "$defs": {
+    "length": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "m",
+                "mm",
+                "um"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "port": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "const": "hot-inlet"
+            },
+            "domain": {
+              "const": "hot"
+            },
+            "face": {
+              "enum": [
+                "-x",
+                "+x",
+                "-y",
+                "+y",
+                "-z",
+                "+z"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "domain",
+            "face"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "const": "hot-outlet"
+            },
+            "domain": {
+              "const": "hot"
+            },
+            "face": {
+              "enum": [
+                "-x",
+                "+x",
+                "-y",
+                "+y",
+                "-z",
+                "+z"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "domain",
+            "face"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "const": "cold-inlet"
+            },
+            "domain": {
+              "const": "cold"
+            },
+            "face": {
+              "enum": [
+                "-x",
+                "+x",
+                "-y",
+                "+y",
+                "-z",
+                "+z"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "domain",
+            "face"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "const": "cold-outlet"
+            },
+            "domain": {
+              "const": "cold"
+            },
+            "face": {
+              "enum": [
+                "-x",
+                "+x",
+                "-y",
+                "+y",
+                "-z",
+                "+z"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "domain",
+            "face"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "required": [
+    "kind",
+    "schemaVersion",
+    "payload"
+  ],
+  "properties": {
+    "kind": {
+      "const": "geometry-spec"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "cellSizeM",
+        "wallThicknessM",
+        "envelope",
+        "ports"
+      ],
+      "properties": {
+        "pattern": {
+          "const": "gyroid"
+        },
+        "cellSizeM": {
+          "type": "object",
+          "required": [
+            "valueM"
+          ],
+          "properties": {
+            "kind": {
+              "const": "const"
+            },
+            "valueM": {
+              "$ref": "#/$defs/length"
+            }
+          },
+          "additionalProperties": false
+        },
+        "wallThicknessM": {
+          "type": "object",
+          "required": [
+            "valueM"
+          ],
+          "properties": {
+            "kind": {
+              "const": "const"
+            },
+            "valueM": {
+              "$ref": "#/$defs/length"
+            }
+          },
+          "additionalProperties": false
+        },
+        "splitting": {
+          "const": "fullwall"
+        },
+        "envelope": {
+          "type": "object",
+          "required": [
+            "sizeM"
+          ],
+          "properties": {
+            "kind": {
+              "const": "box"
+            },
+            "sizeM": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/length"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "additionalProperties": false
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/port"
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "hot-inlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "hot-outlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "cold-inlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "cold-outlet"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
