@@ -1,3 +1,3 @@
-# Mesh implementation placeholder
+# Mesh executor
 
-S4 transfers and productizes the approved path-C converter here. This directory is intentionally non-executable in S0.
+Run `python3 -m openfoam.mesh.convert` in the solver image with the `/work` request layout. The M0 converter source is retained with provenance comments; product validation and reporting are separate adapters.

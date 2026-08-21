@@ -1,0 +1,5 @@
+# Runtime observed in the M0 mesh-paths environment on 2026-08-21.
+python==3.12.3
+numpy==2.5.1
+jsonschema==4.26.0
+pytest==8.4.2
