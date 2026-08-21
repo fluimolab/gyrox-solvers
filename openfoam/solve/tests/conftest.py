@@ -9,29 +9,26 @@ import pytest
 
 
 TITLES = {
-    "test_renderer_join": "[SR-01] renderer join",
-    "test_thermo_roundtrip": "[SR-02] material roundtrip",
-    "test_fingerprint": "[SR-03] render fingerprint",
-    "test_judge_golden": "[SR-04] recorded judge",
-    "test_judge_axes": "[SR-05] axis separation",
-    "test_judge_insufficient": "[SR-06] fail closed",
-    "test_divergence": "[SR-07] divergence precedence",
-    "test_exit_summary": "[SR-08] exit and dual record",
-    "test_ckpt_produce": "[SR-09] checkpoint product",
-    "test_ckpt_resume": "[SR-10] resume branches",
-    "test_patchmap_validate": "[SR-11] map revalidation",
-    "test_verification": "[SR-12] conservative verification",
-    "test_policy_passthrough": "[SR-13] policy transcription",
-    "test_progress_stream": "[SR-14] live progress parser",
-    "test_runner_integration": "[SR-15] runner process integration",
-    "test_nonfinite_execute": "[SR-16] non-finite execute precedence",
+    "test_renderer_join": "[SR-01] 렌더러 조인(인렛 2항·아웃렛 상수)",
+    "test_thermo_roundtrip": "[SR-02] 물성 왕복 원값 일치",
+    "test_fingerprint": "[SR-03] 렌더 지문(코어 수 불변·relaxation 변경 감지)",
+    "test_judge_golden": "[SR-04] judge 골든 = CL2 기록 재현",
+    "test_judge_axes": "[SR-05] judge 3필드 축 분리",
+    "test_judge_insufficient": "[SR-06] insufficient fail-closed",
+    "test_divergence": "[SR-07] 발산 선행 3분기(exit 20)",
+    "test_exit_summary": "[SR-08] exit 매핑·summary 이중 기록",
+    "test_ckpt_produce": "[SR-09] checkpoint 생산(tar·9필드·ndjson)",
+    "test_ckpt_resume": "[SR-10] 재개 3분기",
+    "test_patchmap_validate": "[SR-11] patch-map 재검증 exit 30",
+    "test_verification": "[SR-12] verification 보수 기본값",
+    "test_policy_passthrough": "[SR-13] executorPolicy 전사·fallback 부재",
 }
 
 
 def pytest_collection_modifyitems(items):
     for item in items:
         title = TITLES.get(item.path.stem)
-        if title:
+        if title and title.split(" ", 1)[0] in item.name:
             item._nodeid = f"{item.path.as_posix()}::{title}"
             item.name = title
 

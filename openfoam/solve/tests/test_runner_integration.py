@@ -11,6 +11,7 @@ import sys
 import tarfile
 import threading
 import time
+from functools import partial
 from pathlib import Path
 
 import pytest
@@ -18,7 +19,13 @@ import pytest
 from openfoam.common.progress import ProgressWriter
 from openfoam.common.schema_adapter import canonical_hash
 from openfoam.solve.renderer import render_case
-from openfoam.solve.runner import _run_solver_with_checkpoints, map_process_exit
+import openfoam.solve.runner as solve_runner
+from openfoam.solve.runner import (
+    DEFAULT_CANCEL_WRITE_GRACE_SEC,
+    _cancel_write_grace_sec,
+    _run_solver_with_checkpoints,
+    map_process_exit,
+)
 
 
 def _write_tool(path: Path, source: str) -> None:
@@ -113,6 +120,129 @@ def _runner_env(repo_root: Path, tools: Path, work: Path, mode: str) -> dict[str
         GYROX_WORK_ROOT=str(work),
         FAKE_OPENFOAM_MODE=mode,
     )
+
+
+def _block_mesh_dict(region: str) -> str:
+    bounds = {
+        "hot": (0.0, 3.0, "hot_inlet", "hot_outlet", "hot_wall", "hot_to_solid", "solid", "solid_to_hot"),
+        "solid": (3.0, 6.0, None, None, "solid_external", "solid_to_cold", "cold", "cold_to_solid"),
+        "cold": (6.0, 9.0, "cold_outlet", "cold_inlet", "cold_wall", "cold_to_solid", "solid", "solid_to_cold"),
+    }
+    y0, y1, inlet, outlet, wall, upper, upper_region, upper_patch = bounds[region]
+    if region == "solid":
+        lower = "solid_to_hot"
+        lower_region = "hot"
+        lower_patch = "hot_to_solid"
+    else:
+        lower = wall
+        lower_region = None
+        lower_patch = None
+
+    def mapped(name: str, neighbour_region: str, neighbour_patch: str, face: str) -> str:
+        return f"""
+    {name}
+    {{
+        type mappedWall;
+        sampleMode nearestPatchFace;
+        sampleRegion {neighbour_region};
+        samplePatch {neighbour_patch};
+        faces ({face});
+    }}"""
+
+    patches = []
+    if inlet is not None:
+        patches.extend([
+            f"{inlet} {{ type patch; faces ((0 4 7 3)); }}",
+            f"{outlet} {{ type patch; faces ((1 2 6 5)); }}",
+        ])
+    if lower_region is None:
+        wall_faces = "((0 1 5 4) (0 3 2 1) (4 5 6 7))"
+        patches.append(f"{wall} {{ type wall; faces {wall_faces}; }}")
+    else:
+        patches.append(mapped(lower, lower_region, lower_patch, "(0 1 5 4)"))
+        patches.append(f"{wall} {{ type wall; faces ((0 4 7 3) (1 2 6 5) (0 3 2 1) (4 5 6 7)); }}")
+    patches.append(mapped(upper, upper_region, upper_patch, "(3 7 6 2)"))
+
+    return f"""FoamFile
+{{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object blockMeshDict;
+}}
+convertToMeters 0.001;
+vertices
+(
+    (0 {y0} 0) (9 {y0} 0) (9 {y1} 0) (0 {y1} 0)
+    (0 {y0} 9) (9 {y0} 9) (9 {y1} 9) (0 {y1} 9)
+);
+// Three 36x12x36 slabs form the promotion-plan EXT-A3 envelope and total
+// cell count: 9 mm cubed at 0.25 mm pitch, 3 * 15,552 = 46,656 cells.
+blocks (hex (0 1 2 3 4 5 6 7) (36 12 36) simpleGrading (1 1 1));
+edges ();
+boundary
+(
+    {''.join(patches)}
+);
+mergePatchPairs ();
+"""
+
+
+def _prepare_small_cht_work(tmp_path: Path, solve_document, patch_map, *, cores: int = 2) -> Path:
+    work = _prepare_work(tmp_path, solve_document, patch_map)
+    mesh = work / "input/mesh"
+    shutil.rmtree(mesh)
+    (mesh / "constant").mkdir(parents=True)
+    (mesh / "constant/regionProperties").write_text("""FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object regionProperties;
+}
+regions (fluid (hot cold) solid (solid));
+""")
+    (mesh / "system").mkdir()
+    (mesh / "system/controlDict").write_text("""FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object controlDict;
+}
+application blockMesh;
+startFrom startTime;
+startTime 0;
+stopAt endTime;
+endTime 1;
+deltaT 1;
+writeControl timeStep;
+writeInterval 1;
+""")
+    for region in ("hot", "cold", "solid"):
+        system = mesh / "system" / region
+        system.mkdir(parents=True)
+        (system / "blockMeshDict").write_text(_block_mesh_dict(region))
+        completed = subprocess.run(
+            ["blockMesh", "-case", str(mesh), "-region", region],
+            capture_output=True, text=True, check=False,
+        )
+        assert completed.returncode == 0, completed.stdout + completed.stderr
+    request_path = work / "request.json"
+    request = json.loads(request_path.read_text())
+    request["limits"]["cpuCores"] = cores
+    request_path.write_text(json.dumps(request))
+    return work
+
+
+def test_cancel_write_grace_uses_d_d10_default_and_environment(monkeypatch):
+    monkeypatch.delenv("GYROX_CANCEL_WRITE_GRACE_SEC", raising=False)
+    assert _cancel_write_grace_sec() == DEFAULT_CANCEL_WRITE_GRACE_SEC == 600.0
+    monkeypatch.setenv("GYROX_CANCEL_WRITE_GRACE_SEC", "17.5")
+    assert _cancel_write_grace_sec() == 17.5
+    monkeypatch.setenv("GYROX_CANCEL_WRITE_GRACE_SEC", "nan")
+    with pytest.raises(ValueError, match="positive finite"):
+        _cancel_write_grace_sec()
 
 
 def test_actual_runner_progress_sigterm_final_checkpoint(repo_root, tmp_path, solve_document, patch_map):
@@ -277,6 +407,80 @@ def test_non_graceful_or_duplicate_write_never_declares_checkpoint(
     warnings = [event for event in events if event["type"] == "log"]
     assert warnings
     assert all(event["payload"] == {"level": "warn", "code": "checkpoint-io-error"} for event in warnings)
+
+
+def test_pinned_cht_product_entrypoint_pid1_sigterm_writes_checkpoint(
+    tmp_path, solve_document, patch_map, monkeypatch, capsys,
+):
+    """Cancel the real pinned multi-region product path through its PID-1 handler."""
+    if shutil.which("chtMultiRegionSimpleFoam") is None or shutil.which("blockMesh") is None:
+        pytest.skip("requires the pinned OpenFOAM runtime image")
+    assert os.environ.get("WM_PROJECT_VERSION") == "v2512"
+    assert os.getpid() == 1, "real product cancellation test must run as container PID 1"
+    solve_document["payload"]["limits"]["maxIters"] = 100000
+    work = _prepare_small_cht_work(tmp_path, solve_document, patch_map)
+
+    product_execute = solve_runner.execute
+    monkeypatch.setattr(solve_runner, "execute", partial(product_execute, work))
+    monkeypatch.delenv("GYROX_CANCEL_WRITE_GRACE_SEC", raising=False)
+
+    class CancelAtWindow(ProgressWriter):
+        observed_iter: int | None = None
+
+        def emit(self, event_type, payload, **envelope_fields):
+            event = super().emit(event_type, payload, **envelope_fields)
+            if event_type == "progress" and self.observed_iter is None and 20 <= payload["iter"] <= 29:
+                type(self).observed_iter = payload["iter"]
+                os.kill(os.getpid(), signal.SIGTERM)
+            return event
+
+    monkeypatch.setattr(solve_runner, "ProgressWriter", CancelAtWindow)
+
+    previous_handler = signal.getsignal(signal.SIGTERM)
+    try:
+        result = solve_runner.main()
+    finally:
+        signal.signal(signal.SIGTERM, previous_handler)
+
+    assert CancelAtWindow.observed_iter is not None, "chtMultiRegionSimpleFoam missed cancellation window"
+    assert 20 <= CancelAtWindow.observed_iter <= 29
+    assert result == 143
+    final_result = json.loads((work / "output/result.json").read_text())
+    assert (final_result["outcome"], final_result["exitCode"]) == ("CANCELED", 143)
+
+    declarations = [json.loads(line) for line in (work / "output/checkpoints.ndjson").read_text().splitlines()]
+    assert len(declarations) == 1
+    declaration = declarations[0]
+    assert set(declaration) == {
+        "path", "bytes", "sha256", "iter", "physT", "specHash",
+        "decompN", "timeName", "regions",
+    }
+    assert declaration["decompN"] == 2
+    assert 20 <= declaration["iter"] <= 30
+    assert float(declaration["timeName"]) > 0
+
+    archive_path = work / "output" / declaration["path"]
+    assert hashlib.sha256(archive_path.read_bytes()).hexdigest() == declaration["sha256"]
+    with tarfile.open(archive_path) as archive:
+        members = archive.getnames()
+    for processor in range(declaration["decompN"]):
+        for region in ("hot", "cold", "solid"):
+            prefix = f"processor{processor}/{declaration['timeName']}/{region}/"
+            assert any(name.startswith(prefix) for name in members)
+    processor0_fields = {
+        (parts[2], parts[3])
+        for name in members
+        if len(parts := Path(name).parts) == 4
+        and parts[:2] == ("processor0", declaration["timeName"])
+        and parts[2] in {"hot", "cold", "solid"}
+    }
+    assert len(processor0_fields) >= 9
+    assert {("hot", "U"), ("hot", "T"), ("cold", "U"), ("cold", "T"), ("solid", "T")} <= processor0_fields
+
+    events = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line]
+    assert any(event["type"] == "progress" and 20 <= event["payload"]["iter"] <= 30 for event in events)
+    checkpoint_events = [event for event in events if event["type"] == "checkpoint"]
+    assert len(checkpoint_events) == 1 and checkpoint_events[0]["payload"] == declaration
 
 
 def test_pinned_icofoam_pid1_sigterm_waits_for_write_now(tmp_path, capsys):

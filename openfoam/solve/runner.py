@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import queue
 import re
@@ -39,6 +40,22 @@ SUMMARY_VALUE_KEYS = (
     "dpHotPa", "dpColdPa", "mdotHotKgS", "mdotColdKgS", "fFactor", "qW", "qHotW", "qColdW",
     "effectiveness", "ntu", "uaWK", "jFactor", "tOutHotK", "tOutColdK", "energyBalancePct",
 )
+
+# D-D10 assigns solve cancellation a ten-minute grace. The worker's outer
+# SIGTERM -> grace -> SIGKILL chain remains the final hard upper bound.
+DEFAULT_CANCEL_WRITE_GRACE_SEC = 600.0
+CANCEL_WRITE_GRACE_ENV = "GYROX_CANCEL_WRITE_GRACE_SEC"
+
+
+def _cancel_write_grace_sec() -> float:
+    raw = os.environ.get(CANCEL_WRITE_GRACE_ENV, str(DEFAULT_CANCEL_WRITE_GRACE_SEC))
+    try:
+        value = float(raw)
+    except ValueError as exc:
+        raise ValueError(f"{CANCEL_WRITE_GRACE_ENV} must be a positive finite number") from exc
+    if not math.isfinite(value) or value <= 0:
+        raise ValueError(f"{CANCEL_WRITE_GRACE_ENV} must be a positive finite number")
+    return value
 
 
 def verification_defaults() -> dict[str, Any]:
@@ -206,8 +223,10 @@ def _stream_reader(process: subprocess.Popen[str], log: Any, lines: queue.Queue[
 def _run_solver_with_checkpoints(
     command: list[str], case: Path, output: Path, progress: ProgressWriter, *, interval: int,
     spec_hash: str, cores: int, max_iters: int, terminate_requested: threading.Event | None = None,
-    write_grace: float = 30.0,
+    write_grace: float | None = None,
 ) -> int:
+    if write_grace is None:
+        write_grace = _cancel_write_grace_sec()
     log_path = output / "case" / "logs" / "cht.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     environment = dict(os.environ, OMPI_ALLOW_RUN_AS_ROOT="1", OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1")
