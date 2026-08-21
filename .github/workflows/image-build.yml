@@ -30,6 +30,9 @@ jobs:
           Path("reports").mkdir(exist_ok=True)
           Path("reports/base-image-ref.txt").write_text(bases[0], encoding="utf-8")
           PY
+          # BuildKit keeps pulled base images in its own cache, not the daemon
+          # store — pull the pinned digest explicitly before inspecting it.
+          docker pull "$(cat reports/base-image-ref.txt)"
           docker image inspect "$(cat reports/base-image-ref.txt)" > reports/base-inspect.json
           docker image inspect gyrox/solvers:ci > reports/runtime-inspect.json
           python3 - <<'PY'

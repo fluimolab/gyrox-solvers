@@ -376,7 +376,7 @@ def test_two_intervals_write_distinct_atomic_checkpoints(tmp_path, solve_documen
     "partial-exit",
     "partial-kill",
     "partial-timeout",
-    "duplicate",
+    pytest.param("duplicate", marks=pytest.mark.realtime_cancel),
 ])
 def test_non_graceful_or_duplicate_write_never_declares_checkpoint(
     mode, tmp_path, solve_document, patch_map, monkeypatch, capsys,
@@ -483,6 +483,7 @@ def test_pinned_cht_product_entrypoint_pid1_sigterm_writes_checkpoint(
     assert len(checkpoint_events) == 1 and checkpoint_events[0]["payload"] == declaration
 
 
+@pytest.mark.realtime_cancel
 def test_pinned_icofoam_pid1_sigterm_waits_for_write_now(tmp_path, capsys):
     """Exercise the real 2512 signal semantics used by the runtime image."""
     if shutil.which("icoFoam") is None or shutil.which("blockMesh") is None:

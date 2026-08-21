@@ -1,3 +1,4 @@
+# ADR-006 D8-2: QoI identifiers below are contract data, not new verification claims.
 """Product transcription of the canonical Phase C window judge.
 
 Source: ../gyrox/m0/m04/runs/phaseC/window_analysis_C.py

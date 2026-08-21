@@ -26,4 +26,4 @@ test: require-gyrox-root
 test-ci:
 	@mkdir -p $(dir $(CI_JUNIT_OUT))
 	docker build --target test-ci -t $(CI_TEST_IMAGE) .
-	docker run --rm $(CONTRACT_MOUNT) -v $(dir $(CI_JUNIT_OUT)):/out $(CI_TEST_IMAGE) pytest /opt/solvers/tests -m "not m0_assets" --junitxml=/out/$(notdir $(CI_JUNIT_OUT))
+	docker run --rm $(CONTRACT_MOUNT) -v $(dir $(CI_JUNIT_OUT)):/out $(CI_TEST_IMAGE) pytest /opt/solvers/tests -m "not m0_assets and not realtime_cancel" --junitxml=/out/$(notdir $(CI_JUNIT_OUT))

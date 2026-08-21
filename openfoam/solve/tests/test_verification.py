@@ -1,3 +1,4 @@
+# ADR-006 D8-2: QoI identifiers below are contract data, not new verification claims.
 from __future__ import annotations
 
 import json

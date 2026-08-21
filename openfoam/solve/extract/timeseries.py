@@ -1,3 +1,4 @@
+# ADR-006 D8-2: QoI identifiers below are contract data, not new verification claims.
 # Source: ../gyrox/m0/results/extract/timeseries.py @ ba130aca02c8dfe37f4e4a3e20c8a1a8a521ee7d
 """timeseries.csv — 영역×필드 잔차(solverInfo) + 모니터(surfaceFieldValue/wallHeatFlux)
 iter 기준 병합 + matplotlib 수렴 곡선 스모크 플롯.
