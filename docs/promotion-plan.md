@@ -58,10 +58,10 @@
 | XT-RR-02(specHash 변조 exit 40) | EXT-A3 | 550 | 재개 스테이징 즉시 판정(XT-RR-01 산출 checkpoint 재사용·meta 변조) — 완주 불요 | ≤2 min |
 | XT-RR-03(sidecar 부재 콜드) | EXT-A3 | 550 | 콜드 재계산 개시 관측 — 완주 불요 | ≤3 min |
 | XT-RR-04(재개 소비 V5) | EXT-A3 | **550(XT-RR-01과 동일 spec — ①′ R3 M1: specHash 일치가 재개 전제·러너는 자격 검사 비수행(executor 소관 — S3 더미 기검증))** | **러너 전용 재개 시험 명시(①′ R2 M2)** — checkpoint 원천 = XT-RR-01 취소 산출물(교차 fixture·iter i = 취소 시점 — **i ≤ 30 관측 조건 assert**: 재개 후 신규 표본 550−i ≥ 520 → transientFrac 절단 후 ≥416 ≥ 2W=400·판정 성립)·/work/input 직접 스테이징 → 재개 완주·창 리셋 판정. **제품 경로 주기 checkpoint 재개는 소형 유도 불가**(주기 900 s 계약 상수 — 한계 정직 기재): 생산 축 = 관통 캠페인 관측·소비 축 = 본 러너 시험 | ≤8 min |
-| XT-RR-05(decompN 콜드) | EXT-A3 | 550 | 콜드 전환 관측 — 완주 불요 | ≤3 min |
+| XT-RR-05(decompN 콜드) | EXT-A3 | 550 | **RR-01 산출 checkpoint+유효 sidecar 재사용·specHash `20f867…` 불변·decompN만 불일치(checkpoint 16 → 재개 분해수 8 주입)** — exit 40 미발동 ∧ 콜드 재계산 전환 assert·완주 불요(①′ R4 명세) | ≤3 min |
 | XT-RR-06(캡·취소 동시) | EXT-A3 | 550 | 축소 maxWallClockSec 주입(시험 executorPolicy — 해시 불참여)·완주 불요 | ≤3 min |
 | XT-RR-07(mesh publish 실검증) | EXT-A3 mesh 산출 | — (solve 없음) | publish 가드 판정 | ≤2 min |
-| XT-RR-08(관통 manifest 대조) | **EXT-A4**(①′ R3 M2 — post z=0.015 단면이 기하 내부에 성립하는 전용 기하·§7.4) | 550 | **완주 필요**(4스테이지 관통·manifest 대조 — post 실행 포함) | ≤10 min(N 96,000·t_iter ≈0.95 s — §2 기대 8 min은 [초안]·파일럿 실측 검증) |
+| XT-RR-08(관통 manifest 대조) | **EXT-A4**(§7.4 — post z=0.015 단면 내부 성립·①′ R4 축소 재선정) | 550 | **완주 필요**(4스테이지 관통·manifest 대조 — post 실행 포함·testTimeout 600 s 기본값 내 산술 성립) | ≤8 min(solve ≈4.9 min+전후처리 — 파일럿 검증) |
 | XT-RR-09(estimate 정합) | EXT-A3 | 550 | 제출·admit 단계 판정 — solve 기동 불요 | ≤1 min |
 
 ## 6. 산출·기록
@@ -69,7 +69,7 @@
 ⒜⒝ 산출 = `gyrox/m1/s4-campaign/promotion-{a,b}.json`(캠페인 러너 기계 생성·CP-01/02) · 본 문서의 케이스
 등재값은 CP 매니페스트·pre-run.json이 spec 해시로 결속 · 실측 확정치는 `S4-EXEC-PLAN §10`에 전사.
 
-## 7. 4-spec canonical 전문 (①′ 리뷰 M1 처분 — 기계 판독 등재. 공통: geometry = EXT-A 기하·materials/numerics/convergence = fixture 전개값 불변·mdot = fixture × 면적비 0.16 **정확 십진 리터럴**(hot 0.00375846027232 · cold 0.00381144173392 — 축약 표기 금지))
+## 7. 4-spec canonical 전문 (①′ 리뷰 M1 처분 — 기계 판독 등재. 공통(§7.1~7.3): geometry = EXT-A 기하·materials/numerics/convergence = fixture 전개값 불변·mdot = fixture × 면적비 0.16 정확 십진 리터럴(hot 0.00375846027232 · cold 0.00381144173392) — **예외 §7.4 = EXT-A4 전용 기하·면적비 0.18**. 변형(§7.2·§7.3·§7.4) spec 해시 = pre-run.json 기계 산출·결속)
 
 ### 7.1 파일럿 (EXT-A·pitch 2e-4·maxIters 550) — resolver 산출 spec 해시(①′ R2 검증기 실측 등재): geometry `a9d780ba7f492e9849e370a388f51c4f098556c4606c7664a3df079da1b4798d` · discretization `b16de52d35a1ca669619c41b0154638bc055b788018512a388138614b4bbf93f` · solve `20f867b63871a487fba1d1babe048dfd2d9a6bc308e001e694ec934e842d5cb4` · post `50a010dd49da635960234e107b641d9bd101f3f938153fcb67c7737f5d570893`
 
@@ -313,18 +313,16 @@
 t_iter ≈ 64000/(6334.6×16) ≈ **0.632 s** · 완주 550 iter ≈ **5.8 min**(기동·수확 여유 포함 ≤ testTimeout 600 s의
 초과 시나리오 없음 — 완주 시나리오도 8 min 기대 내·§5 표).)
 
-### 7.4 XT-RR-08 전용 기하 EXT-A4 — base = §7.1 전문·RFC 6902 JSON Patch (①′ R3 M2: envelope z = 0.018 → post z=0.015 단면 내부 성립·인렛 면적 y·z = 0.012×0.018 = 2.16e-4 m² → 면적비 0.24·mdot 정확 십진 리터럴)
+### 7.4 XT-RR-08 전용 기하 EXT-A4 — base = §7.1 전문·RFC 6902 JSON Patch (①′ R4 M 처분 — 축소 재선정: envelope [0.009, 0.009, 0.018](pitch 3e-4 정수 분할 30×30×60)·post z=0.015 내부 성립·인렛 면적 y·z = 0.009×0.018 = 1.62e-4 m² → 면적비 0.18·**900 s 문구 철회 — D-I24 testTimeout 600 s 기본값 내 산술 성립**)
 
 ```json
-[{"op": "replace", "path": "/geometry/payload/envelope/sizeM", "value": [0.012, 0.012, 0.018]},
+[{"op": "replace", "path": "/geometry/payload/envelope/sizeM", "value": [0.009, 0.009, 0.018]},
  {"op": "replace", "path": "/discretization/payload/voxelPitchM", "value": 0.0003},
- {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.00563769040848},
- {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.00571716260088}]
+ {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.00422826780636},
+ {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.00428787195066}]
 ```
 
-(N ≈ 2.592e-6/2.7e-11 = **96,000** · t_iter ≈ 96000/(6334.6×16) ≈ **0.947 s** · 완주 550 ≈ **8.7 min** —
-testTimeout 600 s 초과 아님? **초과함(521 s 솔브 + 기동·수확)** — 처분: XT-RR-08은 int-s4 **hookTimeout/testTimeout
-예외 케이스가 아니라** 시험 내 대기 예산을 D-I24 testTimeout 600 s 내로 만들기 위해 **완주 대기를 폴링 분할**
-(vitest 단일 it의 timeout은 600 s — 초과 위험. **정정: XT-RR-08 testTimeout은 개별 900 s로 상향 지정**(vitest
-per-test timeout 인자 — D-I24 600 s는 기본값·개별 상향은 §2 int-s4 상한 180 min 내 흡수·본 문서가 등재값) —
-①′ 리뷰가 본 처분의 정합을 판정).)
+(N = 30×30×60 = **54,000** · t_iter ≈ 54000/(6334.6×16) ≈ **0.533 s** · 완주 550 ≈ **293 s(4.9 min)** —
+전후처리·기동·수확 여유 **307 s** 내 상한: 파일럿 phase별 실측이 이 여유의 충분성을 검증(§3 provenance —
+초과 반증 시 본 문서 개정·재수행). mdot = fixture × 0.18 정확 십진 리터럴. 변형 spec 해시 4종은 pre-run.json
+기계 산출·결속(§7 머리말 규칙 — §7.2·§7.3과 동일).)
