@@ -1,0 +1,27 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/0.orig/cold/T @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+
+dimensions      [0 0 0 1 0 0 0];
+internalField   uniform 313.15;
+
+boundaryField
+{
+    cold_inlet     { type fixedValue; value uniform 293.15; }
+    cold_outlet    { type inletOutlet; inletValue uniform 293.15; value uniform 293.15; }
+    cold_wall   { type zeroGradient; }   // 측면 노출 유체면 = 단열 (D-M0-6)
+    "cold_to_.*"
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        value           uniform 313.15;
+    }
+}
+
+

@@ -1,9 +1,24 @@
-# S4 발효 전 자리 워크플로 — 자동 트리거 없음(S0). S4에서 make test(S7 자립) 실배선.
+# S4 실배선(P-M03 처분): CI 축 = gyrox 사설 컨텍스트 불요 서브셋(test-ci — `-m "not m0_assets"`).
+# 전체 make test(m0 수용 기록 포함 — S7 자립 판정 정본)는 캠페인 ⑧ 로컬 재실행·리포트 해시 결속(CP 매니페스트).
 name: make-test
 on:
+  pull_request:
   workflow_dispatch: {}
 jobs:
-  placeholder:
+  make-test-ci:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "S4 발효 전 자리 — DETAIL §1.4 make test는 S4에서 배선된다"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify campaign test consumes the frozen runtime image
+        run: |
+          frozen=sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          make -n test IMAGE="$frozen" | grep -F -- "BASE_IMAGE=$frozen"
+      - name: Build and run CI-subset tests in image
+        run: make test-ci CI_JUNIT_OUT=$PWD/reports/make-test-ci-report.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: make-test-ci-report
+          path: reports/make-test-ci-report.xml

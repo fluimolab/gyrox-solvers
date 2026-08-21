@@ -7,6 +7,7 @@ import pytest
 from openfoam.mesh.labels_to_foam import convert
 
 
+@pytest.mark.m0_assets
 @pytest.mark.parametrize("_case", [None], ids=["[MC-01]"])
 def test_byte_preservation(_case, tmp_path, gyrox_root):
     labels = gyrox_root / "m0/fixtures/gyroid-30-4-0.4/labels.vti"

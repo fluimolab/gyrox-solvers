@@ -1,51 +1,87 @@
-"""Thin JSON-Schema adapter.
+"""Load and expose the generated Gyrox Python contract API.
 
-The bridge currently exports schemas but no Python validators.  Keeping schema
-lookup and jsonschema behind this module makes the generated validator a
-drop-in replacement when it arrives.
+The contract tree is supplied by PR-SP1. Product images use
+``/opt/solvers/contract``; local stacked-branch tests point
+``GYROX_CONTRACT_ROOT`` at the SP1 worktree. There is deliberately no raw
+JSON-Schema fallback here: a missing generated export is a packaging error.
 """
 from __future__ import annotations
 
-import json
+import importlib.util
 import os
+import sys
 from functools import lru_cache
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
-import jsonschema
+
+_PACKAGE_NAME = "_gyrox_generated_contract"
 
 
-class ContractValidationError(ValueError):
-    """Raised when a consumed or produced contract document is invalid."""
-
-
-def _schema_roots() -> tuple[Path, ...]:
+def _contract_roots() -> tuple[Path, ...]:
+    configured = os.environ.get("GYROX_CONTRACT_ROOT")
     here = Path(__file__).resolve()
-    configured = os.environ.get("GYROX_SCHEMA_DIR")
-    candidates = [
+    candidates = (
         Path(configured) if configured else None,
-        here.parents[2] / "contract" / "schemas",
-        here.parents[3] / "gyrox" / "packages" / "contracts" / "schemas",
-        Path("/opt/solvers/contract/schemas"),
-    ]
-    return tuple(path for path in candidates if path is not None)
+        here.parents[2] / "contract",
+        Path("/opt/solvers/contract"),
+    )
+    roots: list[Path] = []
+    for candidate in candidates:
+        if candidate is not None and candidate not in roots:
+            roots.append(candidate)
+    return tuple(roots)
 
 
-@lru_cache(maxsize=None)
-def load_schema(kind: str, version: int = 1) -> dict[str, Any]:
-    filename = f"{kind}.v{version}.schema.json"
-    for root in _schema_roots():
-        path = root / filename
-        if path.is_file():
-            return json.loads(path.read_text(encoding="utf-8"))
-    searched = ", ".join(str(root / filename) for root in _schema_roots())
-    raise FileNotFoundError(f"contract schema not found: {searched}")
+@lru_cache(maxsize=1)
+def _generated() -> ModuleType:
+    for root in _contract_roots():
+        package = root / "generated/python"
+        init = package / "__init__.py"
+        if not init.is_file():
+            continue
+        spec = importlib.util.spec_from_file_location(
+            _PACKAGE_NAME, init, submodule_search_locations=[str(package)],
+        )
+        if spec is None or spec.loader is None:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[_PACKAGE_NAME] = module
+        try:
+            spec.loader.exec_module(module)
+        except Exception:
+            sys.modules.pop(_PACKAGE_NAME, None)
+            raise
+        return module
+    searched = ", ".join(str(root / "generated/python/__init__.py") for root in _contract_roots())
+    raise ImportError(f"generated Gyrox Python contract is absent; searched: {searched}")
 
 
-def validate(kind: str, instance: Any, version: int = 1) -> None:
-    schema = load_schema(kind, version)
-    try:
-        jsonschema.Draft202012Validator(schema).validate(instance)
-    except jsonschema.ValidationError as exc:
-        where = "/".join(str(part) for part in exc.absolute_path) or "<root>"
-        raise ContractValidationError(f"{kind}.v{version} at {where}: {exc.message}") from exc
+ContractValidationError = _generated().ContractValidationError
+ValidationResult = _generated().ValidationResult
+
+
+def validate(kind: str, instance: Any, version: int = 1) -> Any:
+    """Return the generated validation result, raising on invalid documents."""
+    if version != 1:
+        raise ValueError(f"unsupported contract schema version: {version}")
+    result = _generated().validate(kind, instance, "canonical")
+    if not result.valid:
+        _generated().assert_valid(kind, instance, "canonical")
+    return result
+
+
+def assert_valid(kind: str, instance: Any, version: int = 1) -> None:
+    if version != 1:
+        raise ValueError(f"unsupported contract schema version: {version}")
+    _generated().assert_valid(kind, instance, "canonical")
+
+
+def canonical_hash(kind: str, instance: Any) -> tuple[str, str]:
+    return _generated().canonical_hash(kind, instance)
+
+
+def generated_module_path() -> Path:
+    """Expose provenance for drift/consumer tests without duplicating loading."""
+    return Path(_generated().__file__).resolve()

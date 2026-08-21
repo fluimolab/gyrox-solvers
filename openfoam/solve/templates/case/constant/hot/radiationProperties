@@ -1,0 +1,12 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/constant/hot/radiationProperties @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      radiationProperties;
+}
+
+radiation       off;
+radiationModel  none;
+

@@ -1,0 +1,17 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/system/fvSchemes @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+
+// 최상위 더미 — 메시 도구용. 실제 스킴은 system/<region>/fvSchemes
+ddtSchemes      { default steadyState; }
+gradSchemes     { default Gauss linear; }
+divSchemes      { default none; }
+laplacianSchemes { default Gauss linear corrected; }
+interpolationSchemes { default linear; }
+snGradSchemes   { default corrected; }
+

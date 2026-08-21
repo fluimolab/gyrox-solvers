@@ -1,0 +1,29 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/system/fvSolution @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+
+// D-M0-27: 3영역 CHT 기준 numerics — k_Al/k_water ~ 400 에서 인터페이스
+// mixed-fraction ~0.003 → 단일 스윕 커플링 정체 (slab 실측: energyCoupling 없이
+// 장기 결합 정체를 해소한 검증 출처: verification/slab-1d-cht.
+SIMPLE
+{
+    energyCoupling
+    {
+        iterations      25;   // D-M0-27 갱신 (웨이브 3): caseA L0 실측 — 100/1e-7은
+                              // 유동 미수렴 구간에서 매 반복 100패스 전소(3.7× 낭비).
+                              // 25/1e-6이 대형 케이스 기준 (wave2-status '솔브 라이브 튜닝')
+        interval        0;
+        convergence
+        {
+            h           1e-6;
+        }
+        onLoop          ( );
+        onConverged     ( );
+        onEnd           ( );
+    }
+}

@@ -1,0 +1,30 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/system/solid/fvSolution @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+
+solvers
+{
+    h
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.1;
+    }
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 1;
+}
+
+relaxationFactors
+{
+    equations { h 0.7; }
+}
+

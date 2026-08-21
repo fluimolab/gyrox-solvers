@@ -1,0 +1,28 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/constant/cold/thermophysicalProperties @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      thermophysicalProperties;
+}
+
+thermoType
+{
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hConst;
+    equationOfState rhoConst;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+mixture
+{
+    specie          { molWeight 18.0153; }
+    equationOfState { rho 998.2; }
+    thermodynamics  { Cp 4182; Hf 0; }
+    transport       { mu 1.002e-3; Pr 7.01; }
+}
+

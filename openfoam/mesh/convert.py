@@ -14,7 +14,7 @@ from openfoam.common.io import (
     find_input,
     load_request,
     manifest_entry,
-    read_json_input,
+    read_canonical_spec_input,
     write_json,
 )
 from openfoam.common.progress import ProgressWriter
@@ -33,6 +33,12 @@ PORT_PATCHES = {
     "port.hot.outlet": ("hot", "hot_outlet"),
     "port.cold.inlet": ("cold", "cold_inlet"),
     "port.cold.outlet": ("cold", "cold_outlet"),
+}
+CONVERTER_PORT_FACES = {
+    "hot-inlet": "-x",
+    "hot-outlet": "+x",
+    "cold-inlet": "+x",
+    "cold-outlet": "-x",
 }
 
 
@@ -65,11 +71,28 @@ def validate_port_area_bounds(report: dict[str, Any], geometry: dict[str, Any]) 
             raise ValueError(f"port area outside envelope face bound: {geom_ref}")
 
 
+def validate_converter_topology(geometry: dict[str, Any]) -> None:
+    """Fail closed unless GeometrySpec matches the byte-preserved M0 x topology."""
+    actual = {port["id"]: port["face"] for port in geometry["ports"]}
+    mismatches = {
+        port_id: {"expected": face, "actual": actual.get(port_id)}
+        for port_id, face in CONVERTER_PORT_FACES.items()
+        if actual.get(port_id) != face
+    }
+    if mismatches:
+        raise ValueError(
+            "unsupported port face topology: M1 converter is counterflow-x only; "
+            f"refusing implicit x interpretation: {mismatches}"
+        )
+
+
 def _documents(request: dict[str, Any], work_root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
-    geometry = read_json_input(request, work_root, ("geometry-spec", "geometry-spec.json"))
-    discretization = read_json_input(request, work_root, ("discretization-spec", "discretization-spec.json"))
-    validate("geometry-spec", geometry)
-    validate("discretization-spec", discretization)
+    geometry = read_canonical_spec_input(
+        request, work_root, "geometry", ("geometry-spec", "geometry-spec.json"),
+    )
+    discretization = read_canonical_spec_input(
+        request, work_root, "discretization", ("discretization-spec", "discretization-spec.json"),
+    )
     return geometry["payload"], discretization["payload"]
 
 
@@ -82,6 +105,7 @@ def execute(work_root: Path = WORK_ROOT) -> int:
     try:
         request = load_request(work_root, "mesh")
         geometry, discretization = _documents(request, work_root)
+        validate_converter_topology(geometry)
         labels = find_input(request, work_root, ("labels", "labels-vti", "volume"), suffix="labels.vti")
         progress.emit("phase", {"name": "render"})
         legacy = labels_to_foam.convert(str(labels), str(output / "case"), fmt="binary")

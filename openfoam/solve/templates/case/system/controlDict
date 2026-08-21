@@ -1,0 +1,31 @@
+// Source: ../gyrox/m0/m04/runs/phaseC/solve/CL2/system/controlDict @ ef610b9ecb4e7114d42c56f07584a0549f94a29c
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+
+application     chtMultiRegionSimpleFoam;   // ESI com 계열 (D-M0-1: 2512 핀)
+
+startFrom       latestTime;
+startTime       0;
+stopAt          endTime;
+endTime         3000;                       // 수렴 판정은 잔차+에너지 밸런스 (함정 9)
+deltaT          1;
+writeControl    timeStep;
+writeInterval   500;
+purgeWrite      4;                          // 디스크 — caseA L0 솔브 11GB 교훈 (웨이브 3)
+writeFormat     binary;
+writePrecision  10;                         // D-M0-23: 기본 정밀도에서 ΔP 소실 실측
+timeFormat      general;
+timePrecision   6;
+runTimeModifiable true;
+
+// D-M0-23: functions 선탑재 필수 (소급 postProcess로 잔차 재구성 불가 실측).
+// FO 이름·구성 = m0/results/case-templates/functions.cfg (M0-5 extract가
+// 이름으로 소비: solverInfo_<role>, solverInfo_solid_<solid>, mdot/p/T_<role>_<in|out>,
+// whf_<role>) — 변경분은 log yes 일부(측정 파서·모니터링용, dat 출력 불변)뿐.
+#include "functions.cfg"
+
