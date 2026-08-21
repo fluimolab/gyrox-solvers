@@ -50,18 +50,18 @@
 - 산술(등재 근거): n=600 → transientFrac 0.2 절단 후 480 ≥ 2W=400(insufficient 미발동)·600 ≥ 하한 550·
   minIterationsForJudgment 400 충족 — 리뷰 양측 산술 검증 완료(계획 §8).
 
-## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 9건 ID별(solve-bearing 8건) 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N ≈ 64,000·t_iter ≈ 0.63 s·완주 ≈ 5.8 min < 기대 8 min·testTimeout 600 s 내 여유). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 + §6.3 ⓒ(①′ R2 인용 정정) — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다)
+## 5. int-s4 실 러너 케이스 고정표 (①′ 리뷰 M2 처분 — 9건 ID별(solve-bearing 8건) 기하·maxIters·종료조건 불변 등재. EXT-A2 폐기 → **EXT-A3**(§7.3 — N ≈ 64,000·t_iter ≈ 0.63 s·완주 ≈ 5.8 min < 기대 8 min·testTimeout 600 s 내 여유). **checkpoint 원천 = 취소 체인 최종 checkpoint publish**(DESIGN §6.8 + §6.3 ⓒ(①′ R2 인용 정정) — 주기 900 s 도달 불요: 시험은 주기 생산에 의존하지 않는다))
 
 | ID | 기하 | maxIters | 종료조건(완주 여부) | 예상 소요 |
 |---|---|---|---|---|
-| XT-RR-01(취소·checkpoint 보존 V4) | EXT-A3 | 550 | **progress iter ≥ 30 관측 시 취소 발동**(checkpoint iter = 취소 시점 — XT-RR-04 fixture 원천·i ≤ 50 관측 조건) — 완주 불요 | ≤2 min |
+| XT-RR-01(취소·checkpoint 보존 V4) | EXT-A3 | 550 | **progress iter ≥ 20 관측 시 취소 발동**(checkpoint iter = 취소 시점 — XT-RR-04 fixture 원천·**i ≤ 30 관측 조건**) — 완주 불요 | ≤2 min |
 | XT-RR-02(specHash 변조 exit 40) | EXT-A3 | 550 | 재개 스테이징 즉시 판정(XT-RR-01 산출 checkpoint 재사용·meta 변조) — 완주 불요 | ≤2 min |
 | XT-RR-03(sidecar 부재 콜드) | EXT-A3 | 550 | 콜드 재계산 개시 관측 — 완주 불요 | ≤3 min |
-| XT-RR-04(재개 소비 V5) | EXT-A3 | **600(재개 런)** | **러너 전용 재개 시험 명시(①′ R2 M2)** — executor 자격 선택 우회(자격 선택은 S3 더미 기검증·S4 이월 축 = **러너의 checkpoint 소비·판정 창 리셋**): checkpoint 원천 = XT-RR-01 취소 산출물(교차 fixture 재사용·iter i = 취소 시점 값 — 시험이 i ≤ 50 관측 조건 assert·산술 600 − i ≥ 550 병기)·/work/input 직접 스테이징 → 재개 완주·창 리셋 판정. **제품 경로 주기 checkpoint 재개는 소형 유도 불가**(주기 900 s 계약 상수 — 한계 정직 기재): 생산 축은 관통 캠페인(⑥ — 900 s 주기 다수 산출) 관측·소비 축은 본 러너 시험이 담당 | ≤8 min |
+| XT-RR-04(재개 소비 V5) | EXT-A3 | **550(XT-RR-01과 동일 spec — ①′ R3 M1: specHash 일치가 재개 전제·러너는 자격 검사 비수행(executor 소관 — S3 더미 기검증))** | **러너 전용 재개 시험 명시(①′ R2 M2)** — checkpoint 원천 = XT-RR-01 취소 산출물(교차 fixture·iter i = 취소 시점 — **i ≤ 30 관측 조건 assert**: 재개 후 신규 표본 550−i ≥ 520 → transientFrac 절단 후 ≥416 ≥ 2W=400·판정 성립)·/work/input 직접 스테이징 → 재개 완주·창 리셋 판정. **제품 경로 주기 checkpoint 재개는 소형 유도 불가**(주기 900 s 계약 상수 — 한계 정직 기재): 생산 축 = 관통 캠페인 관측·소비 축 = 본 러너 시험 | ≤8 min |
 | XT-RR-05(decompN 콜드) | EXT-A3 | 550 | 콜드 전환 관측 — 완주 불요 | ≤3 min |
 | XT-RR-06(캡·취소 동시) | EXT-A3 | 550 | 축소 maxWallClockSec 주입(시험 executorPolicy — 해시 불참여)·완주 불요 | ≤3 min |
 | XT-RR-07(mesh publish 실검증) | EXT-A3 mesh 산출 | — (solve 없음) | publish 가드 판정 | ≤2 min |
-| XT-RR-08(관통 manifest 대조) | EXT-A3 | 550 | **완주 필요**(4스테이지 관통·manifest 대조) | ≤8 min |
+| XT-RR-08(관통 manifest 대조) | **EXT-A4**(①′ R3 M2 — post z=0.015 단면이 기하 내부에 성립하는 전용 기하·§7.4) | 550 | **완주 필요**(4스테이지 관통·manifest 대조 — post 실행 포함) | ≤10 min(N 96,000·t_iter ≈0.95 s — §2 기대 8 min은 [초안]·파일럿 실측 검증) |
 | XT-RR-09(estimate 정합) | EXT-A3 | 550 | 제출·admit 단계 판정 — solve 기동 불요 | ≤1 min |
 
 ## 6. 산출·기록
@@ -309,6 +309,22 @@
 }}]
 ```
 
-(base의 그 외 3-spec 불변 — discretization pitch만 3e-4. N ≈ 1.728e-6/2.7e-11 = **64,000** ·
+(적용 대상 ID별 Patch 규칙(①′ R3 M1 지시 — "그 외 불변" 문언 대체): XT-RR-01·02·03·04·05·06·09 = base(§7.1) + 본 §7.3 Patch(disc 3e-4)·solve maxIters 550 = base 그대로 / XT-RR-08 = §7.4 / XT-RR-07 = §7.3의 mesh 산출까지만. N ≈ 1.728e-6/2.7e-11 = **64,000** ·
 t_iter ≈ 64000/(6334.6×16) ≈ **0.632 s** · 완주 550 iter ≈ **5.8 min**(기동·수확 여유 포함 ≤ testTimeout 600 s의
 초과 시나리오 없음 — 완주 시나리오도 8 min 기대 내·§5 표).)
+
+### 7.4 XT-RR-08 전용 기하 EXT-A4 — base = §7.1 전문·RFC 6902 JSON Patch (①′ R3 M2: envelope z = 0.018 → post z=0.015 단면 내부 성립·인렛 면적 y·z = 0.012×0.018 = 2.16e-4 m² → 면적비 0.24·mdot 정확 십진 리터럴)
+
+```json
+[{"op": "replace", "path": "/geometry/payload/envelope/sizeM", "value": [0.012, 0.012, 0.018]},
+ {"op": "replace", "path": "/discretization/payload/voxelPitchM", "value": 0.0003},
+ {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.00563769040848},
+ {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.00571716260088}]
+```
+
+(N ≈ 2.592e-6/2.7e-11 = **96,000** · t_iter ≈ 96000/(6334.6×16) ≈ **0.947 s** · 완주 550 ≈ **8.7 min** —
+testTimeout 600 s 초과 아님? **초과함(521 s 솔브 + 기동·수확)** — 처분: XT-RR-08은 int-s4 **hookTimeout/testTimeout
+예외 케이스가 아니라** 시험 내 대기 예산을 D-I24 testTimeout 600 s 내로 만들기 위해 **완주 대기를 폴링 분할**
+(vitest 단일 it의 timeout은 600 s — 초과 위험. **정정: XT-RR-08 testTimeout은 개별 900 s로 상향 지정**(vitest
+per-test timeout 인자 — D-I24 600 s는 기본값·개별 상향은 §2 int-s4 상한 180 min 내 흡수·본 문서가 등재값) —
+①′ 리뷰가 본 처분의 정합을 판정).)
