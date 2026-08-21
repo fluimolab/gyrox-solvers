@@ -58,7 +58,7 @@
 | XT-RR-02(specHash 변조 exit 40) | EXT-A3 | 550 | 재개 스테이징 즉시 판정(XT-RR-01 산출 checkpoint 재사용·meta 변조) — 완주 불요 | ≤2 min |
 | XT-RR-03(sidecar 부재 콜드) | EXT-A3 | 550 | 콜드 재계산 개시 관측 — 완주 불요 | ≤3 min |
 | XT-RR-04(재개 소비 V5) | EXT-A3 | **550(XT-RR-01과 동일 spec — ①′ R3 M1: specHash 일치가 재개 전제·러너는 자격 검사 비수행(executor 소관 — S3 더미 기검증))** | **러너 전용 재개 시험 명시(①′ R2 M2)** — checkpoint 원천 = XT-RR-01 취소 산출물(교차 fixture·iter i = 취소 시점 — **i ≤ 30 관측 조건 assert**: 재개 후 신규 표본 550−i ≥ 520 → transientFrac 절단 후 ≥416 ≥ 2W=400·판정 성립)·/work/input 직접 스테이징 → 재개 완주·창 리셋 판정. **제품 경로 주기 checkpoint 재개는 소형 유도 불가**(주기 900 s 계약 상수 — 한계 정직 기재): 생산 축 = 관통 캠페인 관측·소비 축 = 본 러너 시험 | ≤8 min |
-| XT-RR-05(decompN 콜드) | EXT-A3 | 550 | **RR-01 산출 checkpoint+유효 sidecar 재사용·specHash `20f867…` 불변·decompN만 불일치(checkpoint 16 → 재개 분해수 8 주입)** — exit 40 미발동 ∧ 콜드 재계산 전환 assert·완주 불요(①′ R4 명세) | ≤3 min |
+| XT-RR-05(decompN 콜드) | EXT-A3 | 550 | **RR-01 산출 checkpoint+유효 sidecar 재사용·specHash `682cd915fd88aeceee5142a82d81cd56bfffd7b15c02c2aa3f58974fcb1811f1`(EXT-A3 Patch 적용 solve hash — ①′ R6 정정) 불변·decompN만 불일치(checkpoint 16 → 재개 분해수 8 주입)** — exit 40 미발동 ∧ 콜드 재계산 전환 assert·완주 불요(①′ R4 명세) | ≤3 min |
 | XT-RR-06(캡·취소 동시) | EXT-A3 | 550 | 축소 maxWallClockSec 주입(시험 executorPolicy — 해시 불참여)·완주 불요 | ≤3 min |
 | XT-RR-07(mesh publish 실검증) | EXT-A3 mesh 산출 | — (solve 없음) | publish 가드 판정 | ≤2 min |
 | XT-RR-08(관통 manifest 대조) | **EXT-A4**(§7.4 — post z=0.015 내부 성립·①′ R5 재선정) | 550 | **완주 필요**(4스테이지 관통·manifest 대조 — post 실행 포함·testTimeout 600 s 기본값 내 산술 성립) | ≤8 min(solve ≈5.9 min+여유 248 s — 파일럿 검증) |
@@ -328,3 +328,5 @@ t_iter ≈ 0.460 s · 완주 550 ≈ 253 s(4.2 min)** — testTimeout 600 s 내 
 (N = 30×30×72 = **64,800** · t_iter ≈ **0.639 s** · 완주 550 ≈ **352 s(5.9 min)** — 전후처리·기동·수확 여유
 **248 s**: 파일럿 phase별 실측이 충분성 검증(초과 반증 시 본 문서 개정·재수행). mdot = fixture × 0.15 정확
 십진 리터럴. 변형 spec 해시 = pre-run.json 기계 산출·결속.)
+
+> **기하 잔여 위험 병기(①′ R6 — 비차단)**: EXT-A3(축당 2.25 cell 주기)·EXT-A4(x/y 1.875 주기)는 하드 가드·정수 분할로 연결성·포트 노출을 보증하지 못한다 — V1–V5·meshQA·portAreasM2 실측이 최종 판정·미재현 = 새 ID·재수행 처분.
