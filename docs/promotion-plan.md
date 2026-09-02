@@ -45,8 +45,14 @@
 
 ## 4. 정상성 음성 케이스 (CP-04 — 불변 등재)
 
-- **기하 = EXT-A** · **maxIters 600 [초안 — 시험 fixture 파라미터]** · 운전점 = 파일럿과 동일(**BC 전 시간
-  상수 — 시계열 forcing 없음**: 미정착 유도 축 = 짧은 maxIters의 초기 과도 구간 종료) · 분해수 16.
+- **기하 = EXT-A** · **maxIters 600 [초안 — 시험 fixture 파라미터]** · 운전점 = **파일럿 유량의 정확 3배**(hot
+  0.01127538081696 · cold 0.01143432520176 — 정확 십진 ×3 리터럴, BC 전 시간 상수 유지·시계열 forcing 없음:
+  붕괴 유도 축 = 유량 3배의 전단층 불안정 정상진동) · 분해수 16.
+- **개정 이력(2026-09-02 — 캠페인 CP-04 1차 실측 반증)**: 원 등재 메커니즘("짧은 maxIters의 초기 과도 구간
+  종료" — 파일럿 운전점 그대로)은 실측에서 반증됨 — 600 iters에서 dpHot 창평균이 이미 정착(drift 0.042%·span
+  0.216% < 밴드)해 붕괴 불성립. ×3 유량 강제의 실측(동일 mesh·600 iters): exit 10 ∧ dpHot drift 1.019%·span
+  1.019% 양축 밴드 밖(진폭 3.97%) — 기대 붕괴 축 성립 실증 후 재등재. ×5도 span 붕괴하나 drift 축 통과(0.197%)로
+  판별력 열위 — ×3 채택.
 - **기대 붕괴 축 = dpHot drift/span 단독 붕괴**(①′ m2 표제 정합): 판정 술어(S4-EXEC-PLAN §2 축자) = `convergenceAxes.perQoI.dpHotPa.drift.pass
   = false ∨ span.pass = false` ∧ eb·mass·sign·finite 전부 pass ∧ ¬insufficient ∧ exit 10.
 - 이미지 digest = 실행 전 `pre-run.json` 고정(빌드 record 참조 — 최종 cp-manifest가 해시·조상 검증).
@@ -282,7 +288,9 @@
 ### 7.2 정상성 음성 — base = §7.1 전문·**RFC 6902 JSON Patch**(①′ R2 M3 — 기계 판독 형식)
 
 ```json
-[{"op": "replace", "path": "/solve/payload/limits/maxIters", "value": 600}]
+[{"op": "replace", "path": "/solve/payload/limits/maxIters", "value": 600},
+ {"op": "replace", "path": "/solve/payload/bc/0/mdotKgS", "value": 0.01127538081696},
+ {"op": "replace", "path": "/solve/payload/bc/1/mdotKgS", "value": 0.01143432520176}]
 ```
 
 ### 7.3 int-s4 소형 완주 기하 EXT-A3 — base = §7.1 전문·**RFC 6902 JSON Patch**(①′ R5 재선정 — **geometry 하드 가드 `wall < 1.5×pitch` 충족**: pitch 2.5e-4·1.5×0.25 mm = 0.375 ≤ wall 0.4 mm·envelope [0.009]³ = 36³ 정수 분할·인렛 면적비 0.09 mdot 재산정)
