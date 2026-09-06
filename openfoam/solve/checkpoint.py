@@ -115,14 +115,17 @@ def produce_checkpoint(
             "regions": list(REGIONS),
         }
         validate("checkpoint-declaration", declaration)
-        _replace_declarations(declaration_path, [*declarations, declaration])
-        return declaration
+        declarations.append(declaration)
+        _replace_declarations(declaration_path, declarations)
     except Exception:
         if published:
             tar_path.unlink(missing_ok=True)
         raise
     finally:
         temporary.unlink(missing_ok=True)
+    for previous in sorted(declarations, key=lambda item: item["iter"], reverse=True)[2:]:
+        (output_root / previous["path"]).unlink(missing_ok=True)
+    return declaration
 
 
 def resume_checkpoint(case: Path, archive: Path, sidecar: Path, *, spec_hash: str, decomp_n: int) -> ResumeDecision:
