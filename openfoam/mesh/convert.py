@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import resource
+import shutil
 import sys
 import tarfile
 import time
@@ -120,28 +121,32 @@ def execute(work_root: Path = WORK_ROOT) -> int:
         geometry, discretization = _documents(request, work_root)
         validate_converter_topology(geometry)
         labels = find_input(request, work_root, ("labels", "labels-vti", "volume"), suffix="labels.vti")
+        case = work_root / "scratch" / "case"
+        case.mkdir(parents=True, exist_ok=True)
         progress.emit("phase", {"name": "render"})
-        legacy = labels_to_foam.convert(str(labels), str(output / "case"), fmt="binary")
+        legacy = labels_to_foam.convert(str(labels), str(case), fmt="binary")
         report = product_report(legacy)
         validate_port_area_bounds(report, geometry)
-        report_path = output / "case" / "convert-report.json"
+        report_path = output / "convert-report.json"
         write_json(report_path, report)
+        patch_map_path = output / "patch-map.json"
+        shutil.copyfile(case / "patch-map.json", patch_map_path)
 
         progress.emit("phase", {"name": "extract"})
-        qa = run_check_mesh(output / "case", discretization["qa"])
-        qa_log = output / "case" / "checkMesh.log"
+        qa = run_check_mesh(case, discretization["qa"])
+        qa_log = output / "checkMesh.log"
         qa_log.write_text(qa.pop("log"), encoding="utf-8")
-        qa_path = output / "case" / "mesh-qa.json"
+        qa_path = output / "mesh-qa.json"
         write_json(qa_path, qa)
         outcome, exit_code = ("SUCCEEDED", 0) if qa["passed"] else ("MESH_QA_FAILED", 20)
 
         files = []
         if qa["passed"]:
             archive = output / "mesh-case.tar"
-            _package_mesh_case(output / "case", archive)
+            _package_mesh_case(case, archive)
             files.append(manifest_entry(archive, output, "mesh-case", "application/x-tar"))
         files.extend([
-            manifest_entry(output / "case/patch-map.json", output, "patch-map", "application/json"),
+            manifest_entry(patch_map_path, output, "patch-map", "application/json"),
             manifest_entry(report_path, output, "convert-report", "application/json"),
             manifest_entry(qa_path, output, "mesh-artifact", "application/json"),
             manifest_entry(qa_log, output, "mesh-artifact", "text/plain"),

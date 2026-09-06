@@ -73,12 +73,12 @@ def test_solve_manifest_is_closed_and_omits_absent_artifacts(tmp_path):
         "timeseries.csv": ("timeseries", "text/csv"),
         "solve-report.json": ("solve-report", "application/json"),
         "hot-internal.vtu": ("vtk", "application/octet-stream"),
-        "case/logs/cht.log": ("solve-artifact", "text/plain"),
-        "case/logs/foamToVTK.log": ("solve-artifact", "text/plain"),
+        "logs/cht.log": ("solve-artifact", "text/plain"),
+        "logs/foamToVTK.log": ("solve-artifact", "text/plain"),
     }
     excluded = (
         "case/constant/hot/polyMesh/points", "case/VTK/hot/case_1/internal.vtu",
-        "case/logs/diagnostic.json", "case/other.log", "checkpoints/checkpoint-1.tar",
+        "logs/diagnostic.json", "case/other.log", "checkpoints/checkpoint-1.tar",
         "checkpoints.ndjson", "result.json", "output-manifest.json",
     )
     assert runner._output_manifest(tmp_path) == {"files": []}
@@ -118,7 +118,7 @@ def test_foam_to_vtk_exports_hot_internal_and_logs_command(tmp_path, monkeypatch
 def test_foam_to_vtk_rejects_failed_or_ambiguous_exports(tmp_path, monkeypatch):
     for scenario in ("nonzero", "absent", "multiple", "missing-internal"):
         output = tmp_path / scenario
-        case = output / "case"
+        case = tmp_path / "scratch" / scenario / "case"
         (case / "logs").mkdir(parents=True)
         if scenario in ("multiple", "missing-internal"):
             (case / "VTK/hot/case_1").mkdir(parents=True)
@@ -150,7 +150,7 @@ def test_partial_solve_exports_vtk_before_judgment_and_publishes_manifest(tmp_pa
     def run(command, **kwargs):
         commands.append(command[0])
         if command[0] == "foamToVTK":
-            internal = work / "output/case/VTK/hot/case_10/internal.vtu"
+            internal = work / "scratch/case/VTK/hot/case_10/internal.vtu"
             internal.parent.mkdir(parents=True)
             internal.write_bytes(b"partial vtk")
         return subprocess.CompletedProcess(command, 0, stdout="completed")
@@ -172,6 +172,9 @@ def test_partial_solve_exports_vtk_before_judgment_and_publishes_manifest(tmp_pa
     assert json.loads((output / "result.json").read_text())["outcome"] == "SUCCEEDED_WITH_WARNINGS"
     manifest = json.loads((output / "output-manifest.json").read_text())
     assert {entry["kind"] for entry in manifest["files"]} == {"summary", "timeseries", "solve-report", "vtk", "solve-artifact"}
+    assert {path.relative_to(output).as_posix() for path in output.rglob("*") if path.is_file()} == {
+        entry["path"] for entry in manifest["files"]
+    } | {"output-manifest.json", "result.json"}
     events = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     phases = [event["payload"]["name"] for event in events if event["type"] == "phase"]
     assert phases == ["render", "decompose", "solve", "reconstruct", "extract", "extract"]
@@ -187,3 +190,60 @@ def test_foam_to_vtk_failure_returns_infrastructure_failed(tmp_path, solve_docum
     result = json.loads((work / "output/result.json").read_text())
     assert result["outcome"] == "INFRASTRUCTURE_FAILED"
     assert result["warnings"] == ["foamToVTK failed with 7"]
+
+
+def test_output_files_stay_within_declarations_checkpoints_and_controls_on_early_exit(
+    tmp_path, solve_document, patch_map, monkeypatch,
+):
+    copyfile = runner.shutil.copyfile
+    for scenario, code in (("diverged", 20), ("canceled", 143), ("failed", 1), ("copy-failed", 20)):
+        work = _prepare_work(tmp_path / scenario, solve_document, patch_map)
+        _mock_solver(monkeypatch)
+
+        def solve(command, case, output, progress, **kwargs):
+            assert case == work / "scratch/case"
+            assert str(case) in command
+            (case / "logs/cht.log").write_bytes(b"solver diagnostic\x00\xff\n")
+            (case / "logs/decomposePar.log").write_bytes(b"decomposed\n")
+            (case / "logs/diagnostic.json").write_text("scratch only")
+            if code == 143:
+                for iteration in (1, 2, 3):
+                    for region in ("hot", "cold", "solid"):
+                        field = case / f"processor0/{iteration}" / region / "T"
+                        field.parent.mkdir(parents=True)
+                        field.write_text("checkpoint field")
+                    runner.produce_checkpoint(
+                        case, output, spec_hash=kwargs["spec_hash"], decomp_n=1,
+                        iteration=iteration, phys_t=float(iteration), time_name=str(iteration),
+                    )
+            return code
+
+        def copy_log(source, target, **kwargs):
+            if scenario == "copy-failed" and source == work / "scratch/case/logs/cht.log":
+                raise OSError("injected log copy failure")
+            return copyfile(source, target, **kwargs)
+
+        monkeypatch.setattr(runner, "_run_solver_with_checkpoints", solve)
+        monkeypatch.setattr(runner.shutil, "copyfile", copy_log)
+        assert runner.execute(work) == code
+        output = work / "output"
+        result = json.loads((output / "result.json").read_text())
+        assert result["exitCode"] == code
+        manifest = json.loads((output / "output-manifest.json").read_text())
+        declared = {entry["path"] for entry in manifest["files"]}
+        checkpoints = set()
+        if code == 143:
+            declarations = [json.loads(line) for line in (output / "checkpoints.ndjson").read_text().splitlines()]
+            checkpoints = {entry["path"] for entry in declarations[-2:]}
+            assert {path.relative_to(output).as_posix() for path in (output / "checkpoints").iterdir()} == checkpoints
+        controls = {"output-manifest.json", "result.json", "checkpoints.ndjson"}
+        assert {path.relative_to(output).as_posix() for path in output.rglob("*") if path.is_file()} <= declared | checkpoints | controls
+        assert not (output / "case").exists()
+        assert "logs/decomposePar.log" in declared
+        assert (output / "logs/decomposePar.log").read_bytes() == b"decomposed\n"
+        if scenario == "copy-failed":
+            assert any("injected log copy failure" in warning for warning in result["warnings"])
+            assert "logs/cht.log" not in declared
+        else:
+            assert "logs/cht.log" in declared
+            assert (output / "logs/cht.log").read_bytes() == b"solver diagnostic\x00\xff\n"

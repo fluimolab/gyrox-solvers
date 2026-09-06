@@ -60,7 +60,7 @@ def _mesh_work(repo_root, tmp_path, monkeypatch, *, passed):
 
     def convert(*args, **kwargs):
         report = original(*args, **kwargs)
-        patch_bytes.append((tmp_path / "output/case/patch-map.json").read_bytes())
+        patch_bytes.append((tmp_path / "scratch/case/patch-map.json").read_bytes())
         return report
 
     completed = subprocess.CompletedProcess([], 0 if passed else 1, stdout="Mesh OK." if passed else "Failed 1 mesh checks")
@@ -77,17 +77,20 @@ def test_mesh_manifest_declares_stage_artifacts_without_changing_patch_map(repo_
     output = tmp_path / "output"
     manifest = json.loads((output / "output-manifest.json").read_text())
     validate("output-manifest", manifest)
+    assert {path.relative_to(output).as_posix() for path in output.rglob("*") if path.is_file()} == {
+        entry["path"] for entry in manifest["files"]
+    } | {"output-manifest.json", "result.json"}
     assert {entry["path"]: (entry["kind"], entry["mediaType"]) for entry in manifest["files"]} == {
         "mesh-case.tar": ("mesh-case", "application/x-tar"),
-        "case/patch-map.json": ("patch-map", "application/json"),
-        "case/convert-report.json": ("convert-report", "application/json"),
-        "case/mesh-qa.json": ("mesh-artifact", "application/json"),
-        "case/checkMesh.log": ("mesh-artifact", "text/plain"),
+        "patch-map.json": ("patch-map", "application/json"),
+        "convert-report.json": ("convert-report", "application/json"),
+        "mesh-qa.json": ("mesh-artifact", "application/json"),
+        "checkMesh.log": ("mesh-artifact", "text/plain"),
     }
-    assert (output / "case/patch-map.json").read_bytes() == patch_bytes[0]
+    assert (output / "patch-map.json").read_bytes() == patch_bytes[0]
     with tarfile.open(output / "mesh-case.tar") as archive:
         assert archive.extractfile("patch-map.json").read() == patch_bytes[0]
-        assert set(archive.getnames()) == {path.relative_to(output / "case").as_posix() for path in (output / "case").rglob("*")}
+        assert set(archive.getnames()) == {path.relative_to(tmp_path / "scratch/case").as_posix() for path in (tmp_path / "scratch/case").rglob("*")}
     for entry in manifest["files"]:
         assert entry["sha256"] == sha256_file(output / entry["path"])
 

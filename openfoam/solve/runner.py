@@ -138,7 +138,7 @@ def _output_manifest(output: Path) -> dict[str, Any]:
     ]
     artifacts.extend(
         (path, "solve-artifact", "text/plain")
-        for path in sorted((output / "case/logs").rglob("*.log"))
+        for path in sorted((output / "logs").glob("*.log"))
     )
     return {"files": [
         manifest_entry(path, output, kind, media)
@@ -276,7 +276,7 @@ def _run_solver_with_checkpoints(
 ) -> int:
     if write_grace is None:
         write_grace = _cancel_write_grace_sec()
-    log_path = output / "case" / "logs" / "cht.log"
+    log_path = case / "logs" / "cht.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     environment = dict(os.environ, OMPI_ALLOW_RUN_AS_ROOT="1", OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1")
     requested = terminate_requested or threading.Event()
@@ -469,6 +469,7 @@ def execute(work_root: Path = WORK_ROOT, *, terminate_requested: threading.Event
     progress = ProgressWriter()
     output = work_root / "output"
     output.mkdir(parents=True, exist_ok=True)
+    case = work_root / "scratch" / "case"
     warnings: list[str] = []
     outcome, exit_code = "INFRASTRUCTURE_FAILED", 1
     summary: dict[str, Any] | None = None
@@ -487,7 +488,7 @@ def execute(work_root: Path = WORK_ROOT, *, terminate_requested: threading.Event
         cores = request["limits"]["cpuCores"]
         spec_hash = request["specs"]["solve"]["hash"]
 
-        case = output / "case"
+        case.mkdir(parents=True, exist_ok=True)
         mesh_case = find_input(request, work_root, ("mesh-case", "mesh"))
         _copy_mesh_case(mesh_case, case)
         progress.emit("phase", {"name": "render"})
@@ -567,6 +568,14 @@ def execute(work_root: Path = WORK_ROOT, *, terminate_requested: threading.Event
         )
     else:
         progress.emit("phase", {"name": "extract"}, outcome=outcome)
+
+    for log_path in sorted((case / "logs").glob("*.log")):
+        try:
+            if log_path.is_file():
+                (output / "logs").mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(log_path, output / "logs" / log_path.name)
+        except OSError as exc:
+            warnings.append(f"log copy {log_path.name}: {type(exc).__name__}: {exc}")
 
     manifest = _output_manifest(output)
     validate("output-manifest", manifest)
