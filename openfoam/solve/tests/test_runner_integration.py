@@ -313,14 +313,14 @@ def test_runner_resume_and_cold_branches(checkpoint, expected, repo_root, tmp_pa
     ]
     if checkpoint == "valid":
         assert progress_iters[0] == 21
-        assert (work / "output/case/processor0/constant/hot/polyMesh").is_dir()
-        assert (work / "output/case/processor0/20/hot/T").is_file()
+        assert (work / "scratch/case/processor0/constant/hot/polyMesh").is_dir()
+        assert (work / "scratch/case/processor0/20/hot/T").is_file()
         summary = json.loads((work / "output/summary.json").read_text())
         assert summary["iterations"] == 550
         assert summary["converged"] is True
     elif checkpoint in {"no-sidecar", "decomp-mismatch"}:
         assert progress_iters[0] == 1
-        assert not (work / "output/case/processor0/20/hot/T").exists()
+        assert not (work / "scratch/case/processor0/20/hot/T").exists()
 
 
 def test_runner_rejects_solve_document_hash_mismatch(repo_root, tmp_path, solve_document, patch_map):
@@ -546,7 +546,7 @@ sys.exit(completed.returncode)
     )))
     try:
         thread.start()
-        log_path = output / "case/logs/cht.log"
+        log_path = case / "logs/cht.log"
         deadline = time.monotonic() + 20
         while time.monotonic() < deadline:
             if log_path.is_file() and re.search(r"^Time = 2[0-9](?:\.|$)", log_path.read_text(), re.M):
