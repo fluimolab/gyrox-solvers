@@ -12,9 +12,10 @@ import shutil
 import signal
 import subprocess
 import sys
+import tarfile
 import threading
 import time
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from openfoam.common.io import (
@@ -92,9 +93,57 @@ def _oom_killed() -> bool:
 
 
 def _copy_mesh_case(source: Path, target: Path) -> None:
-    if not source.is_dir():
-        raise ValueError("mesh-case input must be a directory")
-    shutil.copytree(source, target, dirs_exist_ok=True)
+    if source.is_dir():
+        shutil.copytree(source, target, dirs_exist_ok=True)
+        return
+    if not source.is_file():
+        raise ValueError("mesh-case input must be a tar file or directory")
+    with tarfile.open(source, "r") as archive:
+        root = target.resolve()
+        for member in archive.getmembers():
+            name = PurePosixPath(member.name)
+            destination = (target / member.name).resolve()
+            if (
+                name.is_absolute() or ".." in name.parts
+                or not (member.isfile() or member.isdir())
+                or (destination != root and root not in destination.parents)
+            ):
+                raise ValueError(f"unsafe mesh-case member: {member.name}")
+        archive.extractall(target, filter="data")
+
+
+def _export_vtk(case: Path, output: Path) -> None:
+    completed = subprocess.run(
+        ["foamToVTK", "-case", str(case), "-latestTime", "-fields", "(p T)", "-allRegions", "-overwrite"],
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=False,
+    )
+    (case / "logs/foamToVTK.log").write_text(completed.stdout or "", encoding="utf-8")
+    if completed.returncode != 0:
+        raise RuntimeError(f"foamToVTK failed with {completed.returncode}")
+    candidates = sorted(path for path in (case / "VTK/hot").glob("case_*") if path.is_dir())
+    if len(candidates) != 1:
+        raise RuntimeError(f"foamToVTK expected one hot case directory, got {len(candidates)}")
+    internal = candidates[0] / "internal.vtu"
+    if not internal.is_file():
+        raise RuntimeError(f"foamToVTK hot internal.vtu absent: {internal}")
+    shutil.copy2(internal, output / "hot-internal.vtu")
+
+
+def _output_manifest(output: Path) -> dict[str, Any]:
+    artifacts = [
+        (output / "summary.json", "summary", "application/json"),
+        (output / "timeseries.csv", "timeseries", "text/csv"),
+        (output / "solve-report.json", "solve-report", "application/json"),
+        (output / "hot-internal.vtu", "vtk", "application/octet-stream"),
+    ]
+    artifacts.extend(
+        (path, "solve-artifact", "text/plain")
+        for path in sorted((output / "case/logs").rglob("*.log"))
+    )
+    return {"files": [
+        manifest_entry(path, output, kind, media)
+        for path, kind, media in artifacts if path.is_file()
+    ]}
 
 
 def _latest_time(case: Path) -> tuple[int, float, str] | None:
@@ -488,6 +537,7 @@ def execute(work_root: Path = WORK_ROOT, *, terminate_requested: threading.Event
         (case / "logs/reconstructPar.log").write_text(completed.stdout or "", encoding="utf-8")
         if completed.returncode != 0:
             raise RuntimeError(f"reconstructPar failed with {completed.returncode}")
+        _export_vtk(case, output)
 
         progress.emit("phase", {"name": "extract"})
         timeseries = _extract_timeseries(case, output)
@@ -518,13 +568,7 @@ def execute(work_root: Path = WORK_ROOT, *, terminate_requested: threading.Event
     else:
         progress.emit("phase", {"name": "extract"}, outcome=outcome)
 
-    files = []
-    for path in sorted(output.rglob("*")):
-        if path.is_file() and path.name not in {"output-manifest.json", "result.json"}:
-            media = "application/json" if path.suffix == ".json" else "text/csv" if path.suffix == ".csv" else "application/octet-stream"
-            kind = "summary" if path.name == "summary.json" else "solve-artifact"
-            files.append(manifest_entry(path, output, kind, media))
-    manifest = {"files": files}
+    manifest = _output_manifest(output)
     validate("output-manifest", manifest)
     write_json(output / "output-manifest.json", manifest)
     result = {

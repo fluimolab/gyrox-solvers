@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import resource
 import sys
+import tarfile
 import time
 from pathlib import Path
 from typing import Any
@@ -96,6 +97,18 @@ def _documents(request: dict[str, Any], work_root: Path) -> tuple[dict[str, Any]
     return geometry["payload"], discretization["payload"]
 
 
+def _package_mesh_case(case: Path, target: Path) -> None:
+    def normalize(member: tarfile.TarInfo) -> tarfile.TarInfo:
+        member.uid = member.gid = 0
+        member.uname = member.gname = ""
+        member.mtime = 0
+        return member
+
+    with tarfile.open(target, "w") as archive:
+        for path in sorted(case.rglob("*"), key=lambda path: path.relative_to(case).as_posix()):
+            archive.add(path, arcname=path.relative_to(case).as_posix(), recursive=False, filter=normalize)
+
+
 def execute(work_root: Path = WORK_ROOT) -> int:
     started = time.monotonic()
     progress = ProgressWriter()
@@ -123,12 +136,16 @@ def execute(work_root: Path = WORK_ROOT) -> int:
         outcome, exit_code = ("SUCCEEDED", 0) if qa["passed"] else ("MESH_QA_FAILED", 20)
 
         files = []
-        for path in sorted((output / "case").rglob("*")):
-            if path.is_file() and "polyMesh/sets/" not in path.as_posix():
-                media = "application/json" if path.suffix == ".json" else "text/plain"
-                if path.name in {"points", "faces", "owner", "neighbour"}:
-                    media = "application/octet-stream"
-                files.append(manifest_entry(path, output, "mesh-artifact", media))
+        if qa["passed"]:
+            archive = output / "mesh-case.tar"
+            _package_mesh_case(output / "case", archive)
+            files.append(manifest_entry(archive, output, "mesh-case", "application/x-tar"))
+        files.extend([
+            manifest_entry(output / "case/patch-map.json", output, "patch-map", "application/json"),
+            manifest_entry(report_path, output, "convert-report", "application/json"),
+            manifest_entry(qa_path, output, "mesh-artifact", "application/json"),
+            manifest_entry(qa_log, output, "mesh-artifact", "text/plain"),
+        ])
         manifest = {"files": files}
         validate("output-manifest", manifest)
         write_json(output / "output-manifest.json", manifest)

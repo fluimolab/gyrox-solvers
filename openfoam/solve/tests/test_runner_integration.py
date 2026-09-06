@@ -46,6 +46,14 @@ for region in ('hot', 'cold', 'solid'):
     (mesh / 'owner').write_text('nCells: 1\\n')
 """)
     _write_tool(tools / "reconstructPar", "#!/usr/bin/env python3\n")
+    _write_tool(tools / "foamToVTK", """#!/usr/bin/env python3
+import sys
+from pathlib import Path
+case = Path(sys.argv[sys.argv.index('-case') + 1])
+internal = case / 'VTK/hot/case_550/internal.vtu'
+internal.parent.mkdir(parents=True, exist_ok=True)
+internal.write_text('<VTKFile/>')
+""")
     _write_tool(tools / "mpirun", f"""#!/usr/bin/env python3
 import os, sys
 case = sys.argv[sys.argv.index('-case') + 1]
@@ -363,7 +371,12 @@ def test_two_intervals_write_distinct_atomic_checkpoints(tmp_path, solve_documen
     assert len(declarations) >= 2
     assert declarations[0]["iter"] < declarations[1]["iter"]
     assert declarations[0]["path"] != declarations[1]["path"]
-    for declaration in declarations[:2]:
+    declarations = [json.loads(line) for line in (output / "checkpoints.ndjson").read_text().splitlines()]
+    retained = sorted(declarations, key=lambda item: item["iter"], reverse=True)[:2]
+    assert {path.name for path in (output / "checkpoints").glob("*.tar")} == {
+        Path(declaration["path"]).name for declaration in retained
+    }
+    for declaration in retained:
         with tarfile.open(output / declaration["path"]) as archive:
             names = archive.getnames()
         assert all(
