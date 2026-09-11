@@ -29,7 +29,14 @@ from openfoam.common.io import (
 )
 from openfoam.common.progress import ProgressWriter
 from openfoam.common.schema_adapter import ContractValidationError, validate
-from openfoam.solve.checkpoint import produce_checkpoint, resume_checkpoint, validate_processor_mesh
+from openfoam.solve.checkpoint import (
+    _latest_time,
+    _read_declarations,
+    produce_checkpoint,
+    prune_time_directories,
+    resume_checkpoint,
+    validate_processor_mesh,
+)
 from openfoam.solve.extract import build_timeseries
 from openfoam.solve.extract.common import region_cell_count
 from openfoam.solve.judge import JudgeResult, judge_csv
@@ -144,29 +151,6 @@ def _output_manifest(output: Path) -> dict[str, Any]:
         manifest_entry(path, output, kind, media)
         for path, kind, media in artifacts if path.is_file()
     ]}
-
-
-def _latest_time(case: Path) -> tuple[int, float, str] | None:
-    processors = sorted(path for path in case.glob("processor*") if path.is_dir())
-    if not processors:
-        return None
-    common: set[str] | None = None
-    for processor in processors:
-        names = set()
-        for child in processor.iterdir():
-            if child.is_dir():
-                try:
-                    float(child.name)
-                except ValueError:
-                    continue
-                if all((child / region).is_dir() for region in ("hot", "cold", "solid")):
-                    names.add(child.name)
-        common = names if common is None else common & names
-    if not common:
-        return None
-    name = max(common, key=float)
-    phys_t = float(name)
-    return int(phys_t), phys_t, name
 
 
 TIME_LINE = re.compile(r"^Time\s*=\s*([-+0-9.eE]+)")
@@ -354,6 +338,12 @@ def _run_solver_with_checkpoints(
                             return 1
                 elif latest is not None:
                     progress.emit("log", {"level": "warn", "code": "checkpoint-io-error"})
+                if checkpoint_created:
+                    # Publication is complete; cleanup must not affect its outcome or events.
+                    try:
+                        prune_time_directories(case, _read_declarations(output / "checkpoints.ndjson"))
+                    except Exception:
+                        pass
                 if canceled:
                     return 143 if checkpoint_created else 1
                 if not checkpoint_created:

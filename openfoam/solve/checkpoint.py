@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import tarfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,6 +14,7 @@ from openfoam.common.schema_adapter import validate
 
 
 REGIONS = ("hot", "cold", "solid")
+CHECKPOINT_KEEP = 2
 
 
 @dataclass(frozen=True)
@@ -32,6 +34,70 @@ def validate_processor_mesh(case: Path, decomp_n: int) -> None:
             mesh = case / processor / "constant" / region / "polyMesh"
             if not mesh.is_dir():
                 raise FileNotFoundError(f"processor mesh absent: {mesh}")
+
+
+def _latest_time(case: Path) -> tuple[int, float, str] | None:
+    processors = sorted(path for path in case.glob("processor*") if path.is_dir())
+    if not processors:
+        return None
+    common: set[str] | None = None
+    for processor in processors:
+        names = set()
+        for child in processor.iterdir():
+            if child.is_dir():
+                try:
+                    float(child.name)
+                except ValueError:
+                    continue
+                if all((child / region).is_dir() for region in ("hot", "cold", "solid")):
+                    names.add(child.name)
+        common = names if common is None else common & names
+    if not common:
+        return None
+    name = max(common, key=float)
+    phys_t = float(name)
+    return int(phys_t), phys_t, name
+
+
+def prune_time_directories(case: Path, declarations: list[dict]) -> list[str]:
+    """Best-effort rotation after publication, retaining initial and candidate times."""
+    keep = {"0"} | {
+        item["timeName"]
+        for item in sorted(declarations, key=lambda item: item["iter"], reverse=True)[:CHECKPOINT_KEEP]
+    }
+    try:
+        latest = _latest_time(case)
+    except OSError:
+        return []
+    if latest is not None:
+        keep.add(latest[2])
+    time_dirs = []
+    for processor in sorted(case.glob("processor*")):
+        try:
+            if not processor.is_dir():
+                continue
+            for child in processor.iterdir():
+                if child.is_dir():
+                    try:
+                        float(child.name)
+                    except ValueError:
+                        continue
+                    time_dirs.append(child)
+        except OSError:
+            continue
+    if time_dirs:
+        # Also retain the newest numeric time if its regional write is incomplete.
+        keep.add(max(time_dirs, key=lambda path: float(path.name)).name)
+    deleted = []
+    for path in time_dirs:
+        if path.name in keep:
+            continue
+        try:
+            shutil.rmtree(path)
+        except OSError:
+            continue
+        deleted.append(path.relative_to(case).as_posix())
+    return deleted
 
 
 def _checkpoint_members(case: Path, time_name: str, decomp_n: int) -> list[Path]:
@@ -123,7 +189,7 @@ def produce_checkpoint(
         raise
     finally:
         temporary.unlink(missing_ok=True)
-    for previous in sorted(declarations, key=lambda item: item["iter"], reverse=True)[2:]:
+    for previous in sorted(declarations, key=lambda item: item["iter"], reverse=True)[CHECKPOINT_KEEP:]:
         (output_root / previous["path"]).unlink(missing_ok=True)
     return declaration
 

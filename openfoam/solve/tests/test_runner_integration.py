@@ -343,17 +343,20 @@ def test_runner_rejects_solve_document_hash_mismatch(repo_root, tmp_path, solve_
 
 def test_two_intervals_write_distinct_atomic_checkpoints(tmp_path, solve_document, patch_map, monkeypatch):
     case, output = tmp_path / "case", tmp_path / "output"
-    render_case(solve_document, patch_map, case, cores=1, write_interval=500)
-    for region in ("hot", "cold", "solid"):
-        mesh = case / "processor0/constant" / region / "polyMesh"
-        mesh.mkdir(parents=True)
+    render_case(solve_document, patch_map, case, cores=2, write_interval=500)
+    for index in range(2):
+        for region in ("hot", "cold", "solid"):
+            mesh = case / f"processor{index}/constant" / region / "polyMesh"
+            mesh.mkdir(parents=True)
+            for name in ("0", "1", "2", "3"):
+                (case / f"processor{index}" / name / region).mkdir(parents=True)
     monkeypatch.setenv("FAKE_OPENFOAM_MODE", "slow")
     stop = threading.Event()
     result: list[int] = []
     command = [sys.executable, str(Path(__file__).with_name("fake_openfoam_solver.py")), str(case)]
     thread = threading.Thread(target=lambda: result.append(_run_solver_with_checkpoints(
         command, case, output, ProgressWriter(), interval=1, spec_hash="a" * 64,
-        cores=1, max_iters=100000, terminate_requested=stop, write_grace=3,
+        cores=2, max_iters=100000, terminate_requested=stop, write_grace=3,
     )))
     thread.start()
     declarations = []
@@ -383,6 +386,17 @@ def test_two_intervals_write_distinct_atomic_checkpoints(tmp_path, solve_documen
             any(name.startswith(f"processor0/{declaration['timeName']}/{region}") for name in names)
             for region in ("hot", "cold", "solid")
         )
+
+    for index in range(2):
+        numeric_times = set()
+        for path in (case / f"processor{index}").iterdir():
+            if path.is_dir():
+                try:
+                    float(path.name)
+                except ValueError:
+                    continue
+                numeric_times.add(path.name)
+        assert numeric_times == {"0"} | {item["timeName"] for item in retained}
 
 
 @pytest.mark.parametrize("mode", [
@@ -582,3 +596,38 @@ sys.exit(completed.returncode)
     assert any(event["type"] == "progress" and 20 <= event["payload"]["iter"] <= 30 for event in events)
     checkpoints = [event for event in events if event["type"] == "checkpoint"]
     assert len(checkpoints) == 1 and checkpoints[0]["payload"] == declaration
+
+
+@pytest.mark.parametrize("canceled", [False, True])
+def test_prune_failure_does_not_change_checkpoint_outcome_or_events(
+    tmp_path, solve_document, patch_map, monkeypatch, capsys, canceled,
+):
+    case, output = tmp_path / "case", tmp_path / "output"
+    render_case(solve_document, patch_map, case, cores=1, write_interval=500)
+    for region in ("hot", "cold", "solid"):
+        (case / "processor0/constant" / region / "polyMesh").mkdir(parents=True)
+    monkeypatch.setenv("FAKE_OPENFOAM_MODE", "slow")
+    calls = []
+
+    def fail_prune(prune_case, declarations):
+        assert prune_case == case
+        assert declarations == [json.loads(line) for line in (output / "checkpoints.ndjson").read_text().splitlines()]
+        assert (output / declarations[-1]["path"]).is_file()
+        calls.append(declarations)
+        raise OSError("injected prune failure")
+
+    monkeypatch.setattr(solve_runner, "prune_time_directories", fail_prune)
+    stop = threading.Event()
+    if canceled:
+        stop.set()
+    command = [sys.executable, str(Path(__file__).with_name("fake_openfoam_solver.py")), str(case)]
+    result = _run_solver_with_checkpoints(
+        command, case, output, ProgressWriter(), interval=0, spec_hash="a" * 64,
+        cores=1, max_iters=1, terminate_requested=stop, write_grace=3,
+    )
+
+    assert result == (143 if canceled else 0)
+    assert len(calls) == 1
+    events = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line]
+    assert [event["payload"] for event in events if event["type"] == "checkpoint"] == calls[0]
+    assert not [event for event in events if event["type"] == "log"]
