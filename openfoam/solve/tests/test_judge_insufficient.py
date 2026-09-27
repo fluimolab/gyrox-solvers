@@ -28,7 +28,13 @@ def test_each_judgment_series_requires_2w(missing, convergence):
     assert (result.exit_code, result.axes["insufficient"]) == (10, True)
 
 
-@pytest.mark.parametrize("key", ["energyBalancePct", "massHotPct", "massColdPct"])
+@pytest.mark.parametrize(
+    "key",
+    ["energyBalancePct", "massHotPct", "massColdPct"],
+    # 명시 비노출 ID — 자동 ID는 판정 리포트(make-test JUnit)에 QoI 등록 토큰을 싣는다
+    # (gyrox S4-EXEC-PLAN rev10 §3.7 ⅰ 토큰 0·full review 2차 F2-M04).
+    ids=["aux-energy-balance", "aux-mass-hot", "aux-mass-cold"],
+)
 def test_auxiliary_series_with_only_w_samples_is_insufficient(key, convergence):
     rows = stable_rows(500)
     for row in rows[100:300]:
@@ -45,7 +51,17 @@ SIGN_KEYS = (
 )
 
 
-@pytest.mark.parametrize("missing_key", SIGN_KEYS)
+# 명시 비노출 ID(SIGN_KEYS와 같은 순서) — 자동 ID는 판정 리포트에 QoI 등록 토큰을 싣는다
+# (gyrox S4-EXEC-PLAN rev10 §3.7 ⅰ 토큰 0·full review 2차 F2-M04).
+SIGN_KEY_IDS = (
+    "hot-pressure-drop", "cold-pressure-drop",
+    "hot-inlet-mass-flow", "hot-outlet-mass-flow",
+    "cold-inlet-mass-flow", "cold-outlet-mass-flow",
+    "hot-heat-rate", "cold-heat-rate",
+)
+
+
+@pytest.mark.parametrize("missing_key", SIGN_KEYS, ids=SIGN_KEY_IDS)
 def test_each_required_sign_series_needs_every_window_sample(missing_key, convergence):
     rows = stable_rows()
     rows[-1].pop(missing_key)
