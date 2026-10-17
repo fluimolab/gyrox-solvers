@@ -2292,22 +2292,18 @@
           }
         }
       },
-      "ExportBundleV1": {
+      "ExportBundleV2": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$id": "https://gyrox.dev/schemas/export-bundle/v1",
-        "title": "Export bundle manifest v1",
-        "$comment": "ADR-006 D8-2: exported results carry the canonical notice identifiers",
+        "$id": "https://gyrox.dev/schemas/export-bundle/v2",
+        "title": "Export bundle manifest v2",
+        "$comment": "ADR-006 D8-2: export-time snapshot; source and scope are historical claims. Unspecified exportedAt/orgId/runId formats and artifact kind vocabulary remain unconstrained strings. specHashes uses the four run-manifest spec slots. Hashes inherit the v1 SHA-256 representation.",
         "type": "object",
-        "required": [
-          "schemaVersion",
-          "revision",
-          "recipe",
-          "artifacts",
-          "notices"
-        ],
         "properties": {
           "schemaVersion": {
-            "const": 1
+            "const": 2
+          },
+          "exportedAt": {
+            "type": "string"
           },
           "revision": {
             "type": "string",
@@ -2316,26 +2312,396 @@
           "recipe": {
             "$ref": "#/$defs/ref"
           },
-          "artifacts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/$defs/ref"
-            }
+          "source": {
+            "type": "object",
+            "properties": {
+              "orgId": {
+                "type": "string"
+              },
+              "runId": {
+                "type": "string"
+              },
+              "manifestHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "documentSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "specHashes": {
+                "type": "object",
+                "properties": {
+                  "geometry": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "discretization": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "solve": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "post": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "geometry",
+                  "discretization",
+                  "solve",
+                  "post"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "orgId",
+              "runId",
+              "manifestHash",
+              "documentSha256",
+              "specHashes"
+            ],
+            "additionalProperties": false
+          },
+          "specs": {
+            "type": "object",
+            "properties": {
+              "geometry": {
+                "$ref": "https://gyrox.dev/schemas/geometry-spec/v1"
+              },
+              "discretization": {
+                "$ref": "https://gyrox.dev/schemas/discretization-spec/v1"
+              },
+              "solve": {
+                "$ref": "https://gyrox.dev/schemas/solve-spec/v1"
+              },
+              "post": {
+                "$ref": "https://gyrox.dev/schemas/post-spec/v1"
+              }
+            },
+            "required": [
+              "geometry",
+              "discretization",
+              "solve",
+              "post"
+            ],
+            "additionalProperties": false
+          },
+          "document": {
+            "$ref": "https://gyrox.dev/schemas/project-document/v1"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "https://gyrox.dev/schemas/summary/v1"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "notices": {
             "type": "array",
             "items": {
-              "enum": [
-                "D8-2",
-                "dp-hot-fixture-limited",
-                "dp-cold-not-established",
-                "nonconverged-partial",
-                "governance-hold"
+              "type": "object",
+              "properties": {
+                "noticeId": {
+                  "enum": [
+                    "D8-2",
+                    "dp-hot-fixture-limited",
+                    "dp-cold-not-established",
+                    "nonconverged-partial",
+                    "governance-hold",
+                    "dp-hot-out-of-scope",
+                    "export-snapshot"
+                  ]
+                },
+                "ko": {
+                  "type": "string"
+                },
+                "en": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "noticeId",
+                "ko",
+                "en"
+              ],
+              "additionalProperties": false
+            },
+            "uniqueItems": true,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "noticeId": {
+                  "const": "export-snapshot"
+                }
+              },
+              "required": [
+                "noticeId"
               ]
             },
+            "allOf": [
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "D8-2"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "dp-hot-fixture-limited"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "dp-cold-not-established"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "nonconverged-partial"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "governance-hold"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "dp-hot-out-of-scope"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "noticeId": {
+                      "const": "export-snapshot"
+                    }
+                  },
+                  "required": [
+                    "noticeId"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              }
+            ]
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "path": {
+                  "$ref": "https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/path"
+                },
+                "mediaType": {
+                  "$ref": "https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/mediaType"
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "units": {
+                      "$ref": "https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/units"
+                    },
+                    "coordinateSystem": {
+                      "$ref": "https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/coordinateSystem"
+                    },
+                    "semanticRole": {
+                      "$ref": "https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/semanticRole"
+                    }
+                  },
+                  "required": [],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "units"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "coordinateSystem"
+                            ]
+                          }
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "units",
+                          "coordinateSystem"
+                        ]
+                      }
+                    }
+                  ],
+                  "$comment": "Metadata fields transcribed from output-manifest.v1; mediaType is the sibling artifact field. Output-manifest bytes/sha256/path/kind are file identity, not metadata."
+                },
+                "derivedFrom": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "hash",
+                "path",
+                "mediaType",
+                "meta"
+              ],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "field",
+                          "slice",
+                          "volume",
+                          "wall-field",
+                          "wall-mesh"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "meta": {
+                        "type": "object",
+                        "required": [
+                          "units",
+                          "coordinateSystem"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "absentKinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
             "uniqueItems": true
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "isFixtureCase": {
+                "type": "boolean"
+              },
+              "anchorsRevision": {
+                "type": "integer",
+                "$comment": "Revision number transcribed from infra/governance/anchors.json; no new range constraint."
+              }
+            },
+            "required": [
+              "isFixtureCase",
+              "anchorsRevision"
+            ],
+            "additionalProperties": false
           }
         },
+        "required": [
+          "schemaVersion",
+          "exportedAt",
+          "revision",
+          "recipe",
+          "source",
+          "specs",
+          "document",
+          "summary",
+          "notices",
+          "artifacts",
+          "absentKinds",
+          "scope"
+        ],
         "additionalProperties": false,
         "$defs": {
           "ref": {
@@ -2356,7 +2722,43 @@
             },
             "additionalProperties": false
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "summary": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            },
+            "then": {
+              "properties": {
+                "absentKinds": {
+                  "contains": {
+                    "const": "summary"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "absentKinds": {
+                  "not": {
+                    "contains": {
+                      "const": "summary"
+                    }
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        ]
       },
       "PatchMapV1": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

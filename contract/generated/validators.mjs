@@ -12145,12 +12145,17 @@ return errors === 0;
 }
 validate59.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validateExportBundleV1 = validate60;
-const schema100 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/export-bundle/v1","title":"Export bundle manifest v1","$comment":"ADR-006 D8-2: exported results carry the canonical notice identifiers","type":"object","required":["schemaVersion","revision","recipe","artifacts","notices"],"properties":{"schemaVersion":{"const":1},"revision":{"type":"string","minLength":1},"recipe":{"$ref":"#/$defs/ref"},"artifacts":{"type":"array","items":{"$ref":"#/$defs/ref"}},"notices":{"type":"array","items":{"enum":["D8-2","dp-hot-fixture-limited","dp-cold-not-established","nonconverged-partial","governance-hold"]},"uniqueItems":true}},"additionalProperties":false,"$defs":{"ref":{"type":"object","required":["kind","hash"],"properties":{"kind":{"type":"string","minLength":1},"hash":{"type":"string","pattern":"^[0-9a-f]{64}$"}},"additionalProperties":false}}};
+export const validateExportBundleV2 = validate60;
+const schema100 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/export-bundle/v2","title":"Export bundle manifest v2","$comment":"ADR-006 D8-2: export-time snapshot; source and scope are historical claims. Unspecified exportedAt/orgId/runId formats and artifact kind vocabulary remain unconstrained strings. specHashes uses the four run-manifest spec slots. Hashes inherit the v1 SHA-256 representation.","type":"object","properties":{"schemaVersion":{"const":2},"exportedAt":{"type":"string"},"revision":{"type":"string","minLength":1},"recipe":{"$ref":"#/$defs/ref"},"source":{"type":"object","properties":{"orgId":{"type":"string"},"runId":{"type":"string"},"manifestHash":{"type":"string","pattern":"^[0-9a-f]{64}$"},"documentSha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},"specHashes":{"type":"object","properties":{"geometry":{"type":"string","pattern":"^[0-9a-f]{64}$"},"discretization":{"type":"string","pattern":"^[0-9a-f]{64}$"},"solve":{"type":"string","pattern":"^[0-9a-f]{64}$"},"post":{"type":"string","pattern":"^[0-9a-f]{64}$"}},"required":["geometry","discretization","solve","post"],"additionalProperties":false}},"required":["orgId","runId","manifestHash","documentSha256","specHashes"],"additionalProperties":false},"specs":{"type":"object","properties":{"geometry":{"$ref":"https://gyrox.dev/schemas/geometry-spec/v1"},"discretization":{"$ref":"https://gyrox.dev/schemas/discretization-spec/v1"},"solve":{"$ref":"https://gyrox.dev/schemas/solve-spec/v1"},"post":{"$ref":"https://gyrox.dev/schemas/post-spec/v1"}},"required":["geometry","discretization","solve","post"],"additionalProperties":false},"document":{"$ref":"https://gyrox.dev/schemas/project-document/v1"},"summary":{"anyOf":[{"$ref":"https://gyrox.dev/schemas/summary/v1"},{"type":"null"}]},"notices":{"type":"array","items":{"type":"object","properties":{"noticeId":{"enum":["D8-2","dp-hot-fixture-limited","dp-cold-not-established","nonconverged-partial","governance-hold","dp-hot-out-of-scope","export-snapshot"]},"ko":{"type":"string"},"en":{"type":"string"}},"required":["noticeId","ko","en"],"additionalProperties":false},"uniqueItems":true,"contains":{"type":"object","properties":{"noticeId":{"const":"export-snapshot"}},"required":["noticeId"]},"allOf":[{"contains":{"type":"object","properties":{"noticeId":{"const":"D8-2"}},"required":["noticeId"]},"minContains":0,"maxContains":1},{"contains":{"type":"object","properties":{"noticeId":{"const":"dp-hot-fixture-limited"}},"required":["noticeId"]},"minContains":0,"maxContains":1},{"contains":{"type":"object","properties":{"noticeId":{"const":"dp-cold-not-established"}},"required":["noticeId"]},"minContains":0,"maxContains":1},{"contains":{"type":"object","properties":{"noticeId":{"const":"nonconverged-partial"}},"required":["noticeId"]},"minContains":0,"maxContains":1},{"contains":{"type":"object","properties":{"noticeId":{"const":"governance-hold"}},"required":["noticeId"]},"minContains":0,"maxContains":1},{"contains":{"type":"object","properties":{"noticeId":{"const":"dp-hot-out-of-scope"}},"required":["noticeId"]},"minContains":0,"maxContains":1},{"contains":{"type":"object","properties":{"noticeId":{"const":"export-snapshot"}},"required":["noticeId"]},"minContains":0,"maxContains":1}]},"artifacts":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","minLength":1},"hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},"path":{"$ref":"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/path"},"mediaType":{"$ref":"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/mediaType"},"meta":{"type":"object","properties":{"units":{"$ref":"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/units"},"coordinateSystem":{"$ref":"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/coordinateSystem"},"semanticRole":{"$ref":"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/semanticRole"}},"required":[],"additionalProperties":false,"allOf":[{"if":{"type":"object","anyOf":[{"required":["units"]},{"required":["coordinateSystem"]}]},"then":{"required":["units","coordinateSystem"]}}],"$comment":"Metadata fields transcribed from output-manifest.v1; mediaType is the sibling artifact field. Output-manifest bytes/sha256/path/kind are file identity, not metadata."},"derivedFrom":{"type":"string","pattern":"^[0-9a-f]{64}$"}},"required":["kind","hash","path","mediaType","meta"],"additionalProperties":false,"allOf":[{"if":{"type":"object","properties":{"kind":{"enum":["field","slice","volume","wall-field","wall-mesh"]}},"required":["kind"]},"then":{"properties":{"meta":{"type":"object","required":["units","coordinateSystem"]}}}}]}},"absentKinds":{"type":"array","items":{"type":"string","minLength":1},"uniqueItems":true},"scope":{"type":"object","properties":{"isFixtureCase":{"type":"boolean"},"anchorsRevision":{"type":"integer","$comment":"Revision number transcribed from infra/governance/anchors.json; no new range constraint."}},"required":["isFixtureCase","anchorsRevision"],"additionalProperties":false}},"required":["schemaVersion","exportedAt","revision","recipe","source","specs","document","summary","notices","artifacts","absentKinds","scope"],"additionalProperties":false,"$defs":{"ref":{"type":"object","required":["kind","hash"],"properties":{"kind":{"type":"string","minLength":1},"hash":{"type":"string","pattern":"^[0-9a-f]{64}$"}},"additionalProperties":false}},"allOf":[{"if":{"properties":{"summary":{"type":"null"}},"required":["summary"]},"then":{"properties":{"absentKinds":{"contains":{"const":"summary"},"type":"array"}}},"else":{"properties":{"absentKinds":{"not":{"contains":{"const":"summary"}},"type":"array"}}}}]};
 const schema101 = {"type":"object","required":["kind","hash"],"properties":{"kind":{"type":"string","minLength":1},"hash":{"type":"string","pattern":"^[0-9a-f]{64}$"}},"additionalProperties":false};
+const schema105 = {"type":"string","minLength":1,"pattern":"^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"};
+const schema106 = {"type":"string","pattern":"^[^/\\s]+/[^/\\s]+$"};
+const schema107 = {"type":"string","minLength":1};
+const schema108 = {"type":"string","minLength":1};
+const schema109 = {"type":"string","minLength":1};
 
 function validate60(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
-/*# sourceURL="https://gyrox.dev/schemas/export-bundle/v1" */;
+/*# sourceURL="https://gyrox.dev/schemas/export-bundle/v2" */;
 let vErrors = null;
 let errors = 0;
 const evaluated0 = validate60.evaluated;
@@ -12160,9 +12165,13 @@ evaluated0.props = undefined;
 if(evaluated0.dynamicItems){
 evaluated0.items = undefined;
 }
+const _errs3 = errors;
+let valid1 = true;
+const _errs4 = errors;
 if(data && typeof data == "object" && !Array.isArray(data)){
-if(data.schemaVersion === undefined){
-const err0 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "schemaVersion"},message:"must have required property '"+"schemaVersion"+"'"};
+let missing0;
+if((data.summary === undefined) && (missing0 = "summary")){
+const err0 = {};
 if(vErrors === null){
 vErrors = [err0];
 }
@@ -12171,8 +12180,10 @@ vErrors.push(err0);
 }
 errors++;
 }
-if(data.revision === undefined){
-const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "revision"},message:"must have required property '"+"revision"+"'"};
+else {
+if(data.summary !== undefined){
+if(data.summary !== null){
+const err1 = {};
 if(vErrors === null){
 vErrors = [err1];
 }
@@ -12181,8 +12192,32 @@ vErrors.push(err1);
 }
 errors++;
 }
-if(data.recipe === undefined){
-const err2 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "recipe"},message:"must have required property '"+"recipe"+"'"};
+}
+}
+}
+var _valid0 = _errs4 === errors;
+errors = _errs3;
+if(vErrors !== null){
+if(_errs3){
+vErrors.length = _errs3;
+}
+else {
+vErrors = null;
+}
+}
+let ifClause0;
+if(_valid0){
+const _errs7 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.absentKinds !== undefined){
+let data1 = data.absentKinds;
+if(Array.isArray(data1)){
+const _errs10 = errors;
+const len0 = data1.length;
+for(let i0=0; i0<len0; i0++){
+const _errs11 = errors;
+if("summary" !== data1[i0]){
+const err2 = {instancePath:instancePath+"/absentKinds/" + i0,schemaPath:"#/allOf/0/then/properties/absentKinds/contains/const",keyword:"const",params:{allowedValue: "summary"},message:"must be equal to constant"};
 if(vErrors === null){
 vErrors = [err2];
 }
@@ -12191,8 +12226,13 @@ vErrors.push(err2);
 }
 errors++;
 }
-if(data.artifacts === undefined){
-const err3 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "artifacts"},message:"must have required property '"+"artifacts"+"'"};
+var valid4 = _errs11 === errors;
+if(valid4){
+break;
+}
+}
+if(!valid4){
+const err3 = {instancePath:instancePath+"/absentKinds",schemaPath:"#/allOf/0/then/properties/absentKinds/contains",keyword:"contains",params:{minContains: 1},message:"must contain at least 1 valid item(s)"};
 if(vErrors === null){
 vErrors = [err3];
 }
@@ -12201,8 +12241,20 @@ vErrors.push(err3);
 }
 errors++;
 }
-if(data.notices === undefined){
-const err4 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "notices"},message:"must have required property '"+"notices"+"'"};
+else {
+errors = _errs10;
+if(vErrors !== null){
+if(_errs10){
+vErrors.length = _errs10;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+else {
+const err4 = {instancePath:instancePath+"/absentKinds",schemaPath:"#/allOf/0/then/properties/absentKinds/type",keyword:"type",params:{type: "array"},message:"must be array"};
 if(vErrors === null){
 vErrors = [err4];
 }
@@ -12211,9 +12263,24 @@ vErrors.push(err4);
 }
 errors++;
 }
-for(const key0 in data){
-if(!(((((key0 === "schemaVersion") || (key0 === "revision")) || (key0 === "recipe")) || (key0 === "artifacts")) || (key0 === "notices"))){
-const err5 = {instancePath,schemaPath:"#/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key0},message:"must NOT have additional properties"};
+}
+}
+var _valid0 = _errs7 === errors;
+valid1 = _valid0;
+if(valid1){
+var props0 = {};
+props0.absentKinds = true;
+props0.summary = true;
+}
+ifClause0 = "then";
+}
+else {
+const _errs12 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.absentKinds !== undefined){
+let data3 = data.absentKinds;
+if(!(Array.isArray(data3))){
+const err5 = {instancePath:instancePath+"/absentKinds",schemaPath:"#/allOf/0/else/properties/absentKinds/type",keyword:"type",params:{type: "array"},message:"must be array"};
 if(vErrors === null){
 vErrors = [err5];
 }
@@ -12222,10 +12289,15 @@ vErrors.push(err5);
 }
 errors++;
 }
-}
-if(data.schemaVersion !== undefined){
-if(1 !== data.schemaVersion){
-const err6 = {instancePath:instancePath+"/schemaVersion",schemaPath:"#/properties/schemaVersion/const",keyword:"const",params:{allowedValue: 1},message:"must be equal to constant"};
+const _errs15 = errors;
+const _errs16 = errors;
+if(Array.isArray(data3)){
+const _errs17 = errors;
+const len1 = data3.length;
+for(let i1=0; i1<len1; i1++){
+const _errs18 = errors;
+if("summary" !== data3[i1]){
+const err6 = {};
 if(vErrors === null){
 vErrors = [err6];
 }
@@ -12234,12 +12306,13 @@ vErrors.push(err6);
 }
 errors++;
 }
+var valid7 = _errs18 === errors;
+if(valid7){
+break;
 }
-if(data.revision !== undefined){
-let data1 = data.revision;
-if(typeof data1 === "string"){
-if(func7(data1) < 1){
-const err7 = {instancePath:instancePath+"/revision",schemaPath:"#/properties/revision/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+}
+if(!valid7){
+const err7 = {};
 if(vErrors === null){
 vErrors = [err7];
 }
@@ -12248,9 +12321,21 @@ vErrors.push(err7);
 }
 errors++;
 }
+else {
+errors = _errs17;
+if(vErrors !== null){
+if(_errs17){
+vErrors.length = _errs17;
 }
 else {
-const err8 = {instancePath:instancePath+"/revision",schemaPath:"#/properties/revision/type",keyword:"type",params:{type: "string"},message:"must be string"};
+vErrors = null;
+}
+}
+}
+}
+var valid6 = _errs16 === errors;
+if(valid6){
+const err8 = {instancePath:instancePath+"/absentKinds",schemaPath:"#/allOf/0/else/properties/absentKinds/not",keyword:"not",params:{},message:"must NOT be valid"};
 if(vErrors === null){
 vErrors = [err8];
 }
@@ -12259,12 +12344,31 @@ vErrors.push(err8);
 }
 errors++;
 }
+else {
+errors = _errs15;
+if(vErrors !== null){
+if(_errs15){
+vErrors.length = _errs15;
 }
-if(data.recipe !== undefined){
-let data2 = data.recipe;
-if(data2 && typeof data2 == "object" && !Array.isArray(data2)){
-if(data2.kind === undefined){
-const err9 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+else {
+vErrors = null;
+}
+}
+}
+}
+}
+var _valid0 = _errs12 === errors;
+valid1 = _valid0;
+if(valid1){
+if(props0 !== true){
+props0 = props0 || {};
+props0.absentKinds = true;
+}
+}
+ifClause0 = "else";
+}
+if(!valid1){
+const err9 = {instancePath,schemaPath:"#/allOf/0/if",keyword:"if",params:{failingKeyword: ifClause0},message:"must match \""+ifClause0+"\" schema"};
 if(vErrors === null){
 vErrors = [err9];
 }
@@ -12273,8 +12377,9 @@ vErrors.push(err9);
 }
 errors++;
 }
-if(data2.hash === undefined){
-const err10 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/required",keyword:"required",params:{missingProperty: "hash"},message:"must have required property '"+"hash"+"'"};
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.schemaVersion === undefined){
+const err10 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "schemaVersion"},message:"must have required property '"+"schemaVersion"+"'"};
 if(vErrors === null){
 vErrors = [err10];
 }
@@ -12283,9 +12388,8 @@ vErrors.push(err10);
 }
 errors++;
 }
-for(const key1 in data2){
-if(!((key1 === "kind") || (key1 === "hash"))){
-const err11 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key1},message:"must NOT have additional properties"};
+if(data.exportedAt === undefined){
+const err11 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "exportedAt"},message:"must have required property '"+"exportedAt"+"'"};
 if(vErrors === null){
 vErrors = [err11];
 }
@@ -12294,12 +12398,8 @@ vErrors.push(err11);
 }
 errors++;
 }
-}
-if(data2.kind !== undefined){
-let data3 = data2.kind;
-if(typeof data3 === "string"){
-if(func7(data3) < 1){
-const err12 = {instancePath:instancePath+"/recipe/kind",schemaPath:"#/$defs/ref/properties/kind/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(data.revision === undefined){
+const err12 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "revision"},message:"must have required property '"+"revision"+"'"};
 if(vErrors === null){
 vErrors = [err12];
 }
@@ -12308,9 +12408,8 @@ vErrors.push(err12);
 }
 errors++;
 }
-}
-else {
-const err13 = {instancePath:instancePath+"/recipe/kind",schemaPath:"#/$defs/ref/properties/kind/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(data.recipe === undefined){
+const err13 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "recipe"},message:"must have required property '"+"recipe"+"'"};
 if(vErrors === null){
 vErrors = [err13];
 }
@@ -12319,12 +12418,8 @@ vErrors.push(err13);
 }
 errors++;
 }
-}
-if(data2.hash !== undefined){
-let data4 = data2.hash;
-if(typeof data4 === "string"){
-if(!pattern4.test(data4)){
-const err14 = {instancePath:instancePath+"/recipe/hash",schemaPath:"#/$defs/ref/properties/hash/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(data.source === undefined){
+const err14 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "source"},message:"must have required property '"+"source"+"'"};
 if(vErrors === null){
 vErrors = [err14];
 }
@@ -12333,9 +12428,8 @@ vErrors.push(err14);
 }
 errors++;
 }
-}
-else {
-const err15 = {instancePath:instancePath+"/recipe/hash",schemaPath:"#/$defs/ref/properties/hash/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(data.specs === undefined){
+const err15 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "specs"},message:"must have required property '"+"specs"+"'"};
 if(vErrors === null){
 vErrors = [err15];
 }
@@ -12344,10 +12438,8 @@ vErrors.push(err15);
 }
 errors++;
 }
-}
-}
-else {
-const err16 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(data.document === undefined){
+const err16 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "document"},message:"must have required property '"+"document"+"'"};
 if(vErrors === null){
 vErrors = [err16];
 }
@@ -12356,16 +12448,8 @@ vErrors.push(err16);
 }
 errors++;
 }
-}
-if(data.artifacts !== undefined){
-let data5 = data.artifacts;
-if(Array.isArray(data5)){
-const len0 = data5.length;
-for(let i0=0; i0<len0; i0++){
-let data6 = data5[i0];
-if(data6 && typeof data6 == "object" && !Array.isArray(data6)){
-if(data6.kind === undefined){
-const err17 = {instancePath:instancePath+"/artifacts/" + i0,schemaPath:"#/$defs/ref/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(data.summary === undefined){
+const err17 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "summary"},message:"must have required property '"+"summary"+"'"};
 if(vErrors === null){
 vErrors = [err17];
 }
@@ -12374,8 +12458,8 @@ vErrors.push(err17);
 }
 errors++;
 }
-if(data6.hash === undefined){
-const err18 = {instancePath:instancePath+"/artifacts/" + i0,schemaPath:"#/$defs/ref/required",keyword:"required",params:{missingProperty: "hash"},message:"must have required property '"+"hash"+"'"};
+if(data.notices === undefined){
+const err18 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "notices"},message:"must have required property '"+"notices"+"'"};
 if(vErrors === null){
 vErrors = [err18];
 }
@@ -12384,9 +12468,8 @@ vErrors.push(err18);
 }
 errors++;
 }
-for(const key2 in data6){
-if(!((key2 === "kind") || (key2 === "hash"))){
-const err19 = {instancePath:instancePath+"/artifacts/" + i0,schemaPath:"#/$defs/ref/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key2},message:"must NOT have additional properties"};
+if(data.artifacts === undefined){
+const err19 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "artifacts"},message:"must have required property '"+"artifacts"+"'"};
 if(vErrors === null){
 vErrors = [err19];
 }
@@ -12395,12 +12478,8 @@ vErrors.push(err19);
 }
 errors++;
 }
-}
-if(data6.kind !== undefined){
-let data7 = data6.kind;
-if(typeof data7 === "string"){
-if(func7(data7) < 1){
-const err20 = {instancePath:instancePath+"/artifacts/" + i0+"/kind",schemaPath:"#/$defs/ref/properties/kind/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(data.absentKinds === undefined){
+const err20 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "absentKinds"},message:"must have required property '"+"absentKinds"+"'"};
 if(vErrors === null){
 vErrors = [err20];
 }
@@ -12409,9 +12488,8 @@ vErrors.push(err20);
 }
 errors++;
 }
-}
-else {
-const err21 = {instancePath:instancePath+"/artifacts/" + i0+"/kind",schemaPath:"#/$defs/ref/properties/kind/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(data.scope === undefined){
+const err21 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "scope"},message:"must have required property '"+"scope"+"'"};
 if(vErrors === null){
 vErrors = [err21];
 }
@@ -12420,12 +12498,9 @@ vErrors.push(err21);
 }
 errors++;
 }
-}
-if(data6.hash !== undefined){
-let data8 = data6.hash;
-if(typeof data8 === "string"){
-if(!pattern4.test(data8)){
-const err22 = {instancePath:instancePath+"/artifacts/" + i0+"/hash",schemaPath:"#/$defs/ref/properties/hash/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+for(const key0 in data){
+if(!(func1.call(schema100.properties, key0))){
+const err22 = {instancePath,schemaPath:"#/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key0},message:"must NOT have additional properties"};
 if(vErrors === null){
 vErrors = [err22];
 }
@@ -12435,8 +12510,9 @@ vErrors.push(err22);
 errors++;
 }
 }
-else {
-const err23 = {instancePath:instancePath+"/artifacts/" + i0+"/hash",schemaPath:"#/$defs/ref/properties/hash/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(data.schemaVersion !== undefined){
+if(2 !== data.schemaVersion){
+const err23 = {instancePath:instancePath+"/schemaVersion",schemaPath:"#/properties/schemaVersion/const",keyword:"const",params:{allowedValue: 2},message:"must be equal to constant"};
 if(vErrors === null){
 vErrors = [err23];
 }
@@ -12446,9 +12522,9 @@ vErrors.push(err23);
 errors++;
 }
 }
-}
-else {
-const err24 = {instancePath:instancePath+"/artifacts/" + i0,schemaPath:"#/$defs/ref/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(data.exportedAt !== undefined){
+if(typeof data.exportedAt !== "string"){
+const err24 = {instancePath:instancePath+"/exportedAt",schemaPath:"#/properties/exportedAt/type",keyword:"type",params:{type: "string"},message:"must be string"};
 if(vErrors === null){
 vErrors = [err24];
 }
@@ -12458,9 +12534,11 @@ vErrors.push(err24);
 errors++;
 }
 }
-}
-else {
-const err25 = {instancePath:instancePath+"/artifacts",schemaPath:"#/properties/artifacts/type",keyword:"type",params:{type: "array"},message:"must be array"};
+if(data.revision !== undefined){
+let data7 = data.revision;
+if(typeof data7 === "string"){
+if(func7(data7) < 1){
+const err25 = {instancePath:instancePath+"/revision",schemaPath:"#/properties/revision/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
 if(vErrors === null){
 vErrors = [err25];
 }
@@ -12470,14 +12548,8 @@ vErrors.push(err25);
 errors++;
 }
 }
-if(data.notices !== undefined){
-let data9 = data.notices;
-if(Array.isArray(data9)){
-const len1 = data9.length;
-for(let i1=0; i1<len1; i1++){
-let data10 = data9[i1];
-if(!(((((data10 === "D8-2") || (data10 === "dp-hot-fixture-limited")) || (data10 === "dp-cold-not-established")) || (data10 === "nonconverged-partial")) || (data10 === "governance-hold"))){
-const err26 = {instancePath:instancePath+"/notices/" + i1,schemaPath:"#/properties/notices/items/enum",keyword:"enum",params:{allowedValues: schema100.properties.notices.items.enum},message:"must be equal to one of the allowed values"};
+else {
+const err26 = {instancePath:instancePath+"/revision",schemaPath:"#/properties/revision/type",keyword:"type",params:{type: "string"},message:"must be string"};
 if(vErrors === null){
 vErrors = [err26];
 }
@@ -12487,19 +12559,3135 @@ vErrors.push(err26);
 errors++;
 }
 }
-let i2 = data9.length;
-let j0;
-if(i2 > 1){
-outer0:
-for(;i2--;){
-for(j0 = i2; j0--;){
-if(func0(data9[i2], data9[j0])){
-const err27 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/uniqueItems",keyword:"uniqueItems",params:{i: i2, j: j0},message:"must NOT have duplicate items (items ## "+j0+" and "+i2+" are identical)"};
+if(data.recipe !== undefined){
+let data8 = data.recipe;
+if(data8 && typeof data8 == "object" && !Array.isArray(data8)){
+if(data8.kind === undefined){
+const err27 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
 if(vErrors === null){
 vErrors = [err27];
 }
 else {
 vErrors.push(err27);
+}
+errors++;
+}
+if(data8.hash === undefined){
+const err28 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/required",keyword:"required",params:{missingProperty: "hash"},message:"must have required property '"+"hash"+"'"};
+if(vErrors === null){
+vErrors = [err28];
+}
+else {
+vErrors.push(err28);
+}
+errors++;
+}
+for(const key1 in data8){
+if(!((key1 === "kind") || (key1 === "hash"))){
+const err29 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key1},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err29];
+}
+else {
+vErrors.push(err29);
+}
+errors++;
+}
+}
+if(data8.kind !== undefined){
+let data9 = data8.kind;
+if(typeof data9 === "string"){
+if(func7(data9) < 1){
+const err30 = {instancePath:instancePath+"/recipe/kind",schemaPath:"#/$defs/ref/properties/kind/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err30];
+}
+else {
+vErrors.push(err30);
+}
+errors++;
+}
+}
+else {
+const err31 = {instancePath:instancePath+"/recipe/kind",schemaPath:"#/$defs/ref/properties/kind/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err31];
+}
+else {
+vErrors.push(err31);
+}
+errors++;
+}
+}
+if(data8.hash !== undefined){
+let data10 = data8.hash;
+if(typeof data10 === "string"){
+if(!pattern4.test(data10)){
+const err32 = {instancePath:instancePath+"/recipe/hash",schemaPath:"#/$defs/ref/properties/hash/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err32];
+}
+else {
+vErrors.push(err32);
+}
+errors++;
+}
+}
+else {
+const err33 = {instancePath:instancePath+"/recipe/hash",schemaPath:"#/$defs/ref/properties/hash/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err33];
+}
+else {
+vErrors.push(err33);
+}
+errors++;
+}
+}
+}
+else {
+const err34 = {instancePath:instancePath+"/recipe",schemaPath:"#/$defs/ref/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err34];
+}
+else {
+vErrors.push(err34);
+}
+errors++;
+}
+}
+if(data.source !== undefined){
+let data11 = data.source;
+if(data11 && typeof data11 == "object" && !Array.isArray(data11)){
+if(data11.orgId === undefined){
+const err35 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/required",keyword:"required",params:{missingProperty: "orgId"},message:"must have required property '"+"orgId"+"'"};
+if(vErrors === null){
+vErrors = [err35];
+}
+else {
+vErrors.push(err35);
+}
+errors++;
+}
+if(data11.runId === undefined){
+const err36 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/required",keyword:"required",params:{missingProperty: "runId"},message:"must have required property '"+"runId"+"'"};
+if(vErrors === null){
+vErrors = [err36];
+}
+else {
+vErrors.push(err36);
+}
+errors++;
+}
+if(data11.manifestHash === undefined){
+const err37 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/required",keyword:"required",params:{missingProperty: "manifestHash"},message:"must have required property '"+"manifestHash"+"'"};
+if(vErrors === null){
+vErrors = [err37];
+}
+else {
+vErrors.push(err37);
+}
+errors++;
+}
+if(data11.documentSha256 === undefined){
+const err38 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/required",keyword:"required",params:{missingProperty: "documentSha256"},message:"must have required property '"+"documentSha256"+"'"};
+if(vErrors === null){
+vErrors = [err38];
+}
+else {
+vErrors.push(err38);
+}
+errors++;
+}
+if(data11.specHashes === undefined){
+const err39 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/required",keyword:"required",params:{missingProperty: "specHashes"},message:"must have required property '"+"specHashes"+"'"};
+if(vErrors === null){
+vErrors = [err39];
+}
+else {
+vErrors.push(err39);
+}
+errors++;
+}
+for(const key2 in data11){
+if(!(((((key2 === "orgId") || (key2 === "runId")) || (key2 === "manifestHash")) || (key2 === "documentSha256")) || (key2 === "specHashes"))){
+const err40 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key2},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err40];
+}
+else {
+vErrors.push(err40);
+}
+errors++;
+}
+}
+if(data11.orgId !== undefined){
+if(typeof data11.orgId !== "string"){
+const err41 = {instancePath:instancePath+"/source/orgId",schemaPath:"#/properties/source/properties/orgId/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err41];
+}
+else {
+vErrors.push(err41);
+}
+errors++;
+}
+}
+if(data11.runId !== undefined){
+if(typeof data11.runId !== "string"){
+const err42 = {instancePath:instancePath+"/source/runId",schemaPath:"#/properties/source/properties/runId/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err42];
+}
+else {
+vErrors.push(err42);
+}
+errors++;
+}
+}
+if(data11.manifestHash !== undefined){
+let data14 = data11.manifestHash;
+if(typeof data14 === "string"){
+if(!pattern4.test(data14)){
+const err43 = {instancePath:instancePath+"/source/manifestHash",schemaPath:"#/properties/source/properties/manifestHash/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err43];
+}
+else {
+vErrors.push(err43);
+}
+errors++;
+}
+}
+else {
+const err44 = {instancePath:instancePath+"/source/manifestHash",schemaPath:"#/properties/source/properties/manifestHash/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err44];
+}
+else {
+vErrors.push(err44);
+}
+errors++;
+}
+}
+if(data11.documentSha256 !== undefined){
+let data15 = data11.documentSha256;
+if(typeof data15 === "string"){
+if(!pattern4.test(data15)){
+const err45 = {instancePath:instancePath+"/source/documentSha256",schemaPath:"#/properties/source/properties/documentSha256/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err45];
+}
+else {
+vErrors.push(err45);
+}
+errors++;
+}
+}
+else {
+const err46 = {instancePath:instancePath+"/source/documentSha256",schemaPath:"#/properties/source/properties/documentSha256/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err46];
+}
+else {
+vErrors.push(err46);
+}
+errors++;
+}
+}
+if(data11.specHashes !== undefined){
+let data16 = data11.specHashes;
+if(data16 && typeof data16 == "object" && !Array.isArray(data16)){
+if(data16.geometry === undefined){
+const err47 = {instancePath:instancePath+"/source/specHashes",schemaPath:"#/properties/source/properties/specHashes/required",keyword:"required",params:{missingProperty: "geometry"},message:"must have required property '"+"geometry"+"'"};
+if(vErrors === null){
+vErrors = [err47];
+}
+else {
+vErrors.push(err47);
+}
+errors++;
+}
+if(data16.discretization === undefined){
+const err48 = {instancePath:instancePath+"/source/specHashes",schemaPath:"#/properties/source/properties/specHashes/required",keyword:"required",params:{missingProperty: "discretization"},message:"must have required property '"+"discretization"+"'"};
+if(vErrors === null){
+vErrors = [err48];
+}
+else {
+vErrors.push(err48);
+}
+errors++;
+}
+if(data16.solve === undefined){
+const err49 = {instancePath:instancePath+"/source/specHashes",schemaPath:"#/properties/source/properties/specHashes/required",keyword:"required",params:{missingProperty: "solve"},message:"must have required property '"+"solve"+"'"};
+if(vErrors === null){
+vErrors = [err49];
+}
+else {
+vErrors.push(err49);
+}
+errors++;
+}
+if(data16.post === undefined){
+const err50 = {instancePath:instancePath+"/source/specHashes",schemaPath:"#/properties/source/properties/specHashes/required",keyword:"required",params:{missingProperty: "post"},message:"must have required property '"+"post"+"'"};
+if(vErrors === null){
+vErrors = [err50];
+}
+else {
+vErrors.push(err50);
+}
+errors++;
+}
+for(const key3 in data16){
+if(!((((key3 === "geometry") || (key3 === "discretization")) || (key3 === "solve")) || (key3 === "post"))){
+const err51 = {instancePath:instancePath+"/source/specHashes",schemaPath:"#/properties/source/properties/specHashes/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key3},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err51];
+}
+else {
+vErrors.push(err51);
+}
+errors++;
+}
+}
+if(data16.geometry !== undefined){
+let data17 = data16.geometry;
+if(typeof data17 === "string"){
+if(!pattern4.test(data17)){
+const err52 = {instancePath:instancePath+"/source/specHashes/geometry",schemaPath:"#/properties/source/properties/specHashes/properties/geometry/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err52];
+}
+else {
+vErrors.push(err52);
+}
+errors++;
+}
+}
+else {
+const err53 = {instancePath:instancePath+"/source/specHashes/geometry",schemaPath:"#/properties/source/properties/specHashes/properties/geometry/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err53];
+}
+else {
+vErrors.push(err53);
+}
+errors++;
+}
+}
+if(data16.discretization !== undefined){
+let data18 = data16.discretization;
+if(typeof data18 === "string"){
+if(!pattern4.test(data18)){
+const err54 = {instancePath:instancePath+"/source/specHashes/discretization",schemaPath:"#/properties/source/properties/specHashes/properties/discretization/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err54];
+}
+else {
+vErrors.push(err54);
+}
+errors++;
+}
+}
+else {
+const err55 = {instancePath:instancePath+"/source/specHashes/discretization",schemaPath:"#/properties/source/properties/specHashes/properties/discretization/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err55];
+}
+else {
+vErrors.push(err55);
+}
+errors++;
+}
+}
+if(data16.solve !== undefined){
+let data19 = data16.solve;
+if(typeof data19 === "string"){
+if(!pattern4.test(data19)){
+const err56 = {instancePath:instancePath+"/source/specHashes/solve",schemaPath:"#/properties/source/properties/specHashes/properties/solve/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err56];
+}
+else {
+vErrors.push(err56);
+}
+errors++;
+}
+}
+else {
+const err57 = {instancePath:instancePath+"/source/specHashes/solve",schemaPath:"#/properties/source/properties/specHashes/properties/solve/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err57];
+}
+else {
+vErrors.push(err57);
+}
+errors++;
+}
+}
+if(data16.post !== undefined){
+let data20 = data16.post;
+if(typeof data20 === "string"){
+if(!pattern4.test(data20)){
+const err58 = {instancePath:instancePath+"/source/specHashes/post",schemaPath:"#/properties/source/properties/specHashes/properties/post/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err58];
+}
+else {
+vErrors.push(err58);
+}
+errors++;
+}
+}
+else {
+const err59 = {instancePath:instancePath+"/source/specHashes/post",schemaPath:"#/properties/source/properties/specHashes/properties/post/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err59];
+}
+else {
+vErrors.push(err59);
+}
+errors++;
+}
+}
+}
+else {
+const err60 = {instancePath:instancePath+"/source/specHashes",schemaPath:"#/properties/source/properties/specHashes/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err60];
+}
+else {
+vErrors.push(err60);
+}
+errors++;
+}
+}
+}
+else {
+const err61 = {instancePath:instancePath+"/source",schemaPath:"#/properties/source/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err61];
+}
+else {
+vErrors.push(err61);
+}
+errors++;
+}
+}
+if(data.specs !== undefined){
+let data21 = data.specs;
+if(data21 && typeof data21 == "object" && !Array.isArray(data21)){
+if(data21.geometry === undefined){
+const err62 = {instancePath:instancePath+"/specs",schemaPath:"#/properties/specs/required",keyword:"required",params:{missingProperty: "geometry"},message:"must have required property '"+"geometry"+"'"};
+if(vErrors === null){
+vErrors = [err62];
+}
+else {
+vErrors.push(err62);
+}
+errors++;
+}
+if(data21.discretization === undefined){
+const err63 = {instancePath:instancePath+"/specs",schemaPath:"#/properties/specs/required",keyword:"required",params:{missingProperty: "discretization"},message:"must have required property '"+"discretization"+"'"};
+if(vErrors === null){
+vErrors = [err63];
+}
+else {
+vErrors.push(err63);
+}
+errors++;
+}
+if(data21.solve === undefined){
+const err64 = {instancePath:instancePath+"/specs",schemaPath:"#/properties/specs/required",keyword:"required",params:{missingProperty: "solve"},message:"must have required property '"+"solve"+"'"};
+if(vErrors === null){
+vErrors = [err64];
+}
+else {
+vErrors.push(err64);
+}
+errors++;
+}
+if(data21.post === undefined){
+const err65 = {instancePath:instancePath+"/specs",schemaPath:"#/properties/specs/required",keyword:"required",params:{missingProperty: "post"},message:"must have required property '"+"post"+"'"};
+if(vErrors === null){
+vErrors = [err65];
+}
+else {
+vErrors.push(err65);
+}
+errors++;
+}
+for(const key4 in data21){
+if(!((((key4 === "geometry") || (key4 === "discretization")) || (key4 === "solve")) || (key4 === "post"))){
+const err66 = {instancePath:instancePath+"/specs",schemaPath:"#/properties/specs/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key4},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err66];
+}
+else {
+vErrors.push(err66);
+}
+errors++;
+}
+}
+if(data21.geometry !== undefined){
+let data22 = data21.geometry;
+if(data22 && typeof data22 == "object" && !Array.isArray(data22)){
+if(data22.kind === undefined){
+const err67 = {instancePath:instancePath+"/specs/geometry",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err67];
+}
+else {
+vErrors.push(err67);
+}
+errors++;
+}
+if(data22.schemaVersion === undefined){
+const err68 = {instancePath:instancePath+"/specs/geometry",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/required",keyword:"required",params:{missingProperty: "schemaVersion"},message:"must have required property '"+"schemaVersion"+"'"};
+if(vErrors === null){
+vErrors = [err68];
+}
+else {
+vErrors.push(err68);
+}
+errors++;
+}
+if(data22.payload === undefined){
+const err69 = {instancePath:instancePath+"/specs/geometry",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/required",keyword:"required",params:{missingProperty: "payload"},message:"must have required property '"+"payload"+"'"};
+if(vErrors === null){
+vErrors = [err69];
+}
+else {
+vErrors.push(err69);
+}
+errors++;
+}
+for(const key5 in data22){
+if(!(((key5 === "kind") || (key5 === "schemaVersion")) || (key5 === "payload"))){
+const err70 = {instancePath:instancePath+"/specs/geometry",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key5},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err70];
+}
+else {
+vErrors.push(err70);
+}
+errors++;
+}
+}
+if(data22.kind !== undefined){
+if("geometry-spec" !== data22.kind){
+const err71 = {instancePath:instancePath+"/specs/geometry/kind",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/kind/const",keyword:"const",params:{allowedValue: "geometry-spec"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err71];
+}
+else {
+vErrors.push(err71);
+}
+errors++;
+}
+}
+if(data22.schemaVersion !== undefined){
+if(1 !== data22.schemaVersion){
+const err72 = {instancePath:instancePath+"/specs/geometry/schemaVersion",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/schemaVersion/const",keyword:"const",params:{allowedValue: 1},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err72];
+}
+else {
+vErrors.push(err72);
+}
+errors++;
+}
+}
+if(data22.payload !== undefined){
+let data25 = data22.payload;
+if(data25 && typeof data25 == "object" && !Array.isArray(data25)){
+if(data25.pattern === undefined){
+const err73 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "pattern"},message:"must have required property '"+"pattern"+"'"};
+if(vErrors === null){
+vErrors = [err73];
+}
+else {
+vErrors.push(err73);
+}
+errors++;
+}
+if(data25.cellSizeM === undefined){
+const err74 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "cellSizeM"},message:"must have required property '"+"cellSizeM"+"'"};
+if(vErrors === null){
+vErrors = [err74];
+}
+else {
+vErrors.push(err74);
+}
+errors++;
+}
+if(data25.wallThicknessM === undefined){
+const err75 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "wallThicknessM"},message:"must have required property '"+"wallThicknessM"+"'"};
+if(vErrors === null){
+vErrors = [err75];
+}
+else {
+vErrors.push(err75);
+}
+errors++;
+}
+if(data25.splitting === undefined){
+const err76 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "splitting"},message:"must have required property '"+"splitting"+"'"};
+if(vErrors === null){
+vErrors = [err76];
+}
+else {
+vErrors.push(err76);
+}
+errors++;
+}
+if(data25.envelope === undefined){
+const err77 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "envelope"},message:"must have required property '"+"envelope"+"'"};
+if(vErrors === null){
+vErrors = [err77];
+}
+else {
+vErrors.push(err77);
+}
+errors++;
+}
+if(data25.ports === undefined){
+const err78 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "ports"},message:"must have required property '"+"ports"+"'"};
+if(vErrors === null){
+vErrors = [err78];
+}
+else {
+vErrors.push(err78);
+}
+errors++;
+}
+for(const key6 in data25){
+if(!((((((key6 === "pattern") || (key6 === "cellSizeM")) || (key6 === "wallThicknessM")) || (key6 === "splitting")) || (key6 === "envelope")) || (key6 === "ports"))){
+const err79 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key6},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err79];
+}
+else {
+vErrors.push(err79);
+}
+errors++;
+}
+}
+if(data25.pattern !== undefined){
+if("gyroid" !== data25.pattern){
+const err80 = {instancePath:instancePath+"/specs/geometry/payload/pattern",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/pattern/const",keyword:"const",params:{allowedValue: "gyroid"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err80];
+}
+else {
+vErrors.push(err80);
+}
+errors++;
+}
+}
+if(data25.cellSizeM !== undefined){
+let data27 = data25.cellSizeM;
+if(data27 && typeof data27 == "object" && !Array.isArray(data27)){
+if(data27.kind === undefined){
+const err81 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err81];
+}
+else {
+vErrors.push(err81);
+}
+errors++;
+}
+if(data27.valueM === undefined){
+const err82 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/required",keyword:"required",params:{missingProperty: "valueM"},message:"must have required property '"+"valueM"+"'"};
+if(vErrors === null){
+vErrors = [err82];
+}
+else {
+vErrors.push(err82);
+}
+errors++;
+}
+for(const key7 in data27){
+if(!((key7 === "kind") || (key7 === "valueM"))){
+const err83 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key7},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err83];
+}
+else {
+vErrors.push(err83);
+}
+errors++;
+}
+}
+if(data27.kind !== undefined){
+if("const" !== data27.kind){
+const err84 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM/kind",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/properties/kind/const",keyword:"const",params:{allowedValue: "const"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err84];
+}
+else {
+vErrors.push(err84);
+}
+errors++;
+}
+}
+if(data27.valueM !== undefined){
+let data29 = data27.valueM;
+if(typeof data29 == "number"){
+if(data29 <= 0 || isNaN(data29)){
+const err85 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM/valueM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/properties/valueM/exclusiveMinimum",keyword:"exclusiveMinimum",params:{comparison: ">", limit: 0},message:"must be > 0"};
+if(vErrors === null){
+vErrors = [err85];
+}
+else {
+vErrors.push(err85);
+}
+errors++;
+}
+}
+else {
+const err86 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM/valueM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/properties/valueM/type",keyword:"type",params:{type: "number"},message:"must be number"};
+if(vErrors === null){
+vErrors = [err86];
+}
+else {
+vErrors.push(err86);
+}
+errors++;
+}
+}
+}
+else {
+const err87 = {instancePath:instancePath+"/specs/geometry/payload/cellSizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/cellSizeM/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err87];
+}
+else {
+vErrors.push(err87);
+}
+errors++;
+}
+}
+if(data25.wallThicknessM !== undefined){
+let data30 = data25.wallThicknessM;
+if(data30 && typeof data30 == "object" && !Array.isArray(data30)){
+if(data30.kind === undefined){
+const err88 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err88];
+}
+else {
+vErrors.push(err88);
+}
+errors++;
+}
+if(data30.valueM === undefined){
+const err89 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/required",keyword:"required",params:{missingProperty: "valueM"},message:"must have required property '"+"valueM"+"'"};
+if(vErrors === null){
+vErrors = [err89];
+}
+else {
+vErrors.push(err89);
+}
+errors++;
+}
+for(const key8 in data30){
+if(!((key8 === "kind") || (key8 === "valueM"))){
+const err90 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key8},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err90];
+}
+else {
+vErrors.push(err90);
+}
+errors++;
+}
+}
+if(data30.kind !== undefined){
+if("const" !== data30.kind){
+const err91 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM/kind",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/properties/kind/const",keyword:"const",params:{allowedValue: "const"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err91];
+}
+else {
+vErrors.push(err91);
+}
+errors++;
+}
+}
+if(data30.valueM !== undefined){
+let data32 = data30.valueM;
+if(typeof data32 == "number"){
+if(data32 <= 0 || isNaN(data32)){
+const err92 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM/valueM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/properties/valueM/exclusiveMinimum",keyword:"exclusiveMinimum",params:{comparison: ">", limit: 0},message:"must be > 0"};
+if(vErrors === null){
+vErrors = [err92];
+}
+else {
+vErrors.push(err92);
+}
+errors++;
+}
+}
+else {
+const err93 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM/valueM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/properties/valueM/type",keyword:"type",params:{type: "number"},message:"must be number"};
+if(vErrors === null){
+vErrors = [err93];
+}
+else {
+vErrors.push(err93);
+}
+errors++;
+}
+}
+}
+else {
+const err94 = {instancePath:instancePath+"/specs/geometry/payload/wallThicknessM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/wallThicknessM/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err94];
+}
+else {
+vErrors.push(err94);
+}
+errors++;
+}
+}
+if(data25.splitting !== undefined){
+if("fullwall" !== data25.splitting){
+const err95 = {instancePath:instancePath+"/specs/geometry/payload/splitting",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/splitting/const",keyword:"const",params:{allowedValue: "fullwall"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err95];
+}
+else {
+vErrors.push(err95);
+}
+errors++;
+}
+}
+if(data25.envelope !== undefined){
+let data34 = data25.envelope;
+if(data34 && typeof data34 == "object" && !Array.isArray(data34)){
+if(data34.kind === undefined){
+const err96 = {instancePath:instancePath+"/specs/geometry/payload/envelope",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err96];
+}
+else {
+vErrors.push(err96);
+}
+errors++;
+}
+if(data34.sizeM === undefined){
+const err97 = {instancePath:instancePath+"/specs/geometry/payload/envelope",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/required",keyword:"required",params:{missingProperty: "sizeM"},message:"must have required property '"+"sizeM"+"'"};
+if(vErrors === null){
+vErrors = [err97];
+}
+else {
+vErrors.push(err97);
+}
+errors++;
+}
+for(const key9 in data34){
+if(!((key9 === "kind") || (key9 === "sizeM"))){
+const err98 = {instancePath:instancePath+"/specs/geometry/payload/envelope",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key9},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err98];
+}
+else {
+vErrors.push(err98);
+}
+errors++;
+}
+}
+if(data34.kind !== undefined){
+if("box" !== data34.kind){
+const err99 = {instancePath:instancePath+"/specs/geometry/payload/envelope/kind",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/properties/kind/const",keyword:"const",params:{allowedValue: "box"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err99];
+}
+else {
+vErrors.push(err99);
+}
+errors++;
+}
+}
+if(data34.sizeM !== undefined){
+let data36 = data34.sizeM;
+if(Array.isArray(data36)){
+if(data36.length > 3){
+const err100 = {instancePath:instancePath+"/specs/geometry/payload/envelope/sizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/properties/sizeM/maxItems",keyword:"maxItems",params:{limit: 3},message:"must NOT have more than 3 items"};
+if(vErrors === null){
+vErrors = [err100];
+}
+else {
+vErrors.push(err100);
+}
+errors++;
+}
+if(data36.length < 3){
+const err101 = {instancePath:instancePath+"/specs/geometry/payload/envelope/sizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/properties/sizeM/minItems",keyword:"minItems",params:{limit: 3},message:"must NOT have fewer than 3 items"};
+if(vErrors === null){
+vErrors = [err101];
+}
+else {
+vErrors.push(err101);
+}
+errors++;
+}
+const len2 = data36.length;
+for(let i2=0; i2<len2; i2++){
+let data37 = data36[i2];
+if(typeof data37 == "number"){
+if(data37 <= 0 || isNaN(data37)){
+const err102 = {instancePath:instancePath+"/specs/geometry/payload/envelope/sizeM/" + i2,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/properties/sizeM/items/exclusiveMinimum",keyword:"exclusiveMinimum",params:{comparison: ">", limit: 0},message:"must be > 0"};
+if(vErrors === null){
+vErrors = [err102];
+}
+else {
+vErrors.push(err102);
+}
+errors++;
+}
+}
+else {
+const err103 = {instancePath:instancePath+"/specs/geometry/payload/envelope/sizeM/" + i2,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/properties/sizeM/items/type",keyword:"type",params:{type: "number"},message:"must be number"};
+if(vErrors === null){
+vErrors = [err103];
+}
+else {
+vErrors.push(err103);
+}
+errors++;
+}
+}
+}
+else {
+const err104 = {instancePath:instancePath+"/specs/geometry/payload/envelope/sizeM",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/properties/sizeM/type",keyword:"type",params:{type: "array"},message:"must be array"};
+if(vErrors === null){
+vErrors = [err104];
+}
+else {
+vErrors.push(err104);
+}
+errors++;
+}
+}
+}
+else {
+const err105 = {instancePath:instancePath+"/specs/geometry/payload/envelope",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/envelope/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err105];
+}
+else {
+vErrors.push(err105);
+}
+errors++;
+}
+}
+if(data25.ports !== undefined){
+let data38 = data25.ports;
+if(Array.isArray(data38)){
+const _errs92 = errors;
+const len3 = data38.length;
+for(let i3=0; i3<len3; i3++){
+let data39 = data38[i3];
+const _errs93 = errors;
+if(data39 && typeof data39 == "object" && !Array.isArray(data39)){
+if(data39.id === undefined){
+const err106 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i3,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/0/contains/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err106];
+}
+else {
+vErrors.push(err106);
+}
+errors++;
+}
+if(data39.id !== undefined){
+if("hot-inlet" !== data39.id){
+const err107 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i3+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/0/contains/properties/id/const",keyword:"const",params:{allowedValue: "hot-inlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err107];
+}
+else {
+vErrors.push(err107);
+}
+errors++;
+}
+}
+}
+else {
+const err108 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i3,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/0/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err108];
+}
+else {
+vErrors.push(err108);
+}
+errors++;
+}
+var valid23 = _errs93 === errors;
+if(valid23){
+break;
+}
+}
+if(!valid23){
+const err109 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/0/contains",keyword:"contains",params:{minContains: 1},message:"must contain at least 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err109];
+}
+else {
+vErrors.push(err109);
+}
+errors++;
+}
+else {
+errors = _errs92;
+if(vErrors !== null){
+if(_errs92){
+vErrors.length = _errs92;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data38)){
+const _errs97 = errors;
+const len4 = data38.length;
+for(let i4=0; i4<len4; i4++){
+let data41 = data38[i4];
+const _errs98 = errors;
+if(data41 && typeof data41 == "object" && !Array.isArray(data41)){
+if(data41.id === undefined){
+const err110 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i4,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/1/contains/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err110];
+}
+else {
+vErrors.push(err110);
+}
+errors++;
+}
+if(data41.id !== undefined){
+if("hot-outlet" !== data41.id){
+const err111 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i4+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/1/contains/properties/id/const",keyword:"const",params:{allowedValue: "hot-outlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err111];
+}
+else {
+vErrors.push(err111);
+}
+errors++;
+}
+}
+}
+else {
+const err112 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i4,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/1/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err112];
+}
+else {
+vErrors.push(err112);
+}
+errors++;
+}
+var valid25 = _errs98 === errors;
+if(valid25){
+break;
+}
+}
+if(!valid25){
+const err113 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/1/contains",keyword:"contains",params:{minContains: 1},message:"must contain at least 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err113];
+}
+else {
+vErrors.push(err113);
+}
+errors++;
+}
+else {
+errors = _errs97;
+if(vErrors !== null){
+if(_errs97){
+vErrors.length = _errs97;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data38)){
+const _errs102 = errors;
+const len5 = data38.length;
+for(let i5=0; i5<len5; i5++){
+let data43 = data38[i5];
+const _errs103 = errors;
+if(data43 && typeof data43 == "object" && !Array.isArray(data43)){
+if(data43.id === undefined){
+const err114 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i5,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/2/contains/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err114];
+}
+else {
+vErrors.push(err114);
+}
+errors++;
+}
+if(data43.id !== undefined){
+if("cold-inlet" !== data43.id){
+const err115 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i5+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/2/contains/properties/id/const",keyword:"const",params:{allowedValue: "cold-inlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err115];
+}
+else {
+vErrors.push(err115);
+}
+errors++;
+}
+}
+}
+else {
+const err116 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i5,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/2/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err116];
+}
+else {
+vErrors.push(err116);
+}
+errors++;
+}
+var valid27 = _errs103 === errors;
+if(valid27){
+break;
+}
+}
+if(!valid27){
+const err117 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/2/contains",keyword:"contains",params:{minContains: 1},message:"must contain at least 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err117];
+}
+else {
+vErrors.push(err117);
+}
+errors++;
+}
+else {
+errors = _errs102;
+if(vErrors !== null){
+if(_errs102){
+vErrors.length = _errs102;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data38)){
+const _errs107 = errors;
+const len6 = data38.length;
+for(let i6=0; i6<len6; i6++){
+let data45 = data38[i6];
+const _errs108 = errors;
+if(data45 && typeof data45 == "object" && !Array.isArray(data45)){
+if(data45.id === undefined){
+const err118 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i6,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/3/contains/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err118];
+}
+else {
+vErrors.push(err118);
+}
+errors++;
+}
+if(data45.id !== undefined){
+if("cold-outlet" !== data45.id){
+const err119 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i6+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/3/contains/properties/id/const",keyword:"const",params:{allowedValue: "cold-outlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err119];
+}
+else {
+vErrors.push(err119);
+}
+errors++;
+}
+}
+}
+else {
+const err120 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i6,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/3/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err120];
+}
+else {
+vErrors.push(err120);
+}
+errors++;
+}
+var valid29 = _errs108 === errors;
+if(valid29){
+break;
+}
+}
+if(!valid29){
+const err121 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/allOf/3/contains",keyword:"contains",params:{minContains: 1},message:"must contain at least 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err121];
+}
+else {
+vErrors.push(err121);
+}
+errors++;
+}
+else {
+errors = _errs107;
+if(vErrors !== null){
+if(_errs107){
+vErrors.length = _errs107;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data38)){
+if(data38.length > 4){
+const err122 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/maxItems",keyword:"maxItems",params:{limit: 4},message:"must NOT have more than 4 items"};
+if(vErrors === null){
+vErrors = [err122];
+}
+else {
+vErrors.push(err122);
+}
+errors++;
+}
+if(data38.length < 4){
+const err123 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/minItems",keyword:"minItems",params:{limit: 4},message:"must NOT have fewer than 4 items"};
+if(vErrors === null){
+vErrors = [err123];
+}
+else {
+vErrors.push(err123);
+}
+errors++;
+}
+const len7 = data38.length;
+for(let i7=0; i7<len7; i7++){
+let data47 = data38[i7];
+const _errs112 = errors;
+let valid33 = false;
+let passing0 = null;
+const _errs113 = errors;
+if(data47 && typeof data47 == "object" && !Array.isArray(data47)){
+if(data47.id === undefined){
+const err124 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err124];
+}
+else {
+vErrors.push(err124);
+}
+errors++;
+}
+if(data47.domain === undefined){
+const err125 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/required",keyword:"required",params:{missingProperty: "domain"},message:"must have required property '"+"domain"+"'"};
+if(vErrors === null){
+vErrors = [err125];
+}
+else {
+vErrors.push(err125);
+}
+errors++;
+}
+if(data47.face === undefined){
+const err126 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/required",keyword:"required",params:{missingProperty: "face"},message:"must have required property '"+"face"+"'"};
+if(vErrors === null){
+vErrors = [err126];
+}
+else {
+vErrors.push(err126);
+}
+errors++;
+}
+for(const key10 in data47){
+if(!(((key10 === "id") || (key10 === "domain")) || (key10 === "face"))){
+const err127 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key10},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err127];
+}
+else {
+vErrors.push(err127);
+}
+errors++;
+}
+}
+if(data47.id !== undefined){
+if("hot-inlet" !== data47.id){
+const err128 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/properties/id/const",keyword:"const",params:{allowedValue: "hot-inlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err128];
+}
+else {
+vErrors.push(err128);
+}
+errors++;
+}
+}
+if(data47.domain !== undefined){
+if("hot" !== data47.domain){
+const err129 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/domain",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/properties/domain/const",keyword:"const",params:{allowedValue: "hot"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err129];
+}
+else {
+vErrors.push(err129);
+}
+errors++;
+}
+}
+if(data47.face !== undefined){
+let data50 = data47.face;
+if(!((((((data50 === "-x") || (data50 === "+x")) || (data50 === "-y")) || (data50 === "+y")) || (data50 === "-z")) || (data50 === "+z"))){
+const err130 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/face",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/properties/face/enum",keyword:"enum",params:{allowedValues: schema31.properties.payload.properties.ports.items.oneOf[0].properties.face.enum},message:"must be equal to one of the allowed values"};
+if(vErrors === null){
+vErrors = [err130];
+}
+else {
+vErrors.push(err130);
+}
+errors++;
+}
+}
+}
+else {
+const err131 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/0/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err131];
+}
+else {
+vErrors.push(err131);
+}
+errors++;
+}
+var _valid1 = _errs113 === errors;
+if(_valid1){
+valid33 = true;
+passing0 = 0;
+var props1 = true;
+}
+const _errs119 = errors;
+if(data47 && typeof data47 == "object" && !Array.isArray(data47)){
+if(data47.id === undefined){
+const err132 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err132];
+}
+else {
+vErrors.push(err132);
+}
+errors++;
+}
+if(data47.domain === undefined){
+const err133 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/required",keyword:"required",params:{missingProperty: "domain"},message:"must have required property '"+"domain"+"'"};
+if(vErrors === null){
+vErrors = [err133];
+}
+else {
+vErrors.push(err133);
+}
+errors++;
+}
+if(data47.face === undefined){
+const err134 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/required",keyword:"required",params:{missingProperty: "face"},message:"must have required property '"+"face"+"'"};
+if(vErrors === null){
+vErrors = [err134];
+}
+else {
+vErrors.push(err134);
+}
+errors++;
+}
+for(const key11 in data47){
+if(!(((key11 === "id") || (key11 === "domain")) || (key11 === "face"))){
+const err135 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key11},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err135];
+}
+else {
+vErrors.push(err135);
+}
+errors++;
+}
+}
+if(data47.id !== undefined){
+if("hot-outlet" !== data47.id){
+const err136 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/properties/id/const",keyword:"const",params:{allowedValue: "hot-outlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err136];
+}
+else {
+vErrors.push(err136);
+}
+errors++;
+}
+}
+if(data47.domain !== undefined){
+if("hot" !== data47.domain){
+const err137 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/domain",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/properties/domain/const",keyword:"const",params:{allowedValue: "hot"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err137];
+}
+else {
+vErrors.push(err137);
+}
+errors++;
+}
+}
+if(data47.face !== undefined){
+let data53 = data47.face;
+if(!((((((data53 === "-x") || (data53 === "+x")) || (data53 === "-y")) || (data53 === "+y")) || (data53 === "-z")) || (data53 === "+z"))){
+const err138 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/face",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/properties/face/enum",keyword:"enum",params:{allowedValues: schema31.properties.payload.properties.ports.items.oneOf[1].properties.face.enum},message:"must be equal to one of the allowed values"};
+if(vErrors === null){
+vErrors = [err138];
+}
+else {
+vErrors.push(err138);
+}
+errors++;
+}
+}
+}
+else {
+const err139 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/1/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err139];
+}
+else {
+vErrors.push(err139);
+}
+errors++;
+}
+var _valid1 = _errs119 === errors;
+if(_valid1 && valid33){
+valid33 = false;
+passing0 = [passing0, 1];
+}
+else {
+if(_valid1){
+valid33 = true;
+passing0 = 1;
+if(props1 !== true){
+props1 = true;
+}
+}
+const _errs125 = errors;
+if(data47 && typeof data47 == "object" && !Array.isArray(data47)){
+if(data47.id === undefined){
+const err140 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err140];
+}
+else {
+vErrors.push(err140);
+}
+errors++;
+}
+if(data47.domain === undefined){
+const err141 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/required",keyword:"required",params:{missingProperty: "domain"},message:"must have required property '"+"domain"+"'"};
+if(vErrors === null){
+vErrors = [err141];
+}
+else {
+vErrors.push(err141);
+}
+errors++;
+}
+if(data47.face === undefined){
+const err142 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/required",keyword:"required",params:{missingProperty: "face"},message:"must have required property '"+"face"+"'"};
+if(vErrors === null){
+vErrors = [err142];
+}
+else {
+vErrors.push(err142);
+}
+errors++;
+}
+for(const key12 in data47){
+if(!(((key12 === "id") || (key12 === "domain")) || (key12 === "face"))){
+const err143 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key12},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err143];
+}
+else {
+vErrors.push(err143);
+}
+errors++;
+}
+}
+if(data47.id !== undefined){
+if("cold-inlet" !== data47.id){
+const err144 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/properties/id/const",keyword:"const",params:{allowedValue: "cold-inlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err144];
+}
+else {
+vErrors.push(err144);
+}
+errors++;
+}
+}
+if(data47.domain !== undefined){
+if("cold" !== data47.domain){
+const err145 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/domain",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/properties/domain/const",keyword:"const",params:{allowedValue: "cold"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err145];
+}
+else {
+vErrors.push(err145);
+}
+errors++;
+}
+}
+if(data47.face !== undefined){
+let data56 = data47.face;
+if(!((((((data56 === "-x") || (data56 === "+x")) || (data56 === "-y")) || (data56 === "+y")) || (data56 === "-z")) || (data56 === "+z"))){
+const err146 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/face",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/properties/face/enum",keyword:"enum",params:{allowedValues: schema31.properties.payload.properties.ports.items.oneOf[2].properties.face.enum},message:"must be equal to one of the allowed values"};
+if(vErrors === null){
+vErrors = [err146];
+}
+else {
+vErrors.push(err146);
+}
+errors++;
+}
+}
+}
+else {
+const err147 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/2/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err147];
+}
+else {
+vErrors.push(err147);
+}
+errors++;
+}
+var _valid1 = _errs125 === errors;
+if(_valid1 && valid33){
+valid33 = false;
+passing0 = [passing0, 2];
+}
+else {
+if(_valid1){
+valid33 = true;
+passing0 = 2;
+if(props1 !== true){
+props1 = true;
+}
+}
+const _errs131 = errors;
+if(data47 && typeof data47 == "object" && !Array.isArray(data47)){
+if(data47.id === undefined){
+const err148 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/required",keyword:"required",params:{missingProperty: "id"},message:"must have required property '"+"id"+"'"};
+if(vErrors === null){
+vErrors = [err148];
+}
+else {
+vErrors.push(err148);
+}
+errors++;
+}
+if(data47.domain === undefined){
+const err149 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/required",keyword:"required",params:{missingProperty: "domain"},message:"must have required property '"+"domain"+"'"};
+if(vErrors === null){
+vErrors = [err149];
+}
+else {
+vErrors.push(err149);
+}
+errors++;
+}
+if(data47.face === undefined){
+const err150 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/required",keyword:"required",params:{missingProperty: "face"},message:"must have required property '"+"face"+"'"};
+if(vErrors === null){
+vErrors = [err150];
+}
+else {
+vErrors.push(err150);
+}
+errors++;
+}
+for(const key13 in data47){
+if(!(((key13 === "id") || (key13 === "domain")) || (key13 === "face"))){
+const err151 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key13},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err151];
+}
+else {
+vErrors.push(err151);
+}
+errors++;
+}
+}
+if(data47.id !== undefined){
+if("cold-outlet" !== data47.id){
+const err152 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/id",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/properties/id/const",keyword:"const",params:{allowedValue: "cold-outlet"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err152];
+}
+else {
+vErrors.push(err152);
+}
+errors++;
+}
+}
+if(data47.domain !== undefined){
+if("cold" !== data47.domain){
+const err153 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/domain",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/properties/domain/const",keyword:"const",params:{allowedValue: "cold"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err153];
+}
+else {
+vErrors.push(err153);
+}
+errors++;
+}
+}
+if(data47.face !== undefined){
+let data59 = data47.face;
+if(!((((((data59 === "-x") || (data59 === "+x")) || (data59 === "-y")) || (data59 === "+y")) || (data59 === "-z")) || (data59 === "+z"))){
+const err154 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7+"/face",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/properties/face/enum",keyword:"enum",params:{allowedValues: schema31.properties.payload.properties.ports.items.oneOf[3].properties.face.enum},message:"must be equal to one of the allowed values"};
+if(vErrors === null){
+vErrors = [err154];
+}
+else {
+vErrors.push(err154);
+}
+errors++;
+}
+}
+}
+else {
+const err155 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf/3/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err155];
+}
+else {
+vErrors.push(err155);
+}
+errors++;
+}
+var _valid1 = _errs131 === errors;
+if(_valid1 && valid33){
+valid33 = false;
+passing0 = [passing0, 3];
+}
+else {
+if(_valid1){
+valid33 = true;
+passing0 = 3;
+if(props1 !== true){
+props1 = true;
+}
+}
+}
+}
+}
+if(!valid33){
+const err156 = {instancePath:instancePath+"/specs/geometry/payload/ports/" + i7,schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/items/oneOf",keyword:"oneOf",params:{passingSchemas: passing0},message:"must match exactly one schema in oneOf"};
+if(vErrors === null){
+vErrors = [err156];
+}
+else {
+vErrors.push(err156);
+}
+errors++;
+}
+else {
+errors = _errs112;
+if(vErrors !== null){
+if(_errs112){
+vErrors.length = _errs112;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+}
+else {
+const err157 = {instancePath:instancePath+"/specs/geometry/payload/ports",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/properties/ports/type",keyword:"type",params:{type: "array"},message:"must be array"};
+if(vErrors === null){
+vErrors = [err157];
+}
+else {
+vErrors.push(err157);
+}
+errors++;
+}
+}
+}
+else {
+const err158 = {instancePath:instancePath+"/specs/geometry/payload",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/properties/payload/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err158];
+}
+else {
+vErrors.push(err158);
+}
+errors++;
+}
+}
+}
+else {
+const err159 = {instancePath:instancePath+"/specs/geometry",schemaPath:"https://gyrox.dev/schemas/geometry-spec/v1/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err159];
+}
+else {
+vErrors.push(err159);
+}
+errors++;
+}
+}
+if(data21.discretization !== undefined){
+let data60 = data21.discretization;
+if(data60 && typeof data60 == "object" && !Array.isArray(data60)){
+if(data60.kind === undefined){
+const err160 = {instancePath:instancePath+"/specs/discretization",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err160];
+}
+else {
+vErrors.push(err160);
+}
+errors++;
+}
+if(data60.schemaVersion === undefined){
+const err161 = {instancePath:instancePath+"/specs/discretization",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/required",keyword:"required",params:{missingProperty: "schemaVersion"},message:"must have required property '"+"schemaVersion"+"'"};
+if(vErrors === null){
+vErrors = [err161];
+}
+else {
+vErrors.push(err161);
+}
+errors++;
+}
+if(data60.payload === undefined){
+const err162 = {instancePath:instancePath+"/specs/discretization",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/required",keyword:"required",params:{missingProperty: "payload"},message:"must have required property '"+"payload"+"'"};
+if(vErrors === null){
+vErrors = [err162];
+}
+else {
+vErrors.push(err162);
+}
+errors++;
+}
+for(const key14 in data60){
+if(!(((key14 === "kind") || (key14 === "schemaVersion")) || (key14 === "payload"))){
+const err163 = {instancePath:instancePath+"/specs/discretization",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key14},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err163];
+}
+else {
+vErrors.push(err163);
+}
+errors++;
+}
+}
+if(data60.kind !== undefined){
+if("discretization-spec" !== data60.kind){
+const err164 = {instancePath:instancePath+"/specs/discretization/kind",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/kind/const",keyword:"const",params:{allowedValue: "discretization-spec"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err164];
+}
+else {
+vErrors.push(err164);
+}
+errors++;
+}
+}
+if(data60.schemaVersion !== undefined){
+if(1 !== data60.schemaVersion){
+const err165 = {instancePath:instancePath+"/specs/discretization/schemaVersion",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/schemaVersion/const",keyword:"const",params:{allowedValue: 1},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err165];
+}
+else {
+vErrors.push(err165);
+}
+errors++;
+}
+}
+if(data60.payload !== undefined){
+let data63 = data60.payload;
+if(data63 && typeof data63 == "object" && !Array.isArray(data63)){
+if(data63.route === undefined){
+const err166 = {instancePath:instancePath+"/specs/discretization/payload",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "route"},message:"must have required property '"+"route"+"'"};
+if(vErrors === null){
+vErrors = [err166];
+}
+else {
+vErrors.push(err166);
+}
+errors++;
+}
+if(data63.voxelPitchM === undefined){
+const err167 = {instancePath:instancePath+"/specs/discretization/payload",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "voxelPitchM"},message:"must have required property '"+"voxelPitchM"+"'"};
+if(vErrors === null){
+vErrors = [err167];
+}
+else {
+vErrors.push(err167);
+}
+errors++;
+}
+if(data63.qa === undefined){
+const err168 = {instancePath:instancePath+"/specs/discretization/payload",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "qa"},message:"must have required property '"+"qa"+"'"};
+if(vErrors === null){
+vErrors = [err168];
+}
+else {
+vErrors.push(err168);
+}
+errors++;
+}
+for(const key15 in data63){
+if(!(((key15 === "route") || (key15 === "voxelPitchM")) || (key15 === "qa"))){
+const err169 = {instancePath:instancePath+"/specs/discretization/payload",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key15},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err169];
+}
+else {
+vErrors.push(err169);
+}
+errors++;
+}
+}
+if(data63.route !== undefined){
+if("voxel-hexa" !== data63.route){
+const err170 = {instancePath:instancePath+"/specs/discretization/payload/route",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/route/const",keyword:"const",params:{allowedValue: "voxel-hexa"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err170];
+}
+else {
+vErrors.push(err170);
+}
+errors++;
+}
+}
+if(data63.voxelPitchM !== undefined){
+let data65 = data63.voxelPitchM;
+if(typeof data65 == "number"){
+if(data65 <= 0 || isNaN(data65)){
+const err171 = {instancePath:instancePath+"/specs/discretization/payload/voxelPitchM",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/voxelPitchM/exclusiveMinimum",keyword:"exclusiveMinimum",params:{comparison: ">", limit: 0},message:"must be > 0"};
+if(vErrors === null){
+vErrors = [err171];
+}
+else {
+vErrors.push(err171);
+}
+errors++;
+}
+}
+else {
+const err172 = {instancePath:instancePath+"/specs/discretization/payload/voxelPitchM",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/voxelPitchM/type",keyword:"type",params:{type: "number"},message:"must be number"};
+if(vErrors === null){
+vErrors = [err172];
+}
+else {
+vErrors.push(err172);
+}
+errors++;
+}
+}
+if(data63.qa !== undefined){
+let data66 = data63.qa;
+if(data66 && typeof data66 == "object" && !Array.isArray(data66)){
+if(data66.maxNonOrtho === undefined){
+const err173 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "maxNonOrtho"},message:"must have required property '"+"maxNonOrtho"+"'"};
+if(vErrors === null){
+vErrors = [err173];
+}
+else {
+vErrors.push(err173);
+}
+errors++;
+}
+if(data66.maxBoundarySkewness === undefined){
+const err174 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "maxBoundarySkewness"},message:"must have required property '"+"maxBoundarySkewness"+"'"};
+if(vErrors === null){
+vErrors = [err174];
+}
+else {
+vErrors.push(err174);
+}
+errors++;
+}
+if(data66.maxInternalSkewness === undefined){
+const err175 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "maxInternalSkewness"},message:"must have required property '"+"maxInternalSkewness"+"'"};
+if(vErrors === null){
+vErrors = [err175];
+}
+else {
+vErrors.push(err175);
+}
+errors++;
+}
+if(data66.maxConcave === undefined){
+const err176 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "maxConcave"},message:"must have required property '"+"maxConcave"+"'"};
+if(vErrors === null){
+vErrors = [err176];
+}
+else {
+vErrors.push(err176);
+}
+errors++;
+}
+if(data66.minVol === undefined){
+const err177 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minVol"},message:"must have required property '"+"minVol"+"'"};
+if(vErrors === null){
+vErrors = [err177];
+}
+else {
+vErrors.push(err177);
+}
+errors++;
+}
+if(data66.minTetQuality === undefined){
+const err178 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minTetQuality"},message:"must have required property '"+"minTetQuality"+"'"};
+if(vErrors === null){
+vErrors = [err178];
+}
+else {
+vErrors.push(err178);
+}
+errors++;
+}
+if(data66.minArea === undefined){
+const err179 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minArea"},message:"must have required property '"+"minArea"+"'"};
+if(vErrors === null){
+vErrors = [err179];
+}
+else {
+vErrors.push(err179);
+}
+errors++;
+}
+if(data66.minTwist === undefined){
+const err180 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minTwist"},message:"must have required property '"+"minTwist"+"'"};
+if(vErrors === null){
+vErrors = [err180];
+}
+else {
+vErrors.push(err180);
+}
+errors++;
+}
+if(data66.minDeterminant === undefined){
+const err181 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minDeterminant"},message:"must have required property '"+"minDeterminant"+"'"};
+if(vErrors === null){
+vErrors = [err181];
+}
+else {
+vErrors.push(err181);
+}
+errors++;
+}
+if(data66.minFaceWeight === undefined){
+const err182 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minFaceWeight"},message:"must have required property '"+"minFaceWeight"+"'"};
+if(vErrors === null){
+vErrors = [err182];
+}
+else {
+vErrors.push(err182);
+}
+errors++;
+}
+if(data66.minVolRatio === undefined){
+const err183 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minVolRatio"},message:"must have required property '"+"minVolRatio"+"'"};
+if(vErrors === null){
+vErrors = [err183];
+}
+else {
+vErrors.push(err183);
+}
+errors++;
+}
+if(data66.minTriangleTwist === undefined){
+const err184 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minTriangleTwist"},message:"must have required property '"+"minTriangleTwist"+"'"};
+if(vErrors === null){
+vErrors = [err184];
+}
+else {
+vErrors.push(err184);
+}
+errors++;
+}
+if(data66.minEdgeLength === undefined){
+const err185 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/required",keyword:"required",params:{missingProperty: "minEdgeLength"},message:"must have required property '"+"minEdgeLength"+"'"};
+if(vErrors === null){
+vErrors = [err185];
+}
+else {
+vErrors.push(err185);
+}
+errors++;
+}
+for(const key16 in data66){
+if(!(func1.call(schema32.properties.payload.properties.qa.properties, key16))){
+const err186 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key16},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err186];
+}
+else {
+vErrors.push(err186);
+}
+errors++;
+}
+}
+if(data66.maxNonOrtho !== undefined){
+if(65 !== data66.maxNonOrtho){
+const err187 = {instancePath:instancePath+"/specs/discretization/payload/qa/maxNonOrtho",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/maxNonOrtho/const",keyword:"const",params:{allowedValue: 65},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err187];
+}
+else {
+vErrors.push(err187);
+}
+errors++;
+}
+}
+if(data66.maxBoundarySkewness !== undefined){
+if(20 !== data66.maxBoundarySkewness){
+const err188 = {instancePath:instancePath+"/specs/discretization/payload/qa/maxBoundarySkewness",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/maxBoundarySkewness/const",keyword:"const",params:{allowedValue: 20},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err188];
+}
+else {
+vErrors.push(err188);
+}
+errors++;
+}
+}
+if(data66.maxInternalSkewness !== undefined){
+if(4 !== data66.maxInternalSkewness){
+const err189 = {instancePath:instancePath+"/specs/discretization/payload/qa/maxInternalSkewness",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/maxInternalSkewness/const",keyword:"const",params:{allowedValue: 4},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err189];
+}
+else {
+vErrors.push(err189);
+}
+errors++;
+}
+}
+if(data66.maxConcave !== undefined){
+if(80 !== data66.maxConcave){
+const err190 = {instancePath:instancePath+"/specs/discretization/payload/qa/maxConcave",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/maxConcave/const",keyword:"const",params:{allowedValue: 80},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err190];
+}
+else {
+vErrors.push(err190);
+}
+errors++;
+}
+}
+if(data66.minVol !== undefined){
+if(1e-18 !== data66.minVol){
+const err191 = {instancePath:instancePath+"/specs/discretization/payload/qa/minVol",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minVol/const",keyword:"const",params:{allowedValue: 1e-18},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err191];
+}
+else {
+vErrors.push(err191);
+}
+errors++;
+}
+}
+if(data66.minTetQuality !== undefined){
+if(1e-15 !== data66.minTetQuality){
+const err192 = {instancePath:instancePath+"/specs/discretization/payload/qa/minTetQuality",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minTetQuality/const",keyword:"const",params:{allowedValue: 1e-15},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err192];
+}
+else {
+vErrors.push(err192);
+}
+errors++;
+}
+}
+if(data66.minArea !== undefined){
+if(-1 !== data66.minArea){
+const err193 = {instancePath:instancePath+"/specs/discretization/payload/qa/minArea",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minArea/const",keyword:"const",params:{allowedValue: -1},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err193];
+}
+else {
+vErrors.push(err193);
+}
+errors++;
+}
+}
+if(data66.minTwist !== undefined){
+if(0.02 !== data66.minTwist){
+const err194 = {instancePath:instancePath+"/specs/discretization/payload/qa/minTwist",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minTwist/const",keyword:"const",params:{allowedValue: 0.02},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err194];
+}
+else {
+vErrors.push(err194);
+}
+errors++;
+}
+}
+if(data66.minDeterminant !== undefined){
+if(0.001 !== data66.minDeterminant){
+const err195 = {instancePath:instancePath+"/specs/discretization/payload/qa/minDeterminant",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minDeterminant/const",keyword:"const",params:{allowedValue: 0.001},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err195];
+}
+else {
+vErrors.push(err195);
+}
+errors++;
+}
+}
+if(data66.minFaceWeight !== undefined){
+if(0.05 !== data66.minFaceWeight){
+const err196 = {instancePath:instancePath+"/specs/discretization/payload/qa/minFaceWeight",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minFaceWeight/const",keyword:"const",params:{allowedValue: 0.05},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err196];
+}
+else {
+vErrors.push(err196);
+}
+errors++;
+}
+}
+if(data66.minVolRatio !== undefined){
+if(0.01 !== data66.minVolRatio){
+const err197 = {instancePath:instancePath+"/specs/discretization/payload/qa/minVolRatio",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minVolRatio/const",keyword:"const",params:{allowedValue: 0.01},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err197];
+}
+else {
+vErrors.push(err197);
+}
+errors++;
+}
+}
+if(data66.minTriangleTwist !== undefined){
+if(-1 !== data66.minTriangleTwist){
+const err198 = {instancePath:instancePath+"/specs/discretization/payload/qa/minTriangleTwist",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minTriangleTwist/const",keyword:"const",params:{allowedValue: -1},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err198];
+}
+else {
+vErrors.push(err198);
+}
+errors++;
+}
+}
+if(data66.minEdgeLength !== undefined){
+if(-1 !== data66.minEdgeLength){
+const err199 = {instancePath:instancePath+"/specs/discretization/payload/qa/minEdgeLength",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/properties/minEdgeLength/const",keyword:"const",params:{allowedValue: -1},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err199];
+}
+else {
+vErrors.push(err199);
+}
+errors++;
+}
+}
+}
+else {
+const err200 = {instancePath:instancePath+"/specs/discretization/payload/qa",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/properties/qa/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err200];
+}
+else {
+vErrors.push(err200);
+}
+errors++;
+}
+}
+}
+else {
+const err201 = {instancePath:instancePath+"/specs/discretization/payload",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/properties/payload/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err201];
+}
+else {
+vErrors.push(err201);
+}
+errors++;
+}
+}
+}
+else {
+const err202 = {instancePath:instancePath+"/specs/discretization",schemaPath:"https://gyrox.dev/schemas/discretization-spec/v1/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err202];
+}
+else {
+vErrors.push(err202);
+}
+errors++;
+}
+}
+if(data21.solve !== undefined){
+if(!(validate22(data21.solve, {instancePath:instancePath+"/specs/solve",parentData:data21,parentDataProperty:"solve",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate22.errors : vErrors.concat(validate22.errors);
+errors = vErrors.length;
+}
+}
+if(data21.post !== undefined){
+let data81 = data21.post;
+if(data81 && typeof data81 == "object" && !Array.isArray(data81)){
+if(data81.kind === undefined){
+const err203 = {instancePath:instancePath+"/specs/post",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err203];
+}
+else {
+vErrors.push(err203);
+}
+errors++;
+}
+if(data81.schemaVersion === undefined){
+const err204 = {instancePath:instancePath+"/specs/post",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/required",keyword:"required",params:{missingProperty: "schemaVersion"},message:"must have required property '"+"schemaVersion"+"'"};
+if(vErrors === null){
+vErrors = [err204];
+}
+else {
+vErrors.push(err204);
+}
+errors++;
+}
+if(data81.payload === undefined){
+const err205 = {instancePath:instancePath+"/specs/post",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/required",keyword:"required",params:{missingProperty: "payload"},message:"must have required property '"+"payload"+"'"};
+if(vErrors === null){
+vErrors = [err205];
+}
+else {
+vErrors.push(err205);
+}
+errors++;
+}
+for(const key17 in data81){
+if(!(((key17 === "kind") || (key17 === "schemaVersion")) || (key17 === "payload"))){
+const err206 = {instancePath:instancePath+"/specs/post",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key17},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err206];
+}
+else {
+vErrors.push(err206);
+}
+errors++;
+}
+}
+if(data81.kind !== undefined){
+if("post-spec" !== data81.kind){
+const err207 = {instancePath:instancePath+"/specs/post/kind",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/kind/const",keyword:"const",params:{allowedValue: "post-spec"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err207];
+}
+else {
+vErrors.push(err207);
+}
+errors++;
+}
+}
+if(data81.schemaVersion !== undefined){
+if(1 !== data81.schemaVersion){
+const err208 = {instancePath:instancePath+"/specs/post/schemaVersion",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/schemaVersion/const",keyword:"const",params:{allowedValue: 1},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err208];
+}
+else {
+vErrors.push(err208);
+}
+errors++;
+}
+}
+if(data81.payload !== undefined){
+let data84 = data81.payload;
+if(data84 && typeof data84 == "object" && !Array.isArray(data84)){
+if(data84.tier1 === undefined){
+const err209 = {instancePath:instancePath+"/specs/post/payload",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "tier1"},message:"must have required property '"+"tier1"+"'"};
+if(vErrors === null){
+vErrors = [err209];
+}
+else {
+vErrors.push(err209);
+}
+errors++;
+}
+if(data84.tier2 === undefined){
+const err210 = {instancePath:instancePath+"/specs/post/payload",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/payload/required",keyword:"required",params:{missingProperty: "tier2"},message:"must have required property '"+"tier2"+"'"};
+if(vErrors === null){
+vErrors = [err210];
+}
+else {
+vErrors.push(err210);
+}
+errors++;
+}
+for(const key18 in data84){
+if(!((key18 === "tier1") || (key18 === "tier2"))){
+const err211 = {instancePath:instancePath+"/specs/post/payload",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/payload/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key18},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err211];
+}
+else {
+vErrors.push(err211);
+}
+errors++;
+}
+}
+if(data84.tier1 !== undefined){
+if(!func0(data84.tier1, schema38.properties.payload.properties.tier1.const)){
+const err212 = {instancePath:instancePath+"/specs/post/payload/tier1",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/payload/properties/tier1/const",keyword:"const",params:{allowedValue: schema38.properties.payload.properties.tier1.const},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err212];
+}
+else {
+vErrors.push(err212);
+}
+errors++;
+}
+}
+if(data84.tier2 !== undefined){
+if(!func0(data84.tier2, schema38.properties.payload.properties.tier2.const)){
+const err213 = {instancePath:instancePath+"/specs/post/payload/tier2",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/payload/properties/tier2/const",keyword:"const",params:{allowedValue: schema38.properties.payload.properties.tier2.const},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err213];
+}
+else {
+vErrors.push(err213);
+}
+errors++;
+}
+}
+}
+else {
+const err214 = {instancePath:instancePath+"/specs/post/payload",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/properties/payload/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err214];
+}
+else {
+vErrors.push(err214);
+}
+errors++;
+}
+}
+}
+else {
+const err215 = {instancePath:instancePath+"/specs/post",schemaPath:"https://gyrox.dev/schemas/post-spec/v1/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err215];
+}
+else {
+vErrors.push(err215);
+}
+errors++;
+}
+}
+}
+else {
+const err216 = {instancePath:instancePath+"/specs",schemaPath:"#/properties/specs/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err216];
+}
+else {
+vErrors.push(err216);
+}
+errors++;
+}
+}
+if(data.document !== undefined){
+if(!(validate33(data.document, {instancePath:instancePath+"/document",parentData:data,parentDataProperty:"document",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate33.errors : vErrors.concat(validate33.errors);
+errors = vErrors.length;
+}
+}
+if(data.summary !== undefined){
+let data88 = data.summary;
+const _errs180 = errors;
+let valid45 = false;
+const _errs181 = errors;
+if(!(validate52(data88, {instancePath:instancePath+"/summary",parentData:data,parentDataProperty:"summary",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate52.errors : vErrors.concat(validate52.errors);
+errors = vErrors.length;
+}
+var _valid2 = _errs181 === errors;
+valid45 = valid45 || _valid2;
+const _errs182 = errors;
+if(data88 !== null){
+const err217 = {instancePath:instancePath+"/summary",schemaPath:"#/properties/summary/anyOf/1/type",keyword:"type",params:{type: "null"},message:"must be null"};
+if(vErrors === null){
+vErrors = [err217];
+}
+else {
+vErrors.push(err217);
+}
+errors++;
+}
+var _valid2 = _errs182 === errors;
+valid45 = valid45 || _valid2;
+if(!valid45){
+const err218 = {instancePath:instancePath+"/summary",schemaPath:"#/properties/summary/anyOf",keyword:"anyOf",params:{},message:"must match a schema in anyOf"};
+if(vErrors === null){
+vErrors = [err218];
+}
+else {
+vErrors.push(err218);
+}
+errors++;
+}
+else {
+errors = _errs180;
+if(vErrors !== null){
+if(_errs180){
+vErrors.length = _errs180;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(data.notices !== undefined){
+let data89 = data.notices;
+if(Array.isArray(data89)){
+const _errs187 = errors;
+const len8 = data89.length;
+let valid47 = true;
+if(data89.length > 0){
+let count0 = 0;
+for(let i8=0; i8<len8; i8++){
+let data90 = data89[i8];
+const _errs188 = errors;
+if(data90 && typeof data90 == "object" && !Array.isArray(data90)){
+if(data90.noticeId === undefined){
+const err219 = {instancePath:instancePath+"/notices/" + i8,schemaPath:"#/properties/notices/allOf/0/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err219];
+}
+else {
+vErrors.push(err219);
+}
+errors++;
+}
+if(data90.noticeId !== undefined){
+if("D8-2" !== data90.noticeId){
+const err220 = {instancePath:instancePath+"/notices/" + i8+"/noticeId",schemaPath:"#/properties/notices/allOf/0/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "D8-2"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err220];
+}
+else {
+vErrors.push(err220);
+}
+errors++;
+}
+}
+}
+else {
+const err221 = {instancePath:instancePath+"/notices/" + i8,schemaPath:"#/properties/notices/allOf/0/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err221];
+}
+else {
+vErrors.push(err221);
+}
+errors++;
+}
+var _valid3 = _errs188 === errors;
+if(_valid3){
+count0++;
+if(count0 > 1){
+valid47 = false;
+break;
+}
+if(count0 >= 0){
+valid47 = true;
+}
+}
+}
+}
+if(!valid47){
+const err222 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/0/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err222];
+}
+else {
+vErrors.push(err222);
+}
+errors++;
+}
+else {
+errors = _errs187;
+if(vErrors !== null){
+if(_errs187){
+vErrors.length = _errs187;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const _errs192 = errors;
+const len9 = data89.length;
+let valid49 = true;
+if(data89.length > 0){
+let count1 = 0;
+for(let i9=0; i9<len9; i9++){
+let data92 = data89[i9];
+const _errs193 = errors;
+if(data92 && typeof data92 == "object" && !Array.isArray(data92)){
+if(data92.noticeId === undefined){
+const err223 = {instancePath:instancePath+"/notices/" + i9,schemaPath:"#/properties/notices/allOf/1/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err223];
+}
+else {
+vErrors.push(err223);
+}
+errors++;
+}
+if(data92.noticeId !== undefined){
+if("dp-hot-fixture-limited" !== data92.noticeId){
+const err224 = {instancePath:instancePath+"/notices/" + i9+"/noticeId",schemaPath:"#/properties/notices/allOf/1/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "dp-hot-fixture-limited"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err224];
+}
+else {
+vErrors.push(err224);
+}
+errors++;
+}
+}
+}
+else {
+const err225 = {instancePath:instancePath+"/notices/" + i9,schemaPath:"#/properties/notices/allOf/1/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err225];
+}
+else {
+vErrors.push(err225);
+}
+errors++;
+}
+var _valid4 = _errs193 === errors;
+if(_valid4){
+count1++;
+if(count1 > 1){
+valid49 = false;
+break;
+}
+if(count1 >= 0){
+valid49 = true;
+}
+}
+}
+}
+if(!valid49){
+const err226 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/1/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err226];
+}
+else {
+vErrors.push(err226);
+}
+errors++;
+}
+else {
+errors = _errs192;
+if(vErrors !== null){
+if(_errs192){
+vErrors.length = _errs192;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const _errs197 = errors;
+const len10 = data89.length;
+let valid51 = true;
+if(data89.length > 0){
+let count2 = 0;
+for(let i10=0; i10<len10; i10++){
+let data94 = data89[i10];
+const _errs198 = errors;
+if(data94 && typeof data94 == "object" && !Array.isArray(data94)){
+if(data94.noticeId === undefined){
+const err227 = {instancePath:instancePath+"/notices/" + i10,schemaPath:"#/properties/notices/allOf/2/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err227];
+}
+else {
+vErrors.push(err227);
+}
+errors++;
+}
+if(data94.noticeId !== undefined){
+if("dp-cold-not-established" !== data94.noticeId){
+const err228 = {instancePath:instancePath+"/notices/" + i10+"/noticeId",schemaPath:"#/properties/notices/allOf/2/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "dp-cold-not-established"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err228];
+}
+else {
+vErrors.push(err228);
+}
+errors++;
+}
+}
+}
+else {
+const err229 = {instancePath:instancePath+"/notices/" + i10,schemaPath:"#/properties/notices/allOf/2/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err229];
+}
+else {
+vErrors.push(err229);
+}
+errors++;
+}
+var _valid5 = _errs198 === errors;
+if(_valid5){
+count2++;
+if(count2 > 1){
+valid51 = false;
+break;
+}
+if(count2 >= 0){
+valid51 = true;
+}
+}
+}
+}
+if(!valid51){
+const err230 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/2/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err230];
+}
+else {
+vErrors.push(err230);
+}
+errors++;
+}
+else {
+errors = _errs197;
+if(vErrors !== null){
+if(_errs197){
+vErrors.length = _errs197;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const _errs202 = errors;
+const len11 = data89.length;
+let valid53 = true;
+if(data89.length > 0){
+let count3 = 0;
+for(let i11=0; i11<len11; i11++){
+let data96 = data89[i11];
+const _errs203 = errors;
+if(data96 && typeof data96 == "object" && !Array.isArray(data96)){
+if(data96.noticeId === undefined){
+const err231 = {instancePath:instancePath+"/notices/" + i11,schemaPath:"#/properties/notices/allOf/3/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err231];
+}
+else {
+vErrors.push(err231);
+}
+errors++;
+}
+if(data96.noticeId !== undefined){
+if("nonconverged-partial" !== data96.noticeId){
+const err232 = {instancePath:instancePath+"/notices/" + i11+"/noticeId",schemaPath:"#/properties/notices/allOf/3/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "nonconverged-partial"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err232];
+}
+else {
+vErrors.push(err232);
+}
+errors++;
+}
+}
+}
+else {
+const err233 = {instancePath:instancePath+"/notices/" + i11,schemaPath:"#/properties/notices/allOf/3/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err233];
+}
+else {
+vErrors.push(err233);
+}
+errors++;
+}
+var _valid6 = _errs203 === errors;
+if(_valid6){
+count3++;
+if(count3 > 1){
+valid53 = false;
+break;
+}
+if(count3 >= 0){
+valid53 = true;
+}
+}
+}
+}
+if(!valid53){
+const err234 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/3/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err234];
+}
+else {
+vErrors.push(err234);
+}
+errors++;
+}
+else {
+errors = _errs202;
+if(vErrors !== null){
+if(_errs202){
+vErrors.length = _errs202;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const _errs207 = errors;
+const len12 = data89.length;
+let valid55 = true;
+if(data89.length > 0){
+let count4 = 0;
+for(let i12=0; i12<len12; i12++){
+let data98 = data89[i12];
+const _errs208 = errors;
+if(data98 && typeof data98 == "object" && !Array.isArray(data98)){
+if(data98.noticeId === undefined){
+const err235 = {instancePath:instancePath+"/notices/" + i12,schemaPath:"#/properties/notices/allOf/4/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err235];
+}
+else {
+vErrors.push(err235);
+}
+errors++;
+}
+if(data98.noticeId !== undefined){
+if("governance-hold" !== data98.noticeId){
+const err236 = {instancePath:instancePath+"/notices/" + i12+"/noticeId",schemaPath:"#/properties/notices/allOf/4/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "governance-hold"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err236];
+}
+else {
+vErrors.push(err236);
+}
+errors++;
+}
+}
+}
+else {
+const err237 = {instancePath:instancePath+"/notices/" + i12,schemaPath:"#/properties/notices/allOf/4/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err237];
+}
+else {
+vErrors.push(err237);
+}
+errors++;
+}
+var _valid7 = _errs208 === errors;
+if(_valid7){
+count4++;
+if(count4 > 1){
+valid55 = false;
+break;
+}
+if(count4 >= 0){
+valid55 = true;
+}
+}
+}
+}
+if(!valid55){
+const err238 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/4/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err238];
+}
+else {
+vErrors.push(err238);
+}
+errors++;
+}
+else {
+errors = _errs207;
+if(vErrors !== null){
+if(_errs207){
+vErrors.length = _errs207;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const _errs212 = errors;
+const len13 = data89.length;
+let valid57 = true;
+if(data89.length > 0){
+let count5 = 0;
+for(let i13=0; i13<len13; i13++){
+let data100 = data89[i13];
+const _errs213 = errors;
+if(data100 && typeof data100 == "object" && !Array.isArray(data100)){
+if(data100.noticeId === undefined){
+const err239 = {instancePath:instancePath+"/notices/" + i13,schemaPath:"#/properties/notices/allOf/5/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err239];
+}
+else {
+vErrors.push(err239);
+}
+errors++;
+}
+if(data100.noticeId !== undefined){
+if("dp-hot-out-of-scope" !== data100.noticeId){
+const err240 = {instancePath:instancePath+"/notices/" + i13+"/noticeId",schemaPath:"#/properties/notices/allOf/5/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "dp-hot-out-of-scope"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err240];
+}
+else {
+vErrors.push(err240);
+}
+errors++;
+}
+}
+}
+else {
+const err241 = {instancePath:instancePath+"/notices/" + i13,schemaPath:"#/properties/notices/allOf/5/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err241];
+}
+else {
+vErrors.push(err241);
+}
+errors++;
+}
+var _valid8 = _errs213 === errors;
+if(_valid8){
+count5++;
+if(count5 > 1){
+valid57 = false;
+break;
+}
+if(count5 >= 0){
+valid57 = true;
+}
+}
+}
+}
+if(!valid57){
+const err242 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/5/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err242];
+}
+else {
+vErrors.push(err242);
+}
+errors++;
+}
+else {
+errors = _errs212;
+if(vErrors !== null){
+if(_errs212){
+vErrors.length = _errs212;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const _errs217 = errors;
+const len14 = data89.length;
+let valid59 = true;
+if(data89.length > 0){
+let count6 = 0;
+for(let i14=0; i14<len14; i14++){
+let data102 = data89[i14];
+const _errs218 = errors;
+if(data102 && typeof data102 == "object" && !Array.isArray(data102)){
+if(data102.noticeId === undefined){
+const err243 = {instancePath:instancePath+"/notices/" + i14,schemaPath:"#/properties/notices/allOf/6/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err243];
+}
+else {
+vErrors.push(err243);
+}
+errors++;
+}
+if(data102.noticeId !== undefined){
+if("export-snapshot" !== data102.noticeId){
+const err244 = {instancePath:instancePath+"/notices/" + i14+"/noticeId",schemaPath:"#/properties/notices/allOf/6/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "export-snapshot"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err244];
+}
+else {
+vErrors.push(err244);
+}
+errors++;
+}
+}
+}
+else {
+const err245 = {instancePath:instancePath+"/notices/" + i14,schemaPath:"#/properties/notices/allOf/6/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err245];
+}
+else {
+vErrors.push(err245);
+}
+errors++;
+}
+var _valid9 = _errs218 === errors;
+if(_valid9){
+count6++;
+if(count6 > 1){
+valid59 = false;
+break;
+}
+if(count6 >= 0){
+valid59 = true;
+}
+}
+}
+}
+if(!valid59){
+const err246 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/allOf/6/contains",keyword:"contains",params:{minContains: 0, maxContains: 1},message:"must contain at least 0 and no more than 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err246];
+}
+else {
+vErrors.push(err246);
+}
+errors++;
+}
+else {
+errors = _errs217;
+if(vErrors !== null){
+if(_errs217){
+vErrors.length = _errs217;
+}
+else {
+vErrors = null;
+}
+}
+}
+}
+if(Array.isArray(data89)){
+const len15 = data89.length;
+for(let i15=0; i15<len15; i15++){
+let data104 = data89[i15];
+if(data104 && typeof data104 == "object" && !Array.isArray(data104)){
+if(data104.noticeId === undefined){
+const err247 = {instancePath:instancePath+"/notices/" + i15,schemaPath:"#/properties/notices/items/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err247];
+}
+else {
+vErrors.push(err247);
+}
+errors++;
+}
+if(data104.ko === undefined){
+const err248 = {instancePath:instancePath+"/notices/" + i15,schemaPath:"#/properties/notices/items/required",keyword:"required",params:{missingProperty: "ko"},message:"must have required property '"+"ko"+"'"};
+if(vErrors === null){
+vErrors = [err248];
+}
+else {
+vErrors.push(err248);
+}
+errors++;
+}
+if(data104.en === undefined){
+const err249 = {instancePath:instancePath+"/notices/" + i15,schemaPath:"#/properties/notices/items/required",keyword:"required",params:{missingProperty: "en"},message:"must have required property '"+"en"+"'"};
+if(vErrors === null){
+vErrors = [err249];
+}
+else {
+vErrors.push(err249);
+}
+errors++;
+}
+for(const key19 in data104){
+if(!(((key19 === "noticeId") || (key19 === "ko")) || (key19 === "en"))){
+const err250 = {instancePath:instancePath+"/notices/" + i15,schemaPath:"#/properties/notices/items/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key19},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err250];
+}
+else {
+vErrors.push(err250);
+}
+errors++;
+}
+}
+if(data104.noticeId !== undefined){
+let data105 = data104.noticeId;
+if(!(((((((data105 === "D8-2") || (data105 === "dp-hot-fixture-limited")) || (data105 === "dp-cold-not-established")) || (data105 === "nonconverged-partial")) || (data105 === "governance-hold")) || (data105 === "dp-hot-out-of-scope")) || (data105 === "export-snapshot"))){
+const err251 = {instancePath:instancePath+"/notices/" + i15+"/noticeId",schemaPath:"#/properties/notices/items/properties/noticeId/enum",keyword:"enum",params:{allowedValues: schema100.properties.notices.items.properties.noticeId.enum},message:"must be equal to one of the allowed values"};
+if(vErrors === null){
+vErrors = [err251];
+}
+else {
+vErrors.push(err251);
+}
+errors++;
+}
+}
+if(data104.ko !== undefined){
+if(typeof data104.ko !== "string"){
+const err252 = {instancePath:instancePath+"/notices/" + i15+"/ko",schemaPath:"#/properties/notices/items/properties/ko/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err252];
+}
+else {
+vErrors.push(err252);
+}
+errors++;
+}
+}
+if(data104.en !== undefined){
+if(typeof data104.en !== "string"){
+const err253 = {instancePath:instancePath+"/notices/" + i15+"/en",schemaPath:"#/properties/notices/items/properties/en/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err253];
+}
+else {
+vErrors.push(err253);
+}
+errors++;
+}
+}
+}
+else {
+const err254 = {instancePath:instancePath+"/notices/" + i15,schemaPath:"#/properties/notices/items/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err254];
+}
+else {
+vErrors.push(err254);
+}
+errors++;
+}
+}
+const _errs229 = errors;
+const len16 = data89.length;
+for(let i16=0; i16<len16; i16++){
+let data108 = data89[i16];
+const _errs230 = errors;
+if(data108 && typeof data108 == "object" && !Array.isArray(data108)){
+if(data108.noticeId === undefined){
+const err255 = {instancePath:instancePath+"/notices/" + i16,schemaPath:"#/properties/notices/contains/required",keyword:"required",params:{missingProperty: "noticeId"},message:"must have required property '"+"noticeId"+"'"};
+if(vErrors === null){
+vErrors = [err255];
+}
+else {
+vErrors.push(err255);
+}
+errors++;
+}
+if(data108.noticeId !== undefined){
+if("export-snapshot" !== data108.noticeId){
+const err256 = {instancePath:instancePath+"/notices/" + i16+"/noticeId",schemaPath:"#/properties/notices/contains/properties/noticeId/const",keyword:"const",params:{allowedValue: "export-snapshot"},message:"must be equal to constant"};
+if(vErrors === null){
+vErrors = [err256];
+}
+else {
+vErrors.push(err256);
+}
+errors++;
+}
+}
+}
+else {
+const err257 = {instancePath:instancePath+"/notices/" + i16,schemaPath:"#/properties/notices/contains/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err257];
+}
+else {
+vErrors.push(err257);
+}
+errors++;
+}
+var valid64 = _errs230 === errors;
+if(valid64){
+break;
+}
+}
+if(!valid64){
+const err258 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/contains",keyword:"contains",params:{minContains: 1},message:"must contain at least 1 valid item(s)"};
+if(vErrors === null){
+vErrors = [err258];
+}
+else {
+vErrors.push(err258);
+}
+errors++;
+}
+else {
+errors = _errs229;
+if(vErrors !== null){
+if(_errs229){
+vErrors.length = _errs229;
+}
+else {
+vErrors = null;
+}
+}
+}
+let i17 = data89.length;
+let j0;
+if(i17 > 1){
+outer0:
+for(;i17--;){
+for(j0 = i17; j0--;){
+if(func0(data89[i17], data89[j0])){
+const err259 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/uniqueItems",keyword:"uniqueItems",params:{i: i17, j: j0},message:"must NOT have duplicate items (items ## "+j0+" and "+i17+" are identical)"};
+if(vErrors === null){
+vErrors = [err259];
+}
+else {
+vErrors.push(err259);
 }
 errors++;
 break outer0;
@@ -12509,24 +15697,716 @@ break outer0;
 }
 }
 else {
-const err28 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/type",keyword:"type",params:{type: "array"},message:"must be array"};
+const err260 = {instancePath:instancePath+"/notices",schemaPath:"#/properties/notices/type",keyword:"type",params:{type: "array"},message:"must be array"};
 if(vErrors === null){
-vErrors = [err28];
+vErrors = [err260];
 }
 else {
-vErrors.push(err28);
+vErrors.push(err260);
+}
+errors++;
+}
+}
+if(data.artifacts !== undefined){
+let data110 = data.artifacts;
+if(Array.isArray(data110)){
+const len17 = data110.length;
+for(let i18=0; i18<len17; i18++){
+let data111 = data110[i18];
+const _errs238 = errors;
+let valid70 = true;
+const _errs239 = errors;
+if(errors === _errs239){
+if(data111 && typeof data111 == "object" && !Array.isArray(data111)){
+let missing1;
+if((data111.kind === undefined) && (missing1 = "kind")){
+const err261 = {};
+if(vErrors === null){
+vErrors = [err261];
+}
+else {
+vErrors.push(err261);
+}
+errors++;
+}
+else {
+if(data111.kind !== undefined){
+let data112 = data111.kind;
+if(!(((((data112 === "field") || (data112 === "slice")) || (data112 === "volume")) || (data112 === "wall-field")) || (data112 === "wall-mesh"))){
+const err262 = {};
+if(vErrors === null){
+vErrors = [err262];
+}
+else {
+vErrors.push(err262);
+}
+errors++;
+}
+}
+}
+}
+else {
+const err263 = {};
+if(vErrors === null){
+vErrors = [err263];
+}
+else {
+vErrors.push(err263);
+}
+errors++;
+}
+}
+var _valid10 = _errs239 === errors;
+errors = _errs238;
+if(vErrors !== null){
+if(_errs238){
+vErrors.length = _errs238;
+}
+else {
+vErrors = null;
+}
+}
+if(_valid10){
+const _errs242 = errors;
+if(data111 && typeof data111 == "object" && !Array.isArray(data111)){
+if(data111.meta !== undefined){
+let data113 = data111.meta;
+if(data113 && typeof data113 == "object" && !Array.isArray(data113)){
+if(data113.units === undefined){
+const err264 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/allOf/0/then/properties/meta/required",keyword:"required",params:{missingProperty: "units"},message:"must have required property '"+"units"+"'"};
+if(vErrors === null){
+vErrors = [err264];
+}
+else {
+vErrors.push(err264);
+}
+errors++;
+}
+if(data113.coordinateSystem === undefined){
+const err265 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/allOf/0/then/properties/meta/required",keyword:"required",params:{missingProperty: "coordinateSystem"},message:"must have required property '"+"coordinateSystem"+"'"};
+if(vErrors === null){
+vErrors = [err265];
+}
+else {
+vErrors.push(err265);
+}
+errors++;
+}
+}
+else {
+const err266 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/allOf/0/then/properties/meta/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err266];
+}
+else {
+vErrors.push(err266);
+}
+errors++;
+}
+}
+}
+var _valid10 = _errs242 === errors;
+valid70 = _valid10;
+if(valid70){
+var props3 = {};
+props3.meta = true;
+props3.kind = true;
+}
+}
+if(!valid70){
+const err267 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/allOf/0/if",keyword:"if",params:{failingKeyword: "then"},message:"must match \"then\" schema"};
+if(vErrors === null){
+vErrors = [err267];
+}
+else {
+vErrors.push(err267);
+}
+errors++;
+}
+if(data111 && typeof data111 == "object" && !Array.isArray(data111)){
+if(data111.kind === undefined){
+const err268 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/required",keyword:"required",params:{missingProperty: "kind"},message:"must have required property '"+"kind"+"'"};
+if(vErrors === null){
+vErrors = [err268];
+}
+else {
+vErrors.push(err268);
+}
+errors++;
+}
+if(data111.hash === undefined){
+const err269 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/required",keyword:"required",params:{missingProperty: "hash"},message:"must have required property '"+"hash"+"'"};
+if(vErrors === null){
+vErrors = [err269];
+}
+else {
+vErrors.push(err269);
+}
+errors++;
+}
+if(data111.path === undefined){
+const err270 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/required",keyword:"required",params:{missingProperty: "path"},message:"must have required property '"+"path"+"'"};
+if(vErrors === null){
+vErrors = [err270];
+}
+else {
+vErrors.push(err270);
+}
+errors++;
+}
+if(data111.mediaType === undefined){
+const err271 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/required",keyword:"required",params:{missingProperty: "mediaType"},message:"must have required property '"+"mediaType"+"'"};
+if(vErrors === null){
+vErrors = [err271];
+}
+else {
+vErrors.push(err271);
+}
+errors++;
+}
+if(data111.meta === undefined){
+const err272 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/required",keyword:"required",params:{missingProperty: "meta"},message:"must have required property '"+"meta"+"'"};
+if(vErrors === null){
+vErrors = [err272];
+}
+else {
+vErrors.push(err272);
+}
+errors++;
+}
+for(const key20 in data111){
+if(!((((((key20 === "kind") || (key20 === "hash")) || (key20 === "path")) || (key20 === "mediaType")) || (key20 === "meta")) || (key20 === "derivedFrom"))){
+const err273 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key20},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err273];
+}
+else {
+vErrors.push(err273);
+}
+errors++;
+}
+}
+if(data111.kind !== undefined){
+let data114 = data111.kind;
+if(typeof data114 === "string"){
+if(func7(data114) < 1){
+const err274 = {instancePath:instancePath+"/artifacts/" + i18+"/kind",schemaPath:"#/properties/artifacts/items/properties/kind/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err274];
+}
+else {
+vErrors.push(err274);
+}
+errors++;
+}
+}
+else {
+const err275 = {instancePath:instancePath+"/artifacts/" + i18+"/kind",schemaPath:"#/properties/artifacts/items/properties/kind/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err275];
+}
+else {
+vErrors.push(err275);
+}
+errors++;
+}
+}
+if(data111.hash !== undefined){
+let data115 = data111.hash;
+if(typeof data115 === "string"){
+if(!pattern4.test(data115)){
+const err276 = {instancePath:instancePath+"/artifacts/" + i18+"/hash",schemaPath:"#/properties/artifacts/items/properties/hash/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err276];
+}
+else {
+vErrors.push(err276);
+}
+errors++;
+}
+}
+else {
+const err277 = {instancePath:instancePath+"/artifacts/" + i18+"/hash",schemaPath:"#/properties/artifacts/items/properties/hash/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err277];
+}
+else {
+vErrors.push(err277);
+}
+errors++;
+}
+}
+if(data111.path !== undefined){
+let data116 = data111.path;
+if(typeof data116 === "string"){
+if(func7(data116) < 1){
+const err278 = {instancePath:instancePath+"/artifacts/" + i18+"/path",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/path/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err278];
+}
+else {
+vErrors.push(err278);
+}
+errors++;
+}
+if(!pattern11.test(data116)){
+const err279 = {instancePath:instancePath+"/artifacts/" + i18+"/path",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/path/pattern",keyword:"pattern",params:{pattern: "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"},message:"must match pattern \""+"^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"+"\""};
+if(vErrors === null){
+vErrors = [err279];
+}
+else {
+vErrors.push(err279);
+}
+errors++;
+}
+}
+else {
+const err280 = {instancePath:instancePath+"/artifacts/" + i18+"/path",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/path/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err280];
+}
+else {
+vErrors.push(err280);
+}
+errors++;
+}
+}
+if(data111.mediaType !== undefined){
+let data117 = data111.mediaType;
+if(typeof data117 === "string"){
+if(!pattern13.test(data117)){
+const err281 = {instancePath:instancePath+"/artifacts/" + i18+"/mediaType",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/mediaType/pattern",keyword:"pattern",params:{pattern: "^[^/\\s]+/[^/\\s]+$"},message:"must match pattern \""+"^[^/\\s]+/[^/\\s]+$"+"\""};
+if(vErrors === null){
+vErrors = [err281];
+}
+else {
+vErrors.push(err281);
+}
+errors++;
+}
+}
+else {
+const err282 = {instancePath:instancePath+"/artifacts/" + i18+"/mediaType",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/mediaType/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err282];
+}
+else {
+vErrors.push(err282);
+}
+errors++;
+}
+}
+if(data111.meta !== undefined){
+let data118 = data111.meta;
+const _errs260 = errors;
+let valid77 = true;
+const _errs261 = errors;
+if(!(data118 && typeof data118 == "object" && !Array.isArray(data118))){
+const err283 = {};
+if(vErrors === null){
+vErrors = [err283];
+}
+else {
+vErrors.push(err283);
+}
+errors++;
+}
+const _errs263 = errors;
+let valid78 = false;
+const _errs264 = errors;
+if(data118 && typeof data118 == "object" && !Array.isArray(data118)){
+let missing2;
+if((data118.units === undefined) && (missing2 = "units")){
+const err284 = {};
+if(vErrors === null){
+vErrors = [err284];
+}
+else {
+vErrors.push(err284);
+}
+errors++;
+}
+}
+var _valid12 = _errs264 === errors;
+valid78 = valid78 || _valid12;
+const _errs265 = errors;
+if(data118 && typeof data118 == "object" && !Array.isArray(data118)){
+let missing3;
+if((data118.coordinateSystem === undefined) && (missing3 = "coordinateSystem")){
+const err285 = {};
+if(vErrors === null){
+vErrors = [err285];
+}
+else {
+vErrors.push(err285);
+}
+errors++;
+}
+}
+var _valid12 = _errs265 === errors;
+valid78 = valid78 || _valid12;
+if(!valid78){
+const err286 = {};
+if(vErrors === null){
+vErrors = [err286];
+}
+else {
+vErrors.push(err286);
+}
+errors++;
+}
+else {
+errors = _errs263;
+if(vErrors !== null){
+if(_errs263){
+vErrors.length = _errs263;
+}
+else {
+vErrors = null;
+}
+}
+}
+var _valid11 = _errs261 === errors;
+errors = _errs260;
+if(vErrors !== null){
+if(_errs260){
+vErrors.length = _errs260;
+}
+else {
+vErrors = null;
+}
+}
+if(_valid11){
+const _errs266 = errors;
+if(data118 && typeof data118 == "object" && !Array.isArray(data118)){
+if(data118.units === undefined){
+const err287 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/properties/meta/allOf/0/then/required",keyword:"required",params:{missingProperty: "units"},message:"must have required property '"+"units"+"'"};
+if(vErrors === null){
+vErrors = [err287];
+}
+else {
+vErrors.push(err287);
+}
+errors++;
+}
+if(data118.coordinateSystem === undefined){
+const err288 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/properties/meta/allOf/0/then/required",keyword:"required",params:{missingProperty: "coordinateSystem"},message:"must have required property '"+"coordinateSystem"+"'"};
+if(vErrors === null){
+vErrors = [err288];
+}
+else {
+vErrors.push(err288);
+}
+errors++;
+}
+}
+var _valid11 = _errs266 === errors;
+valid77 = _valid11;
+}
+if(!valid77){
+const err289 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/properties/meta/allOf/0/if",keyword:"if",params:{failingKeyword: "then"},message:"must match \"then\" schema"};
+if(vErrors === null){
+vErrors = [err289];
+}
+else {
+vErrors.push(err289);
+}
+errors++;
+}
+if(data118 && typeof data118 == "object" && !Array.isArray(data118)){
+for(const key21 in data118){
+if(!(((key21 === "units") || (key21 === "coordinateSystem")) || (key21 === "semanticRole"))){
+const err290 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/properties/meta/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key21},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err290];
+}
+else {
+vErrors.push(err290);
+}
+errors++;
+}
+}
+if(data118.units !== undefined){
+let data119 = data118.units;
+if(typeof data119 === "string"){
+if(func7(data119) < 1){
+const err291 = {instancePath:instancePath+"/artifacts/" + i18+"/meta/units",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/units/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err291];
+}
+else {
+vErrors.push(err291);
+}
+errors++;
+}
+}
+else {
+const err292 = {instancePath:instancePath+"/artifacts/" + i18+"/meta/units",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/units/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err292];
+}
+else {
+vErrors.push(err292);
+}
+errors++;
+}
+}
+if(data118.coordinateSystem !== undefined){
+let data120 = data118.coordinateSystem;
+if(typeof data120 === "string"){
+if(func7(data120) < 1){
+const err293 = {instancePath:instancePath+"/artifacts/" + i18+"/meta/coordinateSystem",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/coordinateSystem/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err293];
+}
+else {
+vErrors.push(err293);
+}
+errors++;
+}
+}
+else {
+const err294 = {instancePath:instancePath+"/artifacts/" + i18+"/meta/coordinateSystem",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/coordinateSystem/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err294];
+}
+else {
+vErrors.push(err294);
+}
+errors++;
+}
+}
+if(data118.semanticRole !== undefined){
+let data121 = data118.semanticRole;
+if(typeof data121 === "string"){
+if(func7(data121) < 1){
+const err295 = {instancePath:instancePath+"/artifacts/" + i18+"/meta/semanticRole",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/semanticRole/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err295];
+}
+else {
+vErrors.push(err295);
+}
+errors++;
+}
+}
+else {
+const err296 = {instancePath:instancePath+"/artifacts/" + i18+"/meta/semanticRole",schemaPath:"https://gyrox.dev/schemas/output-manifest/v1#/properties/files/items/properties/semanticRole/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err296];
+}
+else {
+vErrors.push(err296);
 }
 errors++;
 }
 }
 }
 else {
-const err29 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"},message:"must be object"};
+const err297 = {instancePath:instancePath+"/artifacts/" + i18+"/meta",schemaPath:"#/properties/artifacts/items/properties/meta/type",keyword:"type",params:{type: "object"},message:"must be object"};
 if(vErrors === null){
-vErrors = [err29];
+vErrors = [err297];
 }
 else {
-vErrors.push(err29);
+vErrors.push(err297);
+}
+errors++;
+}
+}
+if(data111.derivedFrom !== undefined){
+let data122 = data111.derivedFrom;
+if(typeof data122 === "string"){
+if(!pattern4.test(data122)){
+const err298 = {instancePath:instancePath+"/artifacts/" + i18+"/derivedFrom",schemaPath:"#/properties/artifacts/items/properties/derivedFrom/pattern",keyword:"pattern",params:{pattern: "^[0-9a-f]{64}$"},message:"must match pattern \""+"^[0-9a-f]{64}$"+"\""};
+if(vErrors === null){
+vErrors = [err298];
+}
+else {
+vErrors.push(err298);
+}
+errors++;
+}
+}
+else {
+const err299 = {instancePath:instancePath+"/artifacts/" + i18+"/derivedFrom",schemaPath:"#/properties/artifacts/items/properties/derivedFrom/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err299];
+}
+else {
+vErrors.push(err299);
+}
+errors++;
+}
+}
+}
+else {
+const err300 = {instancePath:instancePath+"/artifacts/" + i18,schemaPath:"#/properties/artifacts/items/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err300];
+}
+else {
+vErrors.push(err300);
+}
+errors++;
+}
+}
+}
+else {
+const err301 = {instancePath:instancePath+"/artifacts",schemaPath:"#/properties/artifacts/type",keyword:"type",params:{type: "array"},message:"must be array"};
+if(vErrors === null){
+vErrors = [err301];
+}
+else {
+vErrors.push(err301);
+}
+errors++;
+}
+}
+if(data.absentKinds !== undefined){
+let data123 = data.absentKinds;
+if(Array.isArray(data123)){
+const len18 = data123.length;
+for(let i19=0; i19<len18; i19++){
+let data124 = data123[i19];
+if(typeof data124 === "string"){
+if(func7(data124) < 1){
+const err302 = {instancePath:instancePath+"/absentKinds/" + i19,schemaPath:"#/properties/absentKinds/items/minLength",keyword:"minLength",params:{limit: 1},message:"must NOT have fewer than 1 characters"};
+if(vErrors === null){
+vErrors = [err302];
+}
+else {
+vErrors.push(err302);
+}
+errors++;
+}
+}
+else {
+const err303 = {instancePath:instancePath+"/absentKinds/" + i19,schemaPath:"#/properties/absentKinds/items/type",keyword:"type",params:{type: "string"},message:"must be string"};
+if(vErrors === null){
+vErrors = [err303];
+}
+else {
+vErrors.push(err303);
+}
+errors++;
+}
+}
+let i20 = data123.length;
+let j1;
+if(i20 > 1){
+const indices0 = {};
+for(;i20--;){
+let item0 = data123[i20];
+if(typeof item0 !== "string"){
+continue;
+}
+if(typeof indices0[item0] == "number"){
+j1 = indices0[item0];
+const err304 = {instancePath:instancePath+"/absentKinds",schemaPath:"#/properties/absentKinds/uniqueItems",keyword:"uniqueItems",params:{i: i20, j: j1},message:"must NOT have duplicate items (items ## "+j1+" and "+i20+" are identical)"};
+if(vErrors === null){
+vErrors = [err304];
+}
+else {
+vErrors.push(err304);
+}
+errors++;
+break;
+}
+indices0[item0] = i20;
+}
+}
+}
+else {
+const err305 = {instancePath:instancePath+"/absentKinds",schemaPath:"#/properties/absentKinds/type",keyword:"type",params:{type: "array"},message:"must be array"};
+if(vErrors === null){
+vErrors = [err305];
+}
+else {
+vErrors.push(err305);
+}
+errors++;
+}
+}
+if(data.scope !== undefined){
+let data125 = data.scope;
+if(data125 && typeof data125 == "object" && !Array.isArray(data125)){
+if(data125.isFixtureCase === undefined){
+const err306 = {instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/required",keyword:"required",params:{missingProperty: "isFixtureCase"},message:"must have required property '"+"isFixtureCase"+"'"};
+if(vErrors === null){
+vErrors = [err306];
+}
+else {
+vErrors.push(err306);
+}
+errors++;
+}
+if(data125.anchorsRevision === undefined){
+const err307 = {instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/required",keyword:"required",params:{missingProperty: "anchorsRevision"},message:"must have required property '"+"anchorsRevision"+"'"};
+if(vErrors === null){
+vErrors = [err307];
+}
+else {
+vErrors.push(err307);
+}
+errors++;
+}
+for(const key22 in data125){
+if(!((key22 === "isFixtureCase") || (key22 === "anchorsRevision"))){
+const err308 = {instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key22},message:"must NOT have additional properties"};
+if(vErrors === null){
+vErrors = [err308];
+}
+else {
+vErrors.push(err308);
+}
+errors++;
+}
+}
+if(data125.isFixtureCase !== undefined){
+if(typeof data125.isFixtureCase !== "boolean"){
+const err309 = {instancePath:instancePath+"/scope/isFixtureCase",schemaPath:"#/properties/scope/properties/isFixtureCase/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"};
+if(vErrors === null){
+vErrors = [err309];
+}
+else {
+vErrors.push(err309);
+}
+errors++;
+}
+}
+if(data125.anchorsRevision !== undefined){
+let data127 = data125.anchorsRevision;
+if(!((typeof data127 == "number") && (!(data127 % 1) && !isNaN(data127)))){
+const err310 = {instancePath:instancePath+"/scope/anchorsRevision",schemaPath:"#/properties/scope/properties/anchorsRevision/type",keyword:"type",params:{type: "integer"},message:"must be integer"};
+if(vErrors === null){
+vErrors = [err310];
+}
+else {
+vErrors.push(err310);
+}
+errors++;
+}
+}
+}
+else {
+const err311 = {instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err311];
+}
+else {
+vErrors.push(err311);
+}
+errors++;
+}
+}
+}
+else {
+const err312 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"},message:"must be object"};
+if(vErrors === null){
+vErrors = [err312];
+}
+else {
+vErrors.push(err312);
 }
 errors++;
 }
@@ -12535,25 +16415,25 @@ return errors === 0;
 }
 validate60.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validatePatchMapV1 = validate61;
-const schema103 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/patch-map/v1","title":"M1 fixed-topology patch-map v1","type":"array","minItems":11,"maxItems":11,"items":{"oneOf":[{"$ref":"#/$defs/hotInterface"},{"$ref":"#/$defs/hotInlet"},{"$ref":"#/$defs/hotOutlet"},{"$ref":"#/$defs/hotWall"},{"$ref":"#/$defs/coldInterface"},{"$ref":"#/$defs/coldInlet"},{"$ref":"#/$defs/coldOutlet"},{"$ref":"#/$defs/coldWall"},{"$ref":"#/$defs/solidHotInterface"},{"$ref":"#/$defs/solidColdInterface"},{"$ref":"#/$defs/solidExternalWall"}]},"allOf":[{"contains":{"$ref":"#/$defs/hotInterface"}},{"contains":{"$ref":"#/$defs/hotInlet"}},{"contains":{"$ref":"#/$defs/hotOutlet"}},{"contains":{"$ref":"#/$defs/hotWall"}},{"contains":{"$ref":"#/$defs/coldInterface"}},{"contains":{"$ref":"#/$defs/coldInlet"}},{"contains":{"$ref":"#/$defs/coldOutlet"}},{"contains":{"$ref":"#/$defs/coldWall"}},{"contains":{"$ref":"#/$defs/solidHotInterface"}},{"contains":{"$ref":"#/$defs/solidColdInterface"}},{"contains":{"$ref":"#/$defs/solidExternalWall"}}],"$defs":{"hotInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"hot_to_solid"},"patchType":{"const":"interface"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"hotInlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.inlet"},"patchName":{"const":"hot_inlet"},"patchType":{"const":"inlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"hotOutlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.outlet"},"patchName":{"const":"hot_outlet"},"patchType":{"const":"outlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"hotWall":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.hot"},"patchName":{"const":"hot_wall"},"patchType":{"const":"wall"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"coldInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"cold_to_solid"},"patchType":{"const":"interface"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"coldInlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.inlet"},"patchName":{"const":"cold_inlet"},"patchType":{"const":"inlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"coldOutlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.outlet"},"patchName":{"const":"cold_outlet"},"patchType":{"const":"outlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"coldWall":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.cold"},"patchName":{"const":"cold_wall"},"patchType":{"const":"wall"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"solidHotInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"solid_to_hot"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false},"solidColdInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"solid_to_cold"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false},"solidExternalWall":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.solid.external"},"patchName":{"const":"solid_external"},"patchType":{"const":"wall"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false}}};
-const schema104 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"hot_to_solid"},"patchType":{"const":"interface"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema105 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.inlet"},"patchName":{"const":"hot_inlet"},"patchType":{"const":"inlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema106 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.outlet"},"patchName":{"const":"hot_outlet"},"patchType":{"const":"outlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema107 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.hot"},"patchName":{"const":"hot_wall"},"patchType":{"const":"wall"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema108 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"cold_to_solid"},"patchType":{"const":"interface"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema109 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.inlet"},"patchName":{"const":"cold_inlet"},"patchType":{"const":"inlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema110 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.outlet"},"patchName":{"const":"cold_outlet"},"patchType":{"const":"outlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema111 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.cold"},"patchName":{"const":"cold_wall"},"patchType":{"const":"wall"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema112 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"solid_to_hot"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema113 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"solid_to_cold"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false};
-const schema114 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.solid.external"},"patchName":{"const":"solid_external"},"patchType":{"const":"wall"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false};
+export const validatePatchMapV1 = validate64;
+const schema110 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/patch-map/v1","title":"M1 fixed-topology patch-map v1","type":"array","minItems":11,"maxItems":11,"items":{"oneOf":[{"$ref":"#/$defs/hotInterface"},{"$ref":"#/$defs/hotInlet"},{"$ref":"#/$defs/hotOutlet"},{"$ref":"#/$defs/hotWall"},{"$ref":"#/$defs/coldInterface"},{"$ref":"#/$defs/coldInlet"},{"$ref":"#/$defs/coldOutlet"},{"$ref":"#/$defs/coldWall"},{"$ref":"#/$defs/solidHotInterface"},{"$ref":"#/$defs/solidColdInterface"},{"$ref":"#/$defs/solidExternalWall"}]},"allOf":[{"contains":{"$ref":"#/$defs/hotInterface"}},{"contains":{"$ref":"#/$defs/hotInlet"}},{"contains":{"$ref":"#/$defs/hotOutlet"}},{"contains":{"$ref":"#/$defs/hotWall"}},{"contains":{"$ref":"#/$defs/coldInterface"}},{"contains":{"$ref":"#/$defs/coldInlet"}},{"contains":{"$ref":"#/$defs/coldOutlet"}},{"contains":{"$ref":"#/$defs/coldWall"}},{"contains":{"$ref":"#/$defs/solidHotInterface"}},{"contains":{"$ref":"#/$defs/solidColdInterface"}},{"contains":{"$ref":"#/$defs/solidExternalWall"}}],"$defs":{"hotInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"hot_to_solid"},"patchType":{"const":"interface"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"hotInlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.inlet"},"patchName":{"const":"hot_inlet"},"patchType":{"const":"inlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"hotOutlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.outlet"},"patchName":{"const":"hot_outlet"},"patchType":{"const":"outlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"hotWall":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.hot"},"patchName":{"const":"hot_wall"},"patchType":{"const":"wall"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false},"coldInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"cold_to_solid"},"patchType":{"const":"interface"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"coldInlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.inlet"},"patchName":{"const":"cold_inlet"},"patchType":{"const":"inlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"coldOutlet":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.outlet"},"patchName":{"const":"cold_outlet"},"patchType":{"const":"outlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"coldWall":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.cold"},"patchName":{"const":"cold_wall"},"patchType":{"const":"wall"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false},"solidHotInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"solid_to_hot"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false},"solidColdInterface":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"solid_to_cold"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false},"solidExternalWall":{"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.solid.external"},"patchName":{"const":"solid_external"},"patchType":{"const":"wall"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false}}};
+const schema111 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"hot_to_solid"},"patchType":{"const":"interface"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema112 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.inlet"},"patchName":{"const":"hot_inlet"},"patchType":{"const":"inlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema113 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.hot.outlet"},"patchName":{"const":"hot_outlet"},"patchType":{"const":"outlet"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema114 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.hot"},"patchName":{"const":"hot_wall"},"patchType":{"const":"wall"},"region":{"const":"hot"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema115 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"cold_to_solid"},"patchType":{"const":"interface"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema116 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.inlet"},"patchName":{"const":"cold_inlet"},"patchType":{"const":"inlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema117 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"port.cold.outlet"},"patchName":{"const":"cold_outlet"},"patchType":{"const":"outlet"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema118 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.cold"},"patchName":{"const":"cold_wall"},"patchType":{"const":"wall"},"region":{"const":"cold"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema119 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.hot_solid"},"patchName":{"const":"solid_to_hot"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema120 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"interface.cold_solid"},"patchName":{"const":"solid_to_cold"},"patchType":{"const":"interface"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false};
+const schema121 = {"type":"object","required":["geomRef","patchName","patchType","region"],"properties":{"geomRef":{"const":"wall.solid.external"},"patchName":{"const":"solid_external"},"patchType":{"const":"wall"},"region":{"const":"solid"},"foamType":{"type":"string"}},"additionalProperties":false};
 
-function validate61(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate64(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/patch-map/v1" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate61.evaluated;
+const evaluated0 = validate64.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -15868,19 +19748,19 @@ vErrors.push(err256);
 }
 errors++;
 }
-validate61.errors = vErrors;
+validate64.errors = vErrors;
 return errors === 0;
 }
-validate61.evaluated = {"items":true,"dynamicProps":false,"dynamicItems":false};
+validate64.evaluated = {"items":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validateConvertReportV1 = validate62;
-const schema126 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/convert-report/v1","title":"Mesh converter report v1","$comment":"ADR-006 D8-2: diagnostics must not contain QoI names or values","type":"object","required":["schemaVersion","meshCombinedSha","portAreasM2","diagnostics"],"properties":{"schemaVersion":{"const":1},"meshCombinedSha":{"type":"string","pattern":"^[0-9a-f]{64}$"},"portAreasM2":{"type":"object","required":["port.hot.inlet","port.hot.outlet","port.cold.inlet","port.cold.outlet"],"properties":{"port.hot.inlet":{"type":"number","exclusiveMinimum":0},"port.hot.outlet":{"type":"number","exclusiveMinimum":0},"port.cold.inlet":{"type":"number","exclusiveMinimum":0},"port.cold.outlet":{"type":"number","exclusiveMinimum":0}},"additionalProperties":false},"diagnostics":{"type":"object","description":"Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."}},"additionalProperties":false};
+export const validateConvertReportV1 = validate65;
+const schema133 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/convert-report/v1","title":"Mesh converter report v1","$comment":"ADR-006 D8-2: diagnostics must not contain QoI names or values","type":"object","required":["schemaVersion","meshCombinedSha","portAreasM2","diagnostics"],"properties":{"schemaVersion":{"const":1},"meshCombinedSha":{"type":"string","pattern":"^[0-9a-f]{64}$"},"portAreasM2":{"type":"object","required":["port.hot.inlet","port.hot.outlet","port.cold.inlet","port.cold.outlet"],"properties":{"port.hot.inlet":{"type":"number","exclusiveMinimum":0},"port.hot.outlet":{"type":"number","exclusiveMinimum":0},"port.cold.inlet":{"type":"number","exclusiveMinimum":0},"port.cold.outlet":{"type":"number","exclusiveMinimum":0}},"additionalProperties":false},"diagnostics":{"type":"object","description":"Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."}},"additionalProperties":false};
 
-function validate62(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate65(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/convert-report/v1" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate62.evaluated;
+const evaluated0 = validate65.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -16168,19 +20048,19 @@ vErrors.push(err23);
 }
 errors++;
 }
-validate62.errors = vErrors;
+validate65.errors = vErrors;
 return errors === 0;
 }
-validate62.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate65.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validateSolveReportV1 = validate63;
-const schema127 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/solve-report/v1","title":"Solve runner report v1","$comment":"ADR-006 D8-2: diagnostics must not contain QoI names or values","type":"object","required":["schemaVersion","renderFingerprint","diagnostics"],"properties":{"schemaVersion":{"const":1},"renderFingerprint":{"type":"string","pattern":"^[0-9a-f]{64}$"},"diagnostics":{"type":"object","description":"Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."}},"additionalProperties":false};
+export const validateSolveReportV1 = validate66;
+const schema134 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/solve-report/v1","title":"Solve runner report v1","$comment":"ADR-006 D8-2: diagnostics must not contain QoI names or values","type":"object","required":["schemaVersion","renderFingerprint","diagnostics"],"properties":{"schemaVersion":{"const":1},"renderFingerprint":{"type":"string","pattern":"^[0-9a-f]{64}$"},"diagnostics":{"type":"object","description":"Open diagnostic container; QoI names and values are forbidden by ADR-006 D8-2 and the QoI merge gate."}},"additionalProperties":false};
 
-function validate63(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate66(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/solve-report/v1" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate63.evaluated;
+const evaluated0 = validate66.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -16291,21 +20171,21 @@ vErrors.push(err8);
 }
 errors++;
 }
-validate63.errors = vErrors;
+validate66.errors = vErrors;
 return errors === 0;
 }
-validate63.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate66.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validateSystemEventV1 = validate64;
-const schema128 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/system-event/v1","title":"Worker system event v1","$comment":"ADR-006 D8-2: closed sys.* payloads carry no QoI fields and are not projected to SSE","oneOf":[{"type":"object","required":["type","payload"],"properties":{"type":{"const":"sys.issuance-denied"},"payload":{"$ref":"#/$defs/issuanceDenied"}},"additionalProperties":false},{"type":"object","required":["type","payload"],"properties":{"type":{"const":"sys.stage-contention"},"payload":{"$ref":"#/$defs/stageContention"}},"additionalProperties":false},{"type":"object","required":["type","payload"],"properties":{"type":{"const":"sys.operator-required"},"payload":{"$ref":"#/$defs/operatorRequired"}},"additionalProperties":false}],"$defs":{"stage":{"enum":["geometry","mesh","solve","post"]},"sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},"nullableString":{"oneOf":[{"type":"string"},{"type":"null"}]},"issuanceDenied":{"type":"object","required":["stage","cause"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["governance-hold","governance-drift","quarantine","pin-null"]},"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false},"stageContention":{"type":"object","required":["stage","attempts","elapsedSec"],"properties":{"stage":{"$ref":"#/$defs/stage"},"attempts":{"type":"integer","minimum":1},"elapsedSec":{"type":"integer","minimum":0}},"additionalProperties":false},"labels":{"type":"object","properties":{"gyrox.run_id":{"$ref":"#/$defs/nullableString"},"stage":{"$ref":"#/$defs/nullableString"},"attempt_id":{"$ref":"#/$defs/nullableString"},"fencing_token":{"$ref":"#/$defs/nullableString"}},"additionalProperties":false},"snapshot":{"type":"object","required":["labels","state","imageDigest"],"properties":{"labels":{"$ref":"#/$defs/labels"},"state":{"enum":["created","running","paused","restarting","removing","exited","dead"]},"imageDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false},"operatorRequired":{"oneOf":[{"type":"object","required":["stage","cause","containerRef","snapshot"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["label-mismatch","inconsistent-container"]},"containerRef":{"type":"string","minLength":1},"snapshot":{"$ref":"#/$defs/snapshot"}},"additionalProperties":false},{"type":"object","required":["stage","cause","recordedInputManifestHash","recomputedHash"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"const":"staging-hash-mismatch"},"recordedInputManifestHash":{"$ref":"#/$defs/sha256"},"recomputedHash":{"$ref":"#/$defs/sha256"}},"additionalProperties":false}]}}};
-const schema129 = {"type":"object","required":["stage","cause"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["governance-hold","governance-drift","quarantine","pin-null"]},"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false};
-const schema130 = {"enum":["geometry","mesh","solve","post"]};
-const pattern27 = new RegExp("^sha256:[0-9a-f]{64}$", "u");
+export const validateSystemEventV1 = validate67;
+const schema135 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/system-event/v1","title":"Worker system event v1","$comment":"ADR-006 D8-2: closed sys.* payloads carry no QoI fields and are not projected to SSE","oneOf":[{"type":"object","required":["type","payload"],"properties":{"type":{"const":"sys.issuance-denied"},"payload":{"$ref":"#/$defs/issuanceDenied"}},"additionalProperties":false},{"type":"object","required":["type","payload"],"properties":{"type":{"const":"sys.stage-contention"},"payload":{"$ref":"#/$defs/stageContention"}},"additionalProperties":false},{"type":"object","required":["type","payload"],"properties":{"type":{"const":"sys.operator-required"},"payload":{"$ref":"#/$defs/operatorRequired"}},"additionalProperties":false}],"$defs":{"stage":{"enum":["geometry","mesh","solve","post"]},"sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},"nullableString":{"oneOf":[{"type":"string"},{"type":"null"}]},"issuanceDenied":{"type":"object","required":["stage","cause"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["governance-hold","governance-drift","quarantine","pin-null"]},"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false},"stageContention":{"type":"object","required":["stage","attempts","elapsedSec"],"properties":{"stage":{"$ref":"#/$defs/stage"},"attempts":{"type":"integer","minimum":1},"elapsedSec":{"type":"integer","minimum":0}},"additionalProperties":false},"labels":{"type":"object","properties":{"gyrox.run_id":{"$ref":"#/$defs/nullableString"},"stage":{"$ref":"#/$defs/nullableString"},"attempt_id":{"$ref":"#/$defs/nullableString"},"fencing_token":{"$ref":"#/$defs/nullableString"}},"additionalProperties":false},"snapshot":{"type":"object","required":["labels","state","imageDigest"],"properties":{"labels":{"$ref":"#/$defs/labels"},"state":{"enum":["created","running","paused","restarting","removing","exited","dead"]},"imageDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false},"operatorRequired":{"oneOf":[{"type":"object","required":["stage","cause","containerRef","snapshot"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["label-mismatch","inconsistent-container"]},"containerRef":{"type":"string","minLength":1},"snapshot":{"$ref":"#/$defs/snapshot"}},"additionalProperties":false},{"type":"object","required":["stage","cause","recordedInputManifestHash","recomputedHash"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"const":"staging-hash-mismatch"},"recordedInputManifestHash":{"$ref":"#/$defs/sha256"},"recomputedHash":{"$ref":"#/$defs/sha256"}},"additionalProperties":false}]}}};
+const schema136 = {"type":"object","required":["stage","cause"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["governance-hold","governance-drift","quarantine","pin-null"]},"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false};
+const schema137 = {"enum":["geometry","mesh","solve","post"]};
+const pattern36 = new RegExp("^sha256:[0-9a-f]{64}$", "u");
 
-function validate65(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate68(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate65.evaluated;
+const evaluated0 = validate68.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -16348,7 +20228,7 @@ errors++;
 if(data.stage !== undefined){
 let data0 = data.stage;
 if(!((((data0 === "geometry") || (data0 === "mesh")) || (data0 === "solve")) || (data0 === "post"))){
-const err3 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema130.enum},message:"must be equal to one of the allowed values"};
+const err3 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema137.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err3];
 }
@@ -16361,7 +20241,7 @@ errors++;
 if(data.cause !== undefined){
 let data1 = data.cause;
 if(!((((data1 === "governance-hold") || (data1 === "governance-drift")) || (data1 === "quarantine")) || (data1 === "pin-null"))){
-const err4 = {instancePath:instancePath+"/cause",schemaPath:"#/properties/cause/enum",keyword:"enum",params:{allowedValues: schema129.properties.cause.enum},message:"must be equal to one of the allowed values"};
+const err4 = {instancePath:instancePath+"/cause",schemaPath:"#/properties/cause/enum",keyword:"enum",params:{allowedValues: schema136.properties.cause.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err4];
 }
@@ -16374,7 +20254,7 @@ errors++;
 if(data.digest !== undefined){
 let data2 = data.digest;
 if(typeof data2 === "string"){
-if(!pattern27.test(data2)){
+if(!pattern36.test(data2)){
 const err5 = {instancePath:instancePath+"/digest",schemaPath:"#/properties/digest/pattern",keyword:"pattern",params:{pattern: "^sha256:[0-9a-f]{64}$"},message:"must match pattern \""+"^sha256:[0-9a-f]{64}$"+"\""};
 if(vErrors === null){
 vErrors = [err5];
@@ -16407,17 +20287,17 @@ vErrors.push(err7);
 }
 errors++;
 }
-validate65.errors = vErrors;
+validate68.errors = vErrors;
 return errors === 0;
 }
-validate65.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate68.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-const schema131 = {"type":"object","required":["stage","attempts","elapsedSec"],"properties":{"stage":{"$ref":"#/$defs/stage"},"attempts":{"type":"integer","minimum":1},"elapsedSec":{"type":"integer","minimum":0}},"additionalProperties":false};
+const schema138 = {"type":"object","required":["stage","attempts","elapsedSec"],"properties":{"stage":{"$ref":"#/$defs/stage"},"attempts":{"type":"integer","minimum":1},"elapsedSec":{"type":"integer","minimum":0}},"additionalProperties":false};
 
-function validate67(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate70(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate67.evaluated;
+const evaluated0 = validate70.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -16470,7 +20350,7 @@ errors++;
 if(data.stage !== undefined){
 let data0 = data.stage;
 if(!((((data0 === "geometry") || (data0 === "mesh")) || (data0 === "solve")) || (data0 === "post"))){
-const err4 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema130.enum},message:"must be equal to one of the allowed values"};
+const err4 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema137.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err4];
 }
@@ -16541,21 +20421,21 @@ vErrors.push(err9);
 }
 errors++;
 }
-validate67.errors = vErrors;
+validate70.errors = vErrors;
 return errors === 0;
 }
-validate67.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate70.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-const schema133 = {"oneOf":[{"type":"object","required":["stage","cause","containerRef","snapshot"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["label-mismatch","inconsistent-container"]},"containerRef":{"type":"string","minLength":1},"snapshot":{"$ref":"#/$defs/snapshot"}},"additionalProperties":false},{"type":"object","required":["stage","cause","recordedInputManifestHash","recomputedHash"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"const":"staging-hash-mismatch"},"recordedInputManifestHash":{"$ref":"#/$defs/sha256"},"recomputedHash":{"$ref":"#/$defs/sha256"}},"additionalProperties":false}]};
-const schema142 = {"type":"string","pattern":"^[0-9a-f]{64}$"};
-const schema135 = {"type":"object","required":["labels","state","imageDigest"],"properties":{"labels":{"$ref":"#/$defs/labels"},"state":{"enum":["created","running","paused","restarting","removing","exited","dead"]},"imageDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false};
-const schema136 = {"type":"object","properties":{"gyrox.run_id":{"$ref":"#/$defs/nullableString"},"stage":{"$ref":"#/$defs/nullableString"},"attempt_id":{"$ref":"#/$defs/nullableString"},"fencing_token":{"$ref":"#/$defs/nullableString"}},"additionalProperties":false};
-const schema137 = {"oneOf":[{"type":"string"},{"type":"null"}]};
+const schema140 = {"oneOf":[{"type":"object","required":["stage","cause","containerRef","snapshot"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"enum":["label-mismatch","inconsistent-container"]},"containerRef":{"type":"string","minLength":1},"snapshot":{"$ref":"#/$defs/snapshot"}},"additionalProperties":false},{"type":"object","required":["stage","cause","recordedInputManifestHash","recomputedHash"],"properties":{"stage":{"$ref":"#/$defs/stage"},"cause":{"const":"staging-hash-mismatch"},"recordedInputManifestHash":{"$ref":"#/$defs/sha256"},"recomputedHash":{"$ref":"#/$defs/sha256"}},"additionalProperties":false}]};
+const schema149 = {"type":"string","pattern":"^[0-9a-f]{64}$"};
+const schema142 = {"type":"object","required":["labels","state","imageDigest"],"properties":{"labels":{"$ref":"#/$defs/labels"},"state":{"enum":["created","running","paused","restarting","removing","exited","dead"]},"imageDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}},"additionalProperties":false};
+const schema143 = {"type":"object","properties":{"gyrox.run_id":{"$ref":"#/$defs/nullableString"},"stage":{"$ref":"#/$defs/nullableString"},"attempt_id":{"$ref":"#/$defs/nullableString"},"fencing_token":{"$ref":"#/$defs/nullableString"}},"additionalProperties":false};
+const schema144 = {"oneOf":[{"type":"string"},{"type":"null"}]};
 
-function validate71(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate74(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate71.evaluated;
+const evaluated0 = validate74.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -16846,16 +20726,16 @@ vErrors.push(err13);
 }
 errors++;
 }
-validate71.errors = vErrors;
+validate74.errors = vErrors;
 return errors === 0;
 }
-validate71.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate74.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
 
-function validate70(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate73(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate70.evaluated;
+const evaluated0 = validate73.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -16906,15 +20786,15 @@ errors++;
 }
 }
 if(data.labels !== undefined){
-if(!(validate71(data.labels, {instancePath:instancePath+"/labels",parentData:data,parentDataProperty:"labels",rootData,dynamicAnchors}))){
-vErrors = vErrors === null ? validate71.errors : vErrors.concat(validate71.errors);
+if(!(validate74(data.labels, {instancePath:instancePath+"/labels",parentData:data,parentDataProperty:"labels",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate74.errors : vErrors.concat(validate74.errors);
 errors = vErrors.length;
 }
 }
 if(data.state !== undefined){
 let data1 = data.state;
 if(!(((((((data1 === "created") || (data1 === "running")) || (data1 === "paused")) || (data1 === "restarting")) || (data1 === "removing")) || (data1 === "exited")) || (data1 === "dead"))){
-const err4 = {instancePath:instancePath+"/state",schemaPath:"#/properties/state/enum",keyword:"enum",params:{allowedValues: schema135.properties.state.enum},message:"must be equal to one of the allowed values"};
+const err4 = {instancePath:instancePath+"/state",schemaPath:"#/properties/state/enum",keyword:"enum",params:{allowedValues: schema142.properties.state.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err4];
 }
@@ -16927,7 +20807,7 @@ errors++;
 if(data.imageDigest !== undefined){
 let data2 = data.imageDigest;
 if(typeof data2 === "string"){
-if(!pattern27.test(data2)){
+if(!pattern36.test(data2)){
 const err5 = {instancePath:instancePath+"/imageDigest",schemaPath:"#/properties/imageDigest/pattern",keyword:"pattern",params:{pattern: "^sha256:[0-9a-f]{64}$"},message:"must match pattern \""+"^sha256:[0-9a-f]{64}$"+"\""};
 if(vErrors === null){
 vErrors = [err5];
@@ -16960,16 +20840,16 @@ vErrors.push(err7);
 }
 errors++;
 }
-validate70.errors = vErrors;
+validate73.errors = vErrors;
 return errors === 0;
 }
-validate70.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate73.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
 
-function validate69(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate72(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate69.evaluated;
+const evaluated0 = validate72.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -17036,7 +20916,7 @@ errors++;
 if(data.stage !== undefined){
 let data0 = data.stage;
 if(!((((data0 === "geometry") || (data0 === "mesh")) || (data0 === "solve")) || (data0 === "post"))){
-const err5 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema130.enum},message:"must be equal to one of the allowed values"};
+const err5 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema137.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err5];
 }
@@ -17049,7 +20929,7 @@ errors++;
 if(data.cause !== undefined){
 let data1 = data.cause;
 if(!((data1 === "label-mismatch") || (data1 === "inconsistent-container"))){
-const err6 = {instancePath:instancePath+"/cause",schemaPath:"#/oneOf/0/properties/cause/enum",keyword:"enum",params:{allowedValues: schema133.oneOf[0].properties.cause.enum},message:"must be equal to one of the allowed values"};
+const err6 = {instancePath:instancePath+"/cause",schemaPath:"#/oneOf/0/properties/cause/enum",keyword:"enum",params:{allowedValues: schema140.oneOf[0].properties.cause.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err6];
 }
@@ -17085,8 +20965,8 @@ errors++;
 }
 }
 if(data.snapshot !== undefined){
-if(!(validate70(data.snapshot, {instancePath:instancePath+"/snapshot",parentData:data,parentDataProperty:"snapshot",rootData,dynamicAnchors}))){
-vErrors = vErrors === null ? validate70.errors : vErrors.concat(validate70.errors);
+if(!(validate73(data.snapshot, {instancePath:instancePath+"/snapshot",parentData:data,parentDataProperty:"snapshot",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate73.errors : vErrors.concat(validate73.errors);
 errors = vErrors.length;
 }
 }
@@ -17164,7 +21044,7 @@ errors++;
 if(data.stage !== undefined){
 let data4 = data.stage;
 if(!((((data4 === "geometry") || (data4 === "mesh")) || (data4 === "solve")) || (data4 === "post"))){
-const err15 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema130.enum},message:"must be equal to one of the allowed values"};
+const err15 = {instancePath:instancePath+"/stage",schemaPath:"#/$defs/stage/enum",keyword:"enum",params:{allowedValues: schema137.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err15];
 }
@@ -17282,18 +21162,18 @@ vErrors = null;
 }
 }
 }
-validate69.errors = vErrors;
+validate72.errors = vErrors;
 evaluated0.props = props0;
 return errors === 0;
 }
-validate69.evaluated = {"dynamicProps":true,"dynamicItems":false};
+validate72.evaluated = {"dynamicProps":true,"dynamicItems":false};
 
 
-function validate64(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate67(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/system-event/v1" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate64.evaluated;
+const evaluated0 = validate67.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -17350,8 +21230,8 @@ errors++;
 }
 }
 if(data.payload !== undefined){
-if(!(validate65(data.payload, {instancePath:instancePath+"/payload",parentData:data,parentDataProperty:"payload",rootData,dynamicAnchors}))){
-vErrors = vErrors === null ? validate65.errors : vErrors.concat(validate65.errors);
+if(!(validate68(data.payload, {instancePath:instancePath+"/payload",parentData:data,parentDataProperty:"payload",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate68.errors : vErrors.concat(validate68.errors);
 errors = vErrors.length;
 }
 }
@@ -17419,8 +21299,8 @@ errors++;
 }
 }
 if(data.payload !== undefined){
-if(!(validate67(data.payload, {instancePath:instancePath+"/payload",parentData:data,parentDataProperty:"payload",rootData,dynamicAnchors}))){
-vErrors = vErrors === null ? validate67.errors : vErrors.concat(validate67.errors);
+if(!(validate70(data.payload, {instancePath:instancePath+"/payload",parentData:data,parentDataProperty:"payload",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate70.errors : vErrors.concat(validate70.errors);
 errors = vErrors.length;
 }
 }
@@ -17495,8 +21375,8 @@ errors++;
 }
 }
 if(data.payload !== undefined){
-if(!(validate69(data.payload, {instancePath:instancePath+"/payload",parentData:data,parentDataProperty:"payload",rootData,dynamicAnchors}))){
-vErrors = vErrors === null ? validate69.errors : vErrors.concat(validate69.errors);
+if(!(validate72(data.payload, {instancePath:instancePath+"/payload",parentData:data,parentDataProperty:"payload",rootData,dynamicAnchors}))){
+vErrors = vErrors === null ? validate72.errors : vErrors.concat(validate72.errors);
 errors = vErrors.length;
 }
 }
@@ -17547,22 +21427,22 @@ vErrors = null;
 }
 }
 }
-validate64.errors = vErrors;
+validate67.errors = vErrors;
 evaluated0.props = props0;
 return errors === 0;
 }
-validate64.evaluated = {"dynamicProps":true,"dynamicItems":false};
+validate67.evaluated = {"dynamicProps":true,"dynamicItems":false};
 
-export const validateGeometrySpecV1Input = validate75;
-const schema144 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/geometry-spec/v1/input","title":"GeometrySpec v1 authoring input envelope","$defs":{"length":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]},"port":{"oneOf":[{"type":"object","properties":{"id":{"const":"hot-inlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"hot-outlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-inlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-outlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false}]}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"geometry-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","required":["cellSizeM","wallThicknessM","envelope","ports"],"properties":{"pattern":{"const":"gyroid"},"cellSizeM":{"type":"object","required":["valueM"],"properties":{"kind":{"const":"const"},"valueM":{"$ref":"#/$defs/length"}},"additionalProperties":false},"wallThicknessM":{"type":"object","required":["valueM"],"properties":{"kind":{"const":"const"},"valueM":{"$ref":"#/$defs/length"}},"additionalProperties":false},"splitting":{"const":"fullwall"},"envelope":{"type":"object","required":["sizeM"],"properties":{"kind":{"const":"box"},"sizeM":{"type":"array","items":{"$ref":"#/$defs/length"},"minItems":3,"maxItems":3}},"additionalProperties":false},"ports":{"type":"array","items":{"$ref":"#/$defs/port"},"minItems":4,"maxItems":4,"allOf":[{"contains":{"type":"object","properties":{"id":{"const":"hot-inlet"}},"required":["id"]}},{"contains":{"type":"object","properties":{"id":{"const":"hot-outlet"}},"required":["id"]}},{"contains":{"type":"object","properties":{"id":{"const":"cold-inlet"}},"required":["id"]}},{"contains":{"type":"object","properties":{"id":{"const":"cold-outlet"}},"required":["id"]}}]}},"additionalProperties":false}},"additionalProperties":false};
-const schema145 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]};
-const schema148 = {"oneOf":[{"type":"object","properties":{"id":{"const":"hot-inlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"hot-outlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-inlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-outlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false}]};
+export const validateGeometrySpecV1Input = validate78;
+const schema151 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/geometry-spec/v1/input","title":"GeometrySpec v1 authoring input envelope","$defs":{"length":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]},"port":{"oneOf":[{"type":"object","properties":{"id":{"const":"hot-inlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"hot-outlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-inlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-outlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false}]}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"geometry-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","required":["cellSizeM","wallThicknessM","envelope","ports"],"properties":{"pattern":{"const":"gyroid"},"cellSizeM":{"type":"object","required":["valueM"],"properties":{"kind":{"const":"const"},"valueM":{"$ref":"#/$defs/length"}},"additionalProperties":false},"wallThicknessM":{"type":"object","required":["valueM"],"properties":{"kind":{"const":"const"},"valueM":{"$ref":"#/$defs/length"}},"additionalProperties":false},"splitting":{"const":"fullwall"},"envelope":{"type":"object","required":["sizeM"],"properties":{"kind":{"const":"box"},"sizeM":{"type":"array","items":{"$ref":"#/$defs/length"},"minItems":3,"maxItems":3}},"additionalProperties":false},"ports":{"type":"array","items":{"$ref":"#/$defs/port"},"minItems":4,"maxItems":4,"allOf":[{"contains":{"type":"object","properties":{"id":{"const":"hot-inlet"}},"required":["id"]}},{"contains":{"type":"object","properties":{"id":{"const":"hot-outlet"}},"required":["id"]}},{"contains":{"type":"object","properties":{"id":{"const":"cold-inlet"}},"required":["id"]}},{"contains":{"type":"object","properties":{"id":{"const":"cold-outlet"}},"required":["id"]}}]}},"additionalProperties":false}},"additionalProperties":false};
+const schema152 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]};
+const schema155 = {"oneOf":[{"type":"object","properties":{"id":{"const":"hot-inlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"hot-outlet"},"domain":{"const":"hot"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-inlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false},{"type":"object","properties":{"id":{"const":"cold-outlet"},"domain":{"const":"cold"},"face":{"enum":["-x","+x","-y","+y","-z","+z"]}},"required":["id","domain","face"],"additionalProperties":false}]};
 
-function validate75(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate78(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/geometry-spec/v1/input" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate75.evaluated;
+const evaluated0 = validate78.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -17810,7 +21690,7 @@ errors++;
 if(data6.unit !== undefined){
 let data8 = data6.unit;
 if(!(((data8 === "m") || (data8 === "mm")) || (data8 === "um"))){
-const err20 = {instancePath:instancePath+"/payload/cellSizeM/valueM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema145.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err20 = {instancePath:instancePath+"/payload/cellSizeM/valueM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema152.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err20];
 }
@@ -17983,7 +21863,7 @@ errors++;
 if(data11.unit !== undefined){
 let data13 = data11.unit;
 if(!(((data13 === "m") || (data13 === "mm")) || (data13 === "um"))){
-const err32 = {instancePath:instancePath+"/payload/wallThicknessM/valueM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema145.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err32 = {instancePath:instancePath+"/payload/wallThicknessM/valueM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema152.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err32];
 }
@@ -18192,7 +22072,7 @@ errors++;
 if(data18.unit !== undefined){
 let data20 = data18.unit;
 if(!(((data20 === "m") || (data20 === "mm")) || (data20 === "um"))){
-const err47 = {instancePath:instancePath+"/payload/envelope/sizeM/" + i0+"/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema145.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err47 = {instancePath:instancePath+"/payload/envelope/sizeM/" + i0+"/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema152.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err47];
 }
@@ -18638,7 +22518,7 @@ errors++;
 if(data30.face !== undefined){
 let data33 = data30.face;
 if(!((((((data33 === "-x") || (data33 === "+x")) || (data33 === "-y")) || (data33 === "+y")) || (data33 === "-z")) || (data33 === "+z"))){
-const err76 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/0/properties/face/enum",keyword:"enum",params:{allowedValues: schema148.oneOf[0].properties.face.enum},message:"must be equal to one of the allowed values"};
+const err76 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/0/properties/face/enum",keyword:"enum",params:{allowedValues: schema155.oneOf[0].properties.face.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err76];
 }
@@ -18736,7 +22616,7 @@ errors++;
 if(data30.face !== undefined){
 let data36 = data30.face;
 if(!((((((data36 === "-x") || (data36 === "+x")) || (data36 === "-y")) || (data36 === "+y")) || (data36 === "-z")) || (data36 === "+z"))){
-const err84 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/1/properties/face/enum",keyword:"enum",params:{allowedValues: schema148.oneOf[1].properties.face.enum},message:"must be equal to one of the allowed values"};
+const err84 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/1/properties/face/enum",keyword:"enum",params:{allowedValues: schema155.oneOf[1].properties.face.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err84];
 }
@@ -18841,7 +22721,7 @@ errors++;
 if(data30.face !== undefined){
 let data39 = data30.face;
 if(!((((((data39 === "-x") || (data39 === "+x")) || (data39 === "-y")) || (data39 === "+y")) || (data39 === "-z")) || (data39 === "+z"))){
-const err92 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/2/properties/face/enum",keyword:"enum",params:{allowedValues: schema148.oneOf[2].properties.face.enum},message:"must be equal to one of the allowed values"};
+const err92 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/2/properties/face/enum",keyword:"enum",params:{allowedValues: schema155.oneOf[2].properties.face.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err92];
 }
@@ -18946,7 +22826,7 @@ errors++;
 if(data30.face !== undefined){
 let data42 = data30.face;
 if(!((((((data42 === "-x") || (data42 === "+x")) || (data42 === "-y")) || (data42 === "+y")) || (data42 === "-z")) || (data42 === "+z"))){
-const err100 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/3/properties/face/enum",keyword:"enum",params:{allowedValues: schema148.oneOf[3].properties.face.enum},message:"must be equal to one of the allowed values"};
+const err100 = {instancePath:instancePath+"/payload/ports/" + i5+"/face",schemaPath:"#/$defs/port/oneOf/3/properties/face/enum",keyword:"enum",params:{allowedValues: schema155.oneOf[3].properties.face.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err100];
 }
@@ -19040,21 +22920,21 @@ vErrors.push(err105);
 }
 errors++;
 }
-validate75.errors = vErrors;
+validate78.errors = vErrors;
 return errors === 0;
 }
-validate75.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate78.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validateDiscretizationSpecV1Input = validate76;
-const schema149 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/discretization-spec/v1/input","title":"DiscretizationSpec v1 authoring input envelope","$defs":{"length":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]},"qa":{"type":"object","additionalProperties":false,"properties":{"maxNonOrtho":{"const":65},"maxBoundarySkewness":{"const":20},"maxInternalSkewness":{"const":4},"maxConcave":{"const":80},"minVol":{"const":1e-18},"minTetQuality":{"const":1e-15},"minArea":{"const":-1},"minTwist":{"const":0.02},"minDeterminant":{"const":0.001},"minFaceWeight":{"const":0.05},"minVolRatio":{"const":0.01},"minTriangleTwist":{"const":-1},"minEdgeLength":{"const":-1}}}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"discretization-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","required":["voxelPitchM"],"properties":{"route":{"const":"voxel-hexa"},"voxelPitchM":{"$ref":"#/$defs/length"},"qa":{"$ref":"#/$defs/qa"}},"additionalProperties":false}},"additionalProperties":false};
-const schema150 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]};
-const schema151 = {"type":"object","additionalProperties":false,"properties":{"maxNonOrtho":{"const":65},"maxBoundarySkewness":{"const":20},"maxInternalSkewness":{"const":4},"maxConcave":{"const":80},"minVol":{"const":1e-18},"minTetQuality":{"const":1e-15},"minArea":{"const":-1},"minTwist":{"const":0.02},"minDeterminant":{"const":0.001},"minFaceWeight":{"const":0.05},"minVolRatio":{"const":0.01},"minTriangleTwist":{"const":-1},"minEdgeLength":{"const":-1}}};
+export const validateDiscretizationSpecV1Input = validate79;
+const schema156 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/discretization-spec/v1/input","title":"DiscretizationSpec v1 authoring input envelope","$defs":{"length":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]},"qa":{"type":"object","additionalProperties":false,"properties":{"maxNonOrtho":{"const":65},"maxBoundarySkewness":{"const":20},"maxInternalSkewness":{"const":4},"maxConcave":{"const":80},"minVol":{"const":1e-18},"minTetQuality":{"const":1e-15},"minArea":{"const":-1},"minTwist":{"const":0.02},"minDeterminant":{"const":0.001},"minFaceWeight":{"const":0.05},"minVolRatio":{"const":0.01},"minTriangleTwist":{"const":-1},"minEdgeLength":{"const":-1}}}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"discretization-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","required":["voxelPitchM"],"properties":{"route":{"const":"voxel-hexa"},"voxelPitchM":{"$ref":"#/$defs/length"},"qa":{"$ref":"#/$defs/qa"}},"additionalProperties":false}},"additionalProperties":false};
+const schema157 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]};
+const schema158 = {"type":"object","additionalProperties":false,"properties":{"maxNonOrtho":{"const":65},"maxBoundarySkewness":{"const":20},"maxInternalSkewness":{"const":4},"maxConcave":{"const":80},"minVol":{"const":1e-18},"minTetQuality":{"const":1e-15},"minArea":{"const":-1},"minTwist":{"const":0.02},"minDeterminant":{"const":0.001},"minFaceWeight":{"const":0.05},"minVolRatio":{"const":0.01},"minTriangleTwist":{"const":-1},"minEdgeLength":{"const":-1}}};
 
-function validate76(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate79(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/discretization-spec/v1/input" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate76.evaluated;
+const evaluated0 = validate79.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -19235,7 +23115,7 @@ errors++;
 if(data4.unit !== undefined){
 let data6 = data4.unit;
 if(!(((data6 === "m") || (data6 === "mm")) || (data6 === "um"))){
-const err14 = {instancePath:instancePath+"/payload/voxelPitchM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema150.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err14 = {instancePath:instancePath+"/payload/voxelPitchM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema157.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err14];
 }
@@ -19293,7 +23173,7 @@ if(data2.qa !== undefined){
 let data7 = data2.qa;
 if(data7 && typeof data7 == "object" && !Array.isArray(data7)){
 for(const key3 in data7){
-if(!(func1.call(schema151.properties, key3))){
+if(!(func1.call(schema158.properties, key3))){
 const err17 = {instancePath:instancePath+"/payload/qa",schemaPath:"#/$defs/qa/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key3},message:"must NOT have additional properties"};
 if(vErrors === null){
 vErrors = [err17];
@@ -19495,26 +23375,26 @@ vErrors.push(err33);
 }
 errors++;
 }
-validate76.errors = vErrors;
+validate79.errors = vErrors;
 return errors === 0;
 }
-validate76.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate79.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validateSolveSpecV1Input = validate77;
-const schema152 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/solve-spec/v1/input","title":"SolveSpec v1 authoring input envelope","$comment":"ADR-006 D8-2","$defs":{"PresetRef":{"type":"object","additionalProperties":false,"required":["catalogId","version"],"properties":{"catalogId":{"enum":["water-60c","water-20c","aluminum","cht-simple-v1"]},"version":{"type":"integer","minimum":1}}},"FluidProps":{"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","muPaS","prandtl"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"muPaS":{"type":"number","exclusiveMinimum":0},"prandtl":{"type":"number","exclusiveMinimum":0}}},"SolidProps":{"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","kWMK"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"kWMK":{"type":"number","exclusiveMinimum":0}}},"NumericsBody":{"type":"object","additionalProperties":false,"required":["energyCouplingIters","hTol","writePrecision","relaxation"],"properties":{"energyCouplingIters":{"const":25},"hTol":{"const":0.000001},"writePrecision":{"const":10},"relaxation":{"type":"object","additionalProperties":false,"required":["fluid","solid"],"properties":{"fluid":{"type":"object","additionalProperties":false,"required":["rho","pRgh","U","h"],"properties":{"rho":{"const":1},"pRgh":{"const":0.7},"U":{"const":0.3},"h":{"const":0.5}}},"solid":{"type":"object","additionalProperties":false,"required":["h"],"properties":{"h":{"const":0.7}}}}}}},"massFlow":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["kg/s","g/s"]}},"additionalProperties":false}]},"temperature":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["K","degC"]}},"additionalProperties":false}]},"ConvergenceInput":{"type":"object","additionalProperties":false,"properties":{"windowIters":{"const":200},"windowMeanDriftPct":{"const":0.5},"windowMeanSpanPct":{"const":0.5},"windowMeanTailW":{"const":200},"transientFrac":{"const":0.2},"windowMeanMinIters":{"const":500},"instSpanPct":{"const":0.5},"judgedQoI":{"const":["dpHotPa","dpColdPa","qW"]},"tOutDriftK":{"const":0.1},"tOutSpanK":{"const":0.1},"ebMaxPct":{"const":1},"ebWarnPct":{"const":0.7},"massImbalanceMaxPct":{"const":0.1},"signSanity":{"const":true},"finiteRequired":{"const":true},"signRules":{"const":{"flowDirection":{"hot":{"inlet":"negative","outlet":"positive"},"cold":{"inlet":"negative","outlet":"positive"}},"pressureDirection":{"dpHotPa":"positive","dpColdPa":"positive"},"wallHeatFluxDirection":{"hot":"negative","cold":"positive"}}},"minIterationsForJudgment":{"const":400},"residualBlowupFactor":{"const":1000},"divergenceCheckScope":{"const":"judgedQoI+signRules"}}}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"solve-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","additionalProperties":false,"required":["materials","bc","limits"],"properties":{"backend":{"const":"openfoam-cht"},"solver":{"const":"chtMultiRegionSimpleFoam"},"materials":{"type":"object","additionalProperties":false,"required":["hot","cold","solid"],"properties":{"hot":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/FluidProps"}]},"cold":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/FluidProps"}]},"solid":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/SolidProps"}]}}},"bc":{"type":"array","prefixItems":[{"type":"object","additionalProperties":false,"required":["featureRef","kind","mdotKgS","tK"],"properties":{"featureRef":{"const":"port:hot-inlet"},"kind":{"const":"flowRateInlet"},"mdotKgS":{"$ref":"#/$defs/massFlow"},"tK":{"$ref":"#/$defs/temperature"}}},{"type":"object","additionalProperties":false,"required":["featureRef","kind","mdotKgS","tK"],"properties":{"featureRef":{"const":"port:cold-inlet"},"kind":{"const":"flowRateInlet"},"mdotKgS":{"$ref":"#/$defs/massFlow"},"tK":{"$ref":"#/$defs/temperature"}}}],"items":false,"minItems":2,"maxItems":2},"numerics":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/NumericsBody"}]},"convergence":{"$ref":"#/$defs/ConvergenceInput"},"limits":{"type":"object","additionalProperties":false,"required":["maxIters"],"properties":{"maxIters":{"type":"integer","minimum":500}}}}}},"additionalProperties":false};
-const schema153 = {"type":"object","additionalProperties":false,"required":["catalogId","version"],"properties":{"catalogId":{"enum":["water-60c","water-20c","aluminum","cht-simple-v1"]},"version":{"type":"integer","minimum":1}}};
-const schema154 = {"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","muPaS","prandtl"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"muPaS":{"type":"number","exclusiveMinimum":0},"prandtl":{"type":"number","exclusiveMinimum":0}}};
-const schema158 = {"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","kWMK"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"kWMK":{"type":"number","exclusiveMinimum":0}}};
-const schema159 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["kg/s","g/s"]}},"additionalProperties":false}]};
-const schema160 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["K","degC"]}},"additionalProperties":false}]};
-const schema164 = {"type":"object","additionalProperties":false,"required":["energyCouplingIters","hTol","writePrecision","relaxation"],"properties":{"energyCouplingIters":{"const":25},"hTol":{"const":0.000001},"writePrecision":{"const":10},"relaxation":{"type":"object","additionalProperties":false,"required":["fluid","solid"],"properties":{"fluid":{"type":"object","additionalProperties":false,"required":["rho","pRgh","U","h"],"properties":{"rho":{"const":1},"pRgh":{"const":0.7},"U":{"const":0.3},"h":{"const":0.5}}},"solid":{"type":"object","additionalProperties":false,"required":["h"],"properties":{"h":{"const":0.7}}}}}}};
-const schema165 = {"type":"object","additionalProperties":false,"properties":{"windowIters":{"const":200},"windowMeanDriftPct":{"const":0.5},"windowMeanSpanPct":{"const":0.5},"windowMeanTailW":{"const":200},"transientFrac":{"const":0.2},"windowMeanMinIters":{"const":500},"instSpanPct":{"const":0.5},"judgedQoI":{"const":["dpHotPa","dpColdPa","qW"]},"tOutDriftK":{"const":0.1},"tOutSpanK":{"const":0.1},"ebMaxPct":{"const":1},"ebWarnPct":{"const":0.7},"massImbalanceMaxPct":{"const":0.1},"signSanity":{"const":true},"finiteRequired":{"const":true},"signRules":{"const":{"flowDirection":{"hot":{"inlet":"negative","outlet":"positive"},"cold":{"inlet":"negative","outlet":"positive"}},"pressureDirection":{"dpHotPa":"positive","dpColdPa":"positive"},"wallHeatFluxDirection":{"hot":"negative","cold":"positive"}}},"minIterationsForJudgment":{"const":400},"residualBlowupFactor":{"const":1000},"divergenceCheckScope":{"const":"judgedQoI+signRules"}}};
+export const validateSolveSpecV1Input = validate80;
+const schema159 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/solve-spec/v1/input","title":"SolveSpec v1 authoring input envelope","$comment":"ADR-006 D8-2","$defs":{"PresetRef":{"type":"object","additionalProperties":false,"required":["catalogId","version"],"properties":{"catalogId":{"enum":["water-60c","water-20c","aluminum","cht-simple-v1"]},"version":{"type":"integer","minimum":1}}},"FluidProps":{"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","muPaS","prandtl"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"muPaS":{"type":"number","exclusiveMinimum":0},"prandtl":{"type":"number","exclusiveMinimum":0}}},"SolidProps":{"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","kWMK"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"kWMK":{"type":"number","exclusiveMinimum":0}}},"NumericsBody":{"type":"object","additionalProperties":false,"required":["energyCouplingIters","hTol","writePrecision","relaxation"],"properties":{"energyCouplingIters":{"const":25},"hTol":{"const":0.000001},"writePrecision":{"const":10},"relaxation":{"type":"object","additionalProperties":false,"required":["fluid","solid"],"properties":{"fluid":{"type":"object","additionalProperties":false,"required":["rho","pRgh","U","h"],"properties":{"rho":{"const":1},"pRgh":{"const":0.7},"U":{"const":0.3},"h":{"const":0.5}}},"solid":{"type":"object","additionalProperties":false,"required":["h"],"properties":{"h":{"const":0.7}}}}}}},"massFlow":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["kg/s","g/s"]}},"additionalProperties":false}]},"temperature":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["K","degC"]}},"additionalProperties":false}]},"ConvergenceInput":{"type":"object","additionalProperties":false,"properties":{"windowIters":{"const":200},"windowMeanDriftPct":{"const":0.5},"windowMeanSpanPct":{"const":0.5},"windowMeanTailW":{"const":200},"transientFrac":{"const":0.2},"windowMeanMinIters":{"const":500},"instSpanPct":{"const":0.5},"judgedQoI":{"const":["dpHotPa","dpColdPa","qW"]},"tOutDriftK":{"const":0.1},"tOutSpanK":{"const":0.1},"ebMaxPct":{"const":1},"ebWarnPct":{"const":0.7},"massImbalanceMaxPct":{"const":0.1},"signSanity":{"const":true},"finiteRequired":{"const":true},"signRules":{"const":{"flowDirection":{"hot":{"inlet":"negative","outlet":"positive"},"cold":{"inlet":"negative","outlet":"positive"}},"pressureDirection":{"dpHotPa":"positive","dpColdPa":"positive"},"wallHeatFluxDirection":{"hot":"negative","cold":"positive"}}},"minIterationsForJudgment":{"const":400},"residualBlowupFactor":{"const":1000},"divergenceCheckScope":{"const":"judgedQoI+signRules"}}}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"solve-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","additionalProperties":false,"required":["materials","bc","limits"],"properties":{"backend":{"const":"openfoam-cht"},"solver":{"const":"chtMultiRegionSimpleFoam"},"materials":{"type":"object","additionalProperties":false,"required":["hot","cold","solid"],"properties":{"hot":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/FluidProps"}]},"cold":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/FluidProps"}]},"solid":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/SolidProps"}]}}},"bc":{"type":"array","prefixItems":[{"type":"object","additionalProperties":false,"required":["featureRef","kind","mdotKgS","tK"],"properties":{"featureRef":{"const":"port:hot-inlet"},"kind":{"const":"flowRateInlet"},"mdotKgS":{"$ref":"#/$defs/massFlow"},"tK":{"$ref":"#/$defs/temperature"}}},{"type":"object","additionalProperties":false,"required":["featureRef","kind","mdotKgS","tK"],"properties":{"featureRef":{"const":"port:cold-inlet"},"kind":{"const":"flowRateInlet"},"mdotKgS":{"$ref":"#/$defs/massFlow"},"tK":{"$ref":"#/$defs/temperature"}}}],"items":false,"minItems":2,"maxItems":2},"numerics":{"oneOf":[{"$ref":"#/$defs/PresetRef"},{"$ref":"#/$defs/NumericsBody"}]},"convergence":{"$ref":"#/$defs/ConvergenceInput"},"limits":{"type":"object","additionalProperties":false,"required":["maxIters"],"properties":{"maxIters":{"type":"integer","minimum":500}}}}}},"additionalProperties":false};
+const schema160 = {"type":"object","additionalProperties":false,"required":["catalogId","version"],"properties":{"catalogId":{"enum":["water-60c","water-20c","aluminum","cht-simple-v1"]},"version":{"type":"integer","minimum":1}}};
+const schema161 = {"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","muPaS","prandtl"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"muPaS":{"type":"number","exclusiveMinimum":0},"prandtl":{"type":"number","exclusiveMinimum":0}}};
+const schema165 = {"type":"object","additionalProperties":false,"required":["rhoKgM3","cpJKgK","kWMK"],"properties":{"rhoKgM3":{"type":"number","exclusiveMinimum":0},"cpJKgK":{"type":"number","exclusiveMinimum":0},"kWMK":{"type":"number","exclusiveMinimum":0}}};
+const schema166 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["kg/s","g/s"]}},"additionalProperties":false}]};
+const schema167 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["K","degC"]}},"additionalProperties":false}]};
+const schema171 = {"type":"object","additionalProperties":false,"required":["energyCouplingIters","hTol","writePrecision","relaxation"],"properties":{"energyCouplingIters":{"const":25},"hTol":{"const":0.000001},"writePrecision":{"const":10},"relaxation":{"type":"object","additionalProperties":false,"required":["fluid","solid"],"properties":{"fluid":{"type":"object","additionalProperties":false,"required":["rho","pRgh","U","h"],"properties":{"rho":{"const":1},"pRgh":{"const":0.7},"U":{"const":0.3},"h":{"const":0.5}}},"solid":{"type":"object","additionalProperties":false,"required":["h"],"properties":{"h":{"const":0.7}}}}}}};
+const schema172 = {"type":"object","additionalProperties":false,"properties":{"windowIters":{"const":200},"windowMeanDriftPct":{"const":0.5},"windowMeanSpanPct":{"const":0.5},"windowMeanTailW":{"const":200},"transientFrac":{"const":0.2},"windowMeanMinIters":{"const":500},"instSpanPct":{"const":0.5},"judgedQoI":{"const":["dpHotPa","dpColdPa","qW"]},"tOutDriftK":{"const":0.1},"tOutSpanK":{"const":0.1},"ebMaxPct":{"const":1},"ebWarnPct":{"const":0.7},"massImbalanceMaxPct":{"const":0.1},"signSanity":{"const":true},"finiteRequired":{"const":true},"signRules":{"const":{"flowDirection":{"hot":{"inlet":"negative","outlet":"positive"},"cold":{"inlet":"negative","outlet":"positive"}},"pressureDirection":{"dpHotPa":"positive","dpColdPa":"positive"},"wallHeatFluxDirection":{"hot":"negative","cold":"positive"}}},"minIterationsForJudgment":{"const":400},"residualBlowupFactor":{"const":1000},"divergenceCheckScope":{"const":"judgedQoI+signRules"}}};
 
-function validate77(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate80(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/solve-spec/v1/input" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate77.evaluated;
+const evaluated0 = validate80.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -19744,7 +23624,7 @@ errors++;
 if(data6.catalogId !== undefined){
 let data7 = data6.catalogId;
 if(!((((data7 === "water-60c") || (data7 === "water-20c")) || (data7 === "aluminum")) || (data7 === "cht-simple-v1"))){
-const err19 = {instancePath:instancePath+"/payload/materials/hot/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema153.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
+const err19 = {instancePath:instancePath+"/payload/materials/hot/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema160.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err19];
 }
@@ -20039,7 +23919,7 @@ errors++;
 if(data13.catalogId !== undefined){
 let data14 = data13.catalogId;
 if(!((((data14 === "water-60c") || (data14 === "water-20c")) || (data14 === "aluminum")) || (data14 === "cht-simple-v1"))){
-const err41 = {instancePath:instancePath+"/payload/materials/cold/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema153.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
+const err41 = {instancePath:instancePath+"/payload/materials/cold/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema160.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err41];
 }
@@ -20334,7 +24214,7 @@ errors++;
 if(data20.catalogId !== undefined){
 let data21 = data20.catalogId;
 if(!((((data21 === "water-60c") || (data21 === "water-20c")) || (data21 === "aluminum")) || (data21 === "cht-simple-v1"))){
-const err63 = {instancePath:instancePath+"/payload/materials/solid/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema153.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
+const err63 = {instancePath:instancePath+"/payload/materials/solid/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema160.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err63];
 }
@@ -20737,7 +24617,7 @@ errors++;
 if(data30.unit !== undefined){
 let data32 = data30.unit;
 if(!((data32 === "kg/s") || (data32 === "g/s"))){
-const err94 = {instancePath:instancePath+"/payload/bc/0/mdotKgS/unit",schemaPath:"#/$defs/massFlow/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema159.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err94 = {instancePath:instancePath+"/payload/bc/0/mdotKgS/unit",schemaPath:"#/$defs/massFlow/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema166.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err94];
 }
@@ -20861,7 +24741,7 @@ errors++;
 if(data33.unit !== undefined){
 let data35 = data33.unit;
 if(!((data35 === "K") || (data35 === "degC"))){
-const err102 = {instancePath:instancePath+"/payload/bc/0/tK/unit",schemaPath:"#/$defs/temperature/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema160.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err102 = {instancePath:instancePath+"/payload/bc/0/tK/unit",schemaPath:"#/$defs/temperature/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema167.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err102];
 }
@@ -21076,7 +24956,7 @@ errors++;
 if(data39.unit !== undefined){
 let data41 = data39.unit;
 if(!((data41 === "kg/s") || (data41 === "g/s"))){
-const err118 = {instancePath:instancePath+"/payload/bc/1/mdotKgS/unit",schemaPath:"#/$defs/massFlow/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema159.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err118 = {instancePath:instancePath+"/payload/bc/1/mdotKgS/unit",schemaPath:"#/$defs/massFlow/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema166.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err118];
 }
@@ -21200,7 +25080,7 @@ errors++;
 if(data42.unit !== undefined){
 let data44 = data42.unit;
 if(!((data44 === "K") || (data44 === "degC"))){
-const err126 = {instancePath:instancePath+"/payload/bc/1/tK/unit",schemaPath:"#/$defs/temperature/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema160.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err126 = {instancePath:instancePath+"/payload/bc/1/tK/unit",schemaPath:"#/$defs/temperature/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema167.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err126];
 }
@@ -21331,7 +25211,7 @@ errors++;
 if(data45.catalogId !== undefined){
 let data46 = data45.catalogId;
 if(!((((data46 === "water-60c") || (data46 === "water-20c")) || (data46 === "aluminum")) || (data46 === "cht-simple-v1"))){
-const err135 = {instancePath:instancePath+"/payload/numerics/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema153.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
+const err135 = {instancePath:instancePath+"/payload/numerics/catalogId",schemaPath:"#/$defs/PresetRef/properties/catalogId/enum",keyword:"enum",params:{allowedValues: schema160.properties.catalogId.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err135];
 }
@@ -21735,7 +25615,7 @@ if(data2.convergence !== undefined){
 let data59 = data2.convergence;
 if(data59 && typeof data59 == "object" && !Array.isArray(data59)){
 for(const key20 in data59){
-if(!(func1.call(schema165.properties, key20))){
+if(!(func1.call(schema172.properties, key20))){
 const err167 = {instancePath:instancePath+"/payload/convergence",schemaPath:"#/$defs/ConvergenceInput/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key20},message:"must NOT have additional properties"};
 if(vErrors === null){
 vErrors = [err167];
@@ -21831,8 +25711,8 @@ errors++;
 }
 }
 if(data59.judgedQoI !== undefined){
-if(!func0(data59.judgedQoI, schema165.properties.judgedQoI.const)){
-const err175 = {instancePath:instancePath+"/payload/convergence/judgedQoI",schemaPath:"#/$defs/ConvergenceInput/properties/judgedQoI/const",keyword:"const",params:{allowedValue: schema165.properties.judgedQoI.const},message:"must be equal to constant"};
+if(!func0(data59.judgedQoI, schema172.properties.judgedQoI.const)){
+const err175 = {instancePath:instancePath+"/payload/convergence/judgedQoI",schemaPath:"#/$defs/ConvergenceInput/properties/judgedQoI/const",keyword:"const",params:{allowedValue: schema172.properties.judgedQoI.const},message:"must be equal to constant"};
 if(vErrors === null){
 vErrors = [err175];
 }
@@ -21927,8 +25807,8 @@ errors++;
 }
 }
 if(data59.signRules !== undefined){
-if(!func0(data59.signRules, schema165.properties.signRules.const)){
-const err183 = {instancePath:instancePath+"/payload/convergence/signRules",schemaPath:"#/$defs/ConvergenceInput/properties/signRules/const",keyword:"const",params:{allowedValue: schema165.properties.signRules.const},message:"must be equal to constant"};
+if(!func0(data59.signRules, schema172.properties.signRules.const)){
+const err183 = {instancePath:instancePath+"/payload/convergence/signRules",schemaPath:"#/$defs/ConvergenceInput/properties/signRules/const",keyword:"const",params:{allowedValue: schema172.properties.signRules.const},message:"must be equal to constant"};
 if(vErrors === null){
 vErrors = [err183];
 }
@@ -22071,20 +25951,20 @@ vErrors.push(err194);
 }
 errors++;
 }
-validate77.errors = vErrors;
+validate80.errors = vErrors;
 return errors === 0;
 }
-validate77.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate80.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
-export const validatePostSpecV1Input = validate78;
-const schema166 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/post-spec/v1/input","title":"PostSpec v1 authoring input envelope","$comment":"ADR-006 D8-2","$defs":{"length":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"post-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","properties":{"tier1":{"const":{"summary":true,"timeseries":true}},"tier2":{"type":"object","required":["slices"],"properties":{"slices":{"type":"array","prefixItems":[{"type":"object","required":["axis","offsetM","fields"],"properties":{"axis":{"const":"z"},"offsetM":{"$ref":"#/$defs/length"},"fields":{"const":["p","T"]}},"additionalProperties":false}],"items":false,"minItems":1,"maxItems":1}},"additionalProperties":false}},"additionalProperties":false}},"additionalProperties":false};
-const schema167 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]};
+export const validatePostSpecV1Input = validate81;
+const schema173 = {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://gyrox.dev/schemas/post-spec/v1/input","title":"PostSpec v1 authoring input envelope","$comment":"ADR-006 D8-2","$defs":{"length":{"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]}},"type":"object","required":["kind","schemaVersion","payload"],"properties":{"kind":{"const":"post-spec"},"schemaVersion":{"const":1},"payload":{"type":"object","properties":{"tier1":{"const":{"summary":true,"timeseries":true}},"tier2":{"type":"object","required":["slices"],"properties":{"slices":{"type":"array","prefixItems":[{"type":"object","required":["axis","offsetM","fields"],"properties":{"axis":{"const":"z"},"offsetM":{"$ref":"#/$defs/length"},"fields":{"const":["p","T"]}},"additionalProperties":false}],"items":false,"minItems":1,"maxItems":1}},"additionalProperties":false}},"additionalProperties":false}},"additionalProperties":false};
+const schema174 = {"oneOf":[{"type":"number"},{"type":"object","required":["value","unit"],"properties":{"value":{"type":"number"},"unit":{"enum":["m","mm","um"]}},"additionalProperties":false}]};
 
-function validate78(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
+function validate81(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
 /*# sourceURL="https://gyrox.dev/schemas/post-spec/v1/input" */;
 let vErrors = null;
 let errors = 0;
-const evaluated0 = validate78.evaluated;
+const evaluated0 = validate81.evaluated;
 if(evaluated0.dynamicProps){
 evaluated0.props = undefined;
 }
@@ -22174,8 +26054,8 @@ errors++;
 }
 }
 if(data2.tier1 !== undefined){
-if(!func0(data2.tier1, schema166.properties.payload.properties.tier1.const)){
-const err7 = {instancePath:instancePath+"/payload/tier1",schemaPath:"#/properties/payload/properties/tier1/const",keyword:"const",params:{allowedValue: schema166.properties.payload.properties.tier1.const},message:"must be equal to constant"};
+if(!func0(data2.tier1, schema173.properties.payload.properties.tier1.const)){
+const err7 = {instancePath:instancePath+"/payload/tier1",schemaPath:"#/properties/payload/properties/tier1/const",keyword:"const",params:{allowedValue: schema173.properties.payload.properties.tier1.const},message:"must be equal to constant"};
 if(vErrors === null){
 vErrors = [err7];
 }
@@ -22361,7 +26241,7 @@ errors++;
 if(data8.unit !== undefined){
 let data10 = data8.unit;
 if(!(((data10 === "m") || (data10 === "mm")) || (data10 === "um"))){
-const err22 = {instancePath:instancePath+"/payload/tier2/slices/0/offsetM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema167.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
+const err22 = {instancePath:instancePath+"/payload/tier2/slices/0/offsetM/unit",schemaPath:"#/$defs/length/oneOf/1/properties/unit/enum",keyword:"enum",params:{allowedValues: schema174.oneOf[1].properties.unit.enum},message:"must be equal to one of the allowed values"};
 if(vErrors === null){
 vErrors = [err22];
 }
@@ -22416,8 +26296,8 @@ vErrors = null;
 }
 }
 if(data6.fields !== undefined){
-if(!func0(data6.fields, schema166.properties.payload.properties.tier2.properties.slices.prefixItems[0].properties.fields.const)){
-const err25 = {instancePath:instancePath+"/payload/tier2/slices/0/fields",schemaPath:"#/properties/payload/properties/tier2/properties/slices/prefixItems/0/properties/fields/const",keyword:"const",params:{allowedValue: schema166.properties.payload.properties.tier2.properties.slices.prefixItems[0].properties.fields.const},message:"must be equal to constant"};
+if(!func0(data6.fields, schema173.properties.payload.properties.tier2.properties.slices.prefixItems[0].properties.fields.const)){
+const err25 = {instancePath:instancePath+"/payload/tier2/slices/0/fields",schemaPath:"#/properties/payload/properties/tier2/properties/slices/prefixItems/0/properties/fields/const",keyword:"const",params:{allowedValue: schema173.properties.payload.properties.tier2.properties.slices.prefixItems[0].properties.fields.const},message:"must be equal to constant"};
 if(vErrors === null){
 vErrors = [err25];
 }
@@ -22497,7 +26377,7 @@ vErrors.push(err31);
 }
 errors++;
 }
-validate78.errors = vErrors;
+validate81.errors = vErrors;
 return errors === 0;
 }
-validate78.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
+validate81.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
