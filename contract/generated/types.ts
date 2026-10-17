@@ -421,18 +421,321 @@ export type ResourceEstimateV1 = {
 }[];
 };
 
-export type ExportBundleV1 = {
-  "schemaVersion": 1;
+export type ExportBundleV2 = {
+  "schemaVersion": 2;
+  "exportedAt": string;
   "revision": string;
   "recipe": {
   "kind": string;
   "hash": string;
 };
+  "source": {
+  "orgId": string;
+  "runId": string;
+  "manifestHash": string;
+  "documentSha256": string;
+  "specHashes": {
+  "geometry": string;
+  "discretization": string;
+  "solve": string;
+  "post": string;
+};
+};
+  "specs": {
+  "geometry": {
+  "kind": "geometry-spec";
+  "schemaVersion": 1;
+  "payload": {
+  "pattern": "gyroid";
+  "cellSizeM": {
+  "kind": "const";
+  "valueM": number;
+};
+  "wallThicknessM": {
+  "kind": "const";
+  "valueM": number;
+};
+  "splitting": "fullwall";
+  "envelope": {
+  "kind": "box";
+  "sizeM": number[];
+};
+  "ports": ({
+  "id": "hot-inlet";
+  "domain": "hot";
+  "face": "-x" | "+x" | "-y" | "+y" | "-z" | "+z";
+} | {
+  "id": "hot-outlet";
+  "domain": "hot";
+  "face": "-x" | "+x" | "-y" | "+y" | "-z" | "+z";
+} | {
+  "id": "cold-inlet";
+  "domain": "cold";
+  "face": "-x" | "+x" | "-y" | "+y" | "-z" | "+z";
+} | {
+  "id": "cold-outlet";
+  "domain": "cold";
+  "face": "-x" | "+x" | "-y" | "+y" | "-z" | "+z";
+})[] & unknown[];
+};
+};
+  "discretization": {
+  "kind": "discretization-spec";
+  "schemaVersion": 1;
+  "payload": {
+  "route": "voxel-hexa";
+  "voxelPitchM": number;
+  "qa": {
+  "maxNonOrtho": 65;
+  "maxBoundarySkewness": 20;
+  "maxInternalSkewness": 4;
+  "maxConcave": 80;
+  "minVol": 1e-18;
+  "minTetQuality": 1e-15;
+  "minArea": -1;
+  "minTwist": 0.02;
+  "minDeterminant": 0.001;
+  "minFaceWeight": 0.05;
+  "minVolRatio": 0.01;
+  "minTriangleTwist": -1;
+  "minEdgeLength": -1;
+};
+};
+};
+  "solve": {
+  "kind": "solve-spec";
+  "schemaVersion": 1;
+  "payload": {
+  "backend": "openfoam-cht";
+  "solver": "chtMultiRegionSimpleFoam";
+  "materials": {
+  "hot": {
+  "rhoKgM3": number;
+  "cpJKgK": number;
+  "muPaS": number;
+  "prandtl": number;
+};
+  "cold": {
+  "rhoKgM3": number;
+  "cpJKgK": number;
+  "muPaS": number;
+  "prandtl": number;
+};
+  "solid": {
+  "rhoKgM3": number;
+  "cpJKgK": number;
+  "kWMK": number;
+};
+};
+  "bc": [{
+  "featureRef": "port:hot-inlet";
+  "kind": "flowRateInlet";
+  "mdotKgS": number;
+  "tK": number;
+}, {
+  "featureRef": "port:cold-inlet";
+  "kind": "flowRateInlet";
+  "mdotKgS": number;
+  "tK": number;
+}];
+  "numerics": {
+  "energyCouplingIters": 25;
+  "hTol": 0.000001;
+  "writePrecision": 10;
+  "relaxation": {
+  "fluid": {
+  "rho": 1;
+  "pRgh": 0.7;
+  "U": 0.3;
+  "h": 0.5;
+};
+  "solid": {
+  "h": 0.7;
+};
+};
+};
+  "convergence": {
+  "windowIters": 200;
+  "windowMeanDriftPct": 0.5;
+  "windowMeanSpanPct": 0.5;
+  "windowMeanTailW": 200;
+  "transientFrac": 0.2;
+  "windowMeanMinIters": 500;
+  "instSpanPct": 0.5;
+  "judgedQoI": ["dpHotPa","dpColdPa","qW"];
+  "tOutDriftK": 0.1;
+  "tOutSpanK": 0.1;
+  "ebMaxPct": 1;
+  "ebWarnPct": 0.7;
+  "massImbalanceMaxPct": 0.1;
+  "signSanity": true;
+  "finiteRequired": true;
+  "signRules": {"flowDirection":{"hot":{"inlet":"negative","outlet":"positive"},"cold":{"inlet":"negative","outlet":"positive"}},"pressureDirection":{"dpHotPa":"positive","dpColdPa":"positive"},"wallHeatFluxDirection":{"hot":"negative","cold":"positive"}};
+  "minIterationsForJudgment": 400;
+  "residualBlowupFactor": 1000;
+  "divergenceCheckScope": "judgedQoI+signRules";
+};
+  "limits": {
+  "maxIters": number;
+};
+};
+};
+  "post": {
+  "kind": "post-spec";
+  "schemaVersion": 1;
+  "payload": {
+  "tier1": {"summary":true,"timeseries":true};
+  "tier2": {"slices":[{"axis":"z","offsetM":0.015,"fields":["p","T"]}]};
+};
+};
+};
+  "document": {
+  "schemaVersion": 1;
+  "nodes": {
+  [key: string]: {
+  "type": string;
+  "parentId": string | null;
+  "params": {
+  [key: string]: null | boolean | number | string | unknown[] | unknown;
+};
+  "meta": {
+  [key: string]: null | boolean | number | string | unknown[] | unknown;
+};
+};
+};
+  "rootId": string;
+};
+  "summary": {
+  "dpHotPa": number | null;
+  "dpColdPa": number | null;
+  "mdotHotKgS": number | null;
+  "mdotColdKgS": number | null;
+  "fFactor": number | null;
+  "qW": number | null;
+  "qHotW": number | null;
+  "qColdW": number | null;
+  "effectiveness": number | null;
+  "ntu": number | null;
+  "uaWK": number | null;
+  "jFactor": number | null;
+  "tOutHotK": number | null;
+  "tOutColdK": number | null;
+  "energyBalancePct": number | null;
+  "converged": boolean | null;
+  "convergenceAxes": null | {
+  "perQoI": {
+  "dpHotPa": {
+  "drift": {
+  "pass": boolean;
+  "driftPct": number;
+};
+  "span": {
+  "pass": boolean;
+  "spanPct": number;
+};
+  "instSpanPct": number;
+  "amplitudePct": number;
+};
+  "dpColdPa": {
+  "drift": {
+  "pass": boolean;
+  "driftPct": number;
+};
+  "span": {
+  "pass": boolean;
+  "spanPct": number;
+};
+  "instSpanPct": number;
+  "amplitudePct": number;
+};
+  "qW": {
+  "drift": {
+  "pass": boolean;
+  "driftPct": number;
+};
+  "span": {
+  "pass": boolean;
+  "spanPct": number;
+};
+  "instSpanPct": number;
+  "amplitudePct": number;
+};
+};
+  "tOutHot": {
+  "driftK": number;
+  "spanK": number;
+  "pass": boolean;
+};
+  "tOutCold": {
+  "driftK": number;
+  "spanK": number;
+  "pass": boolean;
+};
+  "eb": {
+  "windowMeanPct": number;
+  "flag": "ok" | "warn" | "owner_escalate";
+  "pass": boolean;
+};
+  "mass": {
+  "hotPct": number;
+  "coldPct": number;
+  "pass": boolean;
+};
+  "sign": {
+  "pass": boolean;
+};
+  "finite": {
+  "pass": boolean;
+};
+  "insufficient": boolean;
+};
+  "convergenceNotice": null | {
+  "noticeId": "nonconverged-partial";
+};
+  "iterations": number | null;
+  "wallClockS": number | null;
+  "cells": number | null;
+  "windowMeanConverged": boolean | null;
+  "dpHotWindowMeanConverged": boolean | null;
+  "verification": {
+  "dpHot": {
+  "status": "verified_fixture_limited";
+  "bandPct": 0.25;
+  "fixtureId": "gyroid-core-30@v1";
+  "anchorLevel": "CL2";
+} | {
+  "status": "regression_only";
+};
+  "dpCold": {"status":"judgment_not_established","ref":"D-M06-1"};
+  "thermal": {"status":"unverified_underprediction","noticeId":"D8-2","dm051":true};
+  "holds": null | {
+  "axis": string;
+  "ref": string;
+}[];
+};
+} | null;
+  "notices": ({
+  "noticeId": "D8-2" | "dp-hot-fixture-limited" | "dp-cold-not-established" | "nonconverged-partial" | "governance-hold" | "dp-hot-out-of-scope" | "export-snapshot";
+  "ko": string;
+  "en": string;
+})[] & unknown[];
   "artifacts": {
   "kind": string;
   "hash": string;
+  "path": string;
+  "mediaType": string;
+  "meta": {
+  "units"?: string;
+  "coordinateSystem"?: string;
+  "semanticRole"?: string;
+};
+  "derivedFrom"?: string;
 }[];
-  "notices": ("D8-2" | "dp-hot-fixture-limited" | "dp-cold-not-established" | "nonconverged-partial" | "governance-hold")[];
+  "absentKinds": string[];
+  "scope": {
+  "isFixtureCase": boolean;
+  "anchorsRevision": number;
+};
 };
 
 export type PatchMapV1 = ({
@@ -788,7 +1091,7 @@ export interface ContractTypeMap {
 
   "resource-estimate": ResourceEstimateV1;
 
-  "export-bundle": ExportBundleV1;
+  "export-bundle": ExportBundleV2;
 
   "patch-map": PatchMapV1;
 

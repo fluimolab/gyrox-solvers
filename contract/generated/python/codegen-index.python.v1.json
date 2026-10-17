@@ -94,7 +94,7 @@
     "schemas/post-manifest.v1.schema.json",
     "schemas/summary.v1.schema.json",
     "schemas/resource-estimate.v1.schema.json",
-    "schemas/export-bundle.v1.schema.json",
+    "schemas/export-bundle.v2.schema.json",
     "schemas/patch-map.v1.schema.json",
     "schemas/convert-report.v1.schema.json",
     "schemas/solve-report.v1.schema.json",

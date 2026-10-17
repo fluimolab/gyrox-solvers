@@ -25,7 +25,7 @@ export declare const validateCheckpointDeclarationV1: StandaloneValidateFunction
 export declare const validatePostManifestV1: StandaloneValidateFunction;
 export declare const validateSummaryV1: StandaloneValidateFunction;
 export declare const validateResourceEstimateV1: StandaloneValidateFunction;
-export declare const validateExportBundleV1: StandaloneValidateFunction;
+export declare const validateExportBundleV2: StandaloneValidateFunction;
 export declare const validatePatchMapV1: StandaloneValidateFunction;
 export declare const validateConvertReportV1: StandaloneValidateFunction;
 export declare const validateSolveReportV1: StandaloneValidateFunction;
